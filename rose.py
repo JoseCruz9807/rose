@@ -110,52 +110,6 @@ t_RIGHTKEY= r'\}'
 t_LEFTPARENTHESIS= r'\('
 t_RIGHTPARENTHESIS= r'\)'
 
-t_INT= r'int'
-t_IF= r'if'
-t_FLOAT= r'float'
-t_ELSE= r'else'
-t_STRING= r'string'
-t_FALSE= r'false'
-t_WHILE= r'while'
-t_BOOL= r'bool'
-t_TRUE= r'true'
-t_SIN= r'sin'
-t_COS= r'cos'
-t_OR= r'OR'
-t_AND= r'AND'
-t_TAN= r'tan'
-t_PRINT= r'print'
-t_RETURN= r'return'
-t_READ= r'read'
-t_SQRT= r'sqrt'
-t_POW= r'pow'
-t_ABS= r'abs'
-t_GRAPH= r'graph'
-t_STDEV= r'stdev'
-t_MEAN= r'mean'
-t_MEDIAN= r'median'
-t_MODE= r'mode'
-t_FACTORIAL= r'factorial'
-t_SORT= r'sort'
-t_LINREG= r'linreg'
-t_FUNCTION= r'function'
-
-###CHECAR SI APPEND SE QUEDA
-t_APPEND= r'append'
-
-t_MAIN= r'main'
-t_EXPORTCSV= r'exportCSV'
-t_ARRANGE= r'arrange'
-t_GRAPH3D= r'graph3d'
-t_PIECHART= r'pieChart'
-t_LINECHART= r'lineChart'
-t_BARCHART= r'barChart'
-t_HISTOGRAMCHART= r'histogramChart'
-t_TRANSPOSE= r'transpose'
-t_GLOBALS= r'globals'
-t_PROGRAM= r'program'
-
-
 
 t_ignore = r' '
 
@@ -209,12 +163,12 @@ def t_ID (t):
         t.type='TAN'
     elif t.value=='transpose':
         t.type='TRANSPOSE'
-    elif t.value=='TRUE':
-        t.type='TRUE'
+    elif t.value=='true':
+        t.type='CTEB'
     elif t.value=='while':
         t.type='WHILE'
     elif t.value=='false':
-        t.type='FALSE'
+        t.type='CTEB'
     elif t.value=='bool':
         t.type='BOOL'
     elif t.value=='cos':
@@ -279,136 +233,6 @@ while True:
     print (tok)
 """
 
-
-
-"""
-PATITO
-def p_patito(p):
-    '''
-    patito : PROGRAM ID SEMICOLON vars bloque
-            | PROGRAM ID SEMICOLON bloque
-    '''
-    print("Exito")
-
-def p_bloque(p):
-    '''
-    bloque : LEFTBRACKET b RIGHTBRACKET
-    '''
-def p_b(p):
-    '''
-    b : estatuto b
-        | empty
-    '''
-
-def p_estatuto(p):
-    '''
-    estatuto : asignacion
-            | condicion
-            | escritura
-    '''
-
-def p_vars(p):
-    '''
-    vars : GLOBALS c
-    '''
-
-
-def p_c(p):
-    '''
-    c : ID COMMA c
-        | ID COLON tipo SEMICOLON c
-        | ID COLON tipo SEMICOLON
-    '''
-
-def p_tipo(p):
-    '''
-    tipo : INT 
-        | FLOAT
-    '''
-
-def p_asignacion(p):
-    '''
-    asignacion : ID EQUALS expresion SEMICOLON
-    '''
-
-def p_escritura(p):
-    '''
-    escritura : PRINT LEFTPARENTHESIS e RIGHTPARENTHESIS SEMICOLON
-    '''
-
-def p_e(p):
-    '''
-    e : expresion PERIOD e
-        | CTES PERIOD e
-        | CTES
-        | expresion
-        | empty
-    '''
-
-
-def p_expresion(p):
-    '''
-    expresion : exp GT exp
-                | exp LT exp
-                | exp DIFFERENT exp
-                | exp
-    '''
-
-def p_exp(p):
-    '''
-    exp : termino g
-    '''
-
-
-def p_g(p):
-    '''
-    g : PLUS termino g
-        | MINUS termino g
-        | empty
-    '''
-
-def p_condicion(p):
-    '''
-    condicion : IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque h SEMICOLON
-    '''
-
-def p_h(p):
-    '''
-    h : ELSE bloque 
-        | empty
-    '''
-
-def p_termino(p):
-    '''
-    termino : factor i
-            | factor
-    '''
-
-def p_i(p):
-    '''
-    i : MULTIPLY factor i
-        | DIVIDE factor i
-        | MULTIPLY factor
-        | DIVIDE factor
-    '''
-
-def p_factor(p):
-    '''
-    factor : LEFTPARENTHESIS expresion RIGHTPARENTHESIS
-            | PLUS varcte
-            | MINUS varcte
-            | varcte
-    '''
-
-def p_varcte(p):
-    '''
-    varcte : ID
-            | CTEI
-            | CTEF
-    '''
-
-"""
-
 def p_rose(p):
     '''
     rose : PROGRAM ID SEMICOLON roseaux main
@@ -438,14 +262,16 @@ def p_vars(p):
 	vars: tipo ID varsaux SEMICOLON
 	'''
 def p_varsaux(p):
-###MAYBE HAY ISSUE AQUI	
 	'''
-	varsaux:	arreglo asigna
-			|	arreglo arreglo asigna
+	varsaux:	arreglo varsaux1
 			|	EQUALS varscte
 			|	empty
 	'''
-
+def p_varsaux1(p):
+	'''
+	varsaux1:	asigna
+			|	arreglo asigna
+	'''
 
 def p_arreglo(p):
 	'''
@@ -453,12 +279,16 @@ def p_arreglo(p):
 	'''
 
 def p_asigna(p):
-#MAYBE HAY ISSUE AQUI 
 	'''
-	asigna	:	EQUALS unidimensional
-			|	EQUALS bidimensional
+	asigna	:	EQUALS asigna1
 			|	empty
 	'''
+def p_asigna1(p):
+	'''
+	asigna1	:	unidimensional
+			|	bidimensional
+	'''
+
 
 def p_unidimensional(p):
 	'''
@@ -479,7 +309,6 @@ def p_bidi1(p):
 	bidi1	:	COMMA unidimensional
 			|	empty
 	'''
-
 
 
 def p_expcomp(p):
@@ -530,7 +359,7 @@ def p_termino(p):
 	'''
 def p_ter1(p):
 	'''
-	ter	:	MULTIPLY termino
+	ter1:	MULTIPLY termino
 		|	DIVIDE termino
 	'''
 
@@ -538,17 +367,164 @@ def p_factor(p):
 	'''
 	factor	:	PLUS varscte
 			|	MINUS varscte
+			|	varscte
 			|	LEFTPARENTHESIS exp RIGHTPARENTHESIS
 	'''
 
-###
-###TE QUEDASTE EN FUNC
-###
+def p_func(p):
+	'''
+	func	:	func1 LEFTPARENTHESIS func2 RIGHTPARENTHESIS bloque
+	'''
+def p_func1(p):
+	'''
+	func1	:	tipo
+			|	FUNC
+	'''
+def p_func2(p):
+	'''
+	func2	:	tipo func3
+	'''
+def p_func3(p):
+	'''
+	func3	:	ID tiposid func4
+	'''
+def p_func4(p):
+	'''
+	func4	:	COMMA ID func3
+			| 	SEMICOLON func5
+	'''
+def p_func5(p):
+	'''
+	func5	:	func2
+			| 	empty
+	'''
+
+def p_tiposid(p):
+    '''
+    tiposid : LEFTBRACKET exp RIGHTBRACKET tiposid1
+    		| empty
+    '''
+def p_tiposid1(p):
+    '''
+    tiposid1: LEFTBRACKET exp RIGHTBRACKET
+    		| empty
+    '''
+
+def p_condition(p):
+    '''
+    condition 	: IF LEFTPARENTHESIS expcomp RIGHTPARENTHESIS bloque condi1
+    '''
+def p_condi1(p):
+    '''
+    condi1 	: 	ELSE bloque
+    		|	empty
+    '''
+
+def p_bloque(p):
+    '''
+    bloque 	: 	LEFTKEY bloque1 RIGHTKEY
+    '''
+def p_bloque1(p):
+    '''
+    bloque1	: 	estatuto
+    		|	empty
+    '''
+
+def p_estatuto(p):
+    '''
+    estatuto 	: 	estatuto1 estatuto2
+    '''
+def p_estatuto1(p):
+    '''
+    estatuto1 	: 	vars estatuto1
+    			|	empty
+    '''
+def p_estatuto2(p):
+    '''
+    estatuto2 	: 	condition estatuto2
+    			|	escritura estatuto2
+    			|	lectura estatuto2
+    			|	specfun estatuto2
+    			|	asignacion estatuto2
+    			|	durante estatuto2
+    			|	empty
+    '''
+
+def p_varscte(p):
+	'''
+    varscte : ID tiposid
+    		| CTEI
+    		| CTEF
+    		| CTES
+    		| CTEB
+    ''' 
+
+def p_asignacion(p):
+	'''
+    asignacion : ID tiposid EQUALS expcomp SEMICOLON
+    ''' 
+
+def p_escritura(p):
+	'''
+    lectura : PRINT LEFTPARENTHESISI escri1 RIGHTPARENTHESIS SEMICOLON
+    ''' 
+def p_escri1(p):
+	'''
+    escri1 : expcomp escri2
+    ''' 
+def p_escri2(p):
+	'''
+    escri2 	: PLUS escri1
+			| empty
+    ''' 
+
+def p_lectura(p):
+	'''
+    lectura : READ LEFTPARENTHESIS ID tiposid LEFTPARENTHESIS SEMICOLON
+    '''
+
+def p_specfun(p):
+	'''
+    specfun : specfun1 LEFTPARENTHESIS specfun2 RIGHTPARENTHESIS SEMICOLON
+    ''' 
+
+########################
+# Nombres de funciones #
+########################
+def p_specfun1(p):
+	'''
+    specfun1: SQRT
+    		| POW
+    		| ABS
+    		| STDEV
+    		| MEAN
+    		| MEDIAN
+    		| MODE
+    		| FACTORIAL
+    		| SORT
+    		| SIN
+    		| COS
+    		| TRANSPOSE
+    		| EXPORTCSV
+    		| ARRANGE
+    		
+    ''' 
+def p_specfun2(p):
+	'''
+    specfun2: varscte specfun3
+    		| empty
+    ''' 
+def p_specfun3(p):
+	'''
+    specfun3: COMMA specfun2
+    		| empty
+	'''
+
 
 def p_empty(p):
-    '''
-    empty : 
-    '''
+	'''
+    empty :
+    ''' 
 
 def p_error(p):
     print ("Error de compilacion")
