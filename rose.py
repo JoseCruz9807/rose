@@ -1,4 +1,4 @@
-|import ply.lex as lex
+import ply.lex as lex
 import ply.yacc as yacc
 import sys
 
@@ -458,8 +458,25 @@ def p_estatuto2(p):
     			|	specfun estatuto2
     			|	asignacion estatuto2
     			|	durante estatuto2
+    			| 	llamafunc estatuto2
     			|	empty
     '''
+
+def p_llamafunc(p):
+	'''
+    llamafunc : ID LEFTPARENTHESIS llamafunc1 RIGHTPARENTHESIS SEMICOLON
+    ''' 
+def p_llamafunc1(p):
+	'''
+    llamafunc1 : ID tiposid llamafunc2
+    ''' 
+def p_llamafunc2(p):
+	'''
+    llamafunc2  : COMMA llamafunc1
+    			| empty
+    ''' 
+
+
 
 def p_varscte(p):
 	'''
