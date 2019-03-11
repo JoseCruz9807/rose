@@ -235,7 +235,7 @@ while True:
 
 def p_rose(p):
     '''
-    rose : PROGRAM ID SEMICOLON roseaux main
+    rose : PROGRAM ID SEMICOLON roseaux MAIN main
     '''
     print("Exito")
 
