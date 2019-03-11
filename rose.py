@@ -1,4 +1,4 @@
-import ply.lex as lex
+|import ply.lex as lex
 import ply.yacc as yacc
 import sys
 
@@ -310,6 +310,17 @@ def p_bidi1(p):
 	'''
 
 
+def p_megaexp(p):
+	'''
+	megaexp	:	expcomp megaexp1
+	'''
+def p_megaexp1(p):
+	'''
+	megaexp1	:	logicalexp
+				|	empty
+	'''
+
+
 def p_expcomp(p):
 	'''
 	expcomp	:	exp expcomp1
@@ -321,8 +332,7 @@ def p_expcomp1(p):
 	'''
 def p_expcomp2(p):
 	'''
-	expcomp2 :	logicalexp exp
-			 |	GTEQ exp
+	expcomp2 :	GTEQ exp
 			 |	LTEQ exp
 			 |	EQUIVALENTE exp
 			 |	GT exp
@@ -338,7 +348,7 @@ def p_logicalexp(p):
 
 def p_durante(p):
 	'''
-	durante	:	WHILE LEFTPARENTHESIS expcomp RIGHTPARENTHESIS bloque
+	durante	:	WHILE LEFTPARENTHESIS megaexp RIGHTPARENTHESIS bloque
 			
 	'''
 
@@ -413,7 +423,7 @@ def p_tiposid1(p):
 
 def p_condition(p):
     '''
-    condition 	: IF LEFTPARENTHESIS expcomp RIGHTPARENTHESIS bloque condi1
+    condition 	: IF LEFTPARENTHESIS megaexp RIGHTPARENTHESIS bloque condi1
     '''
 def p_condi1(p):
     '''
@@ -462,7 +472,7 @@ def p_varscte(p):
 
 def p_asignacion(p):
 	'''
-    asignacion : ID tiposid EQUALS expcomp SEMICOLON
+    asignacion : ID tiposid EQUALS exp SEMICOLON
     ''' 
 
 def p_escritura(p):
@@ -471,7 +481,7 @@ def p_escritura(p):
     ''' 
 def p_escri1(p):
 	'''
-    escri1 : expcomp escri2
+    escri1 : megaexp escri2
     ''' 
 def p_escri2(p):
 	'''
