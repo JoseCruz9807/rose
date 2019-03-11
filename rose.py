@@ -72,7 +72,9 @@ tokens = [
     'ABS',
     'QUOTE',
     'NOT',
-    'OR'
+    'OR' ,
+	'LEFTKEY',
+	'RIGHTKEY'
 ]
 
 #MultiCommentOpen
@@ -91,6 +93,8 @@ t_MINUS= r'\-'
 t_DIVIDE= r'\/'
 t_MULTIPLY= r'\*'
 t_QUOTE= r'\"'
+
+t_DIFFERENT= r'\!\='
 t_NOT= r'\!'
 t_GTEQ= r'\>\='
 t_LTEQ= r'\<\='
@@ -99,9 +103,10 @@ t_EQUIVALENTE= r'\=\='
 t_EQUALS= r'\='
 t_GT= r'\>'
 t_LT= r'\<'
-t_DIFFERENT= r'\!\='
-t_LEFTBRACKET= r'\{'
-t_RIGHTBRACKET= r'\}'
+t_LEFTBRACKET= r'\['
+t_RIGHTBRACKET= r'\]'
+t_LEFTKEY= r'\{'
+t_RIGHTKEY= r'\}'
 t_LEFTPARENTHESIS= r'\('
 t_RIGHTPARENTHESIS= r'\)'
 
@@ -275,13 +280,15 @@ while True:
 """
 
 
-def p_rose(p):
+
+"""
+PATITO
+def p_patito(p):
     '''
-    rose : PROGRAM ID SEMICOLON vars bloque
+    patito : PROGRAM ID SEMICOLON vars bloque
             | PROGRAM ID SEMICOLON bloque
     '''
     print("Exito")
-
 
 def p_bloque(p):
     '''
@@ -399,6 +406,144 @@ def p_varcte(p):
             | CTEI
             | CTEF
     '''
+
+"""
+
+def p_rose(p):
+    '''
+    rose : PROGRAM ID SEMICOLON roseaux main
+    '''
+    print("Exito")
+
+
+def p_roseaux(p):
+    '''
+	roseaux :	GLOBALS vars roseaux2 roseaux3
+			| 	func roseaux3
+			|	empty
+    '''
+def p_roseaux2(p):
+    '''
+	roseaux2:	vars roseaux2
+			|	empty
+	'''
+def p_roseaux3(p):
+    '''
+	roseaux3:	func roseaux3
+			|	empty
+	'''
+
+def p_vars(p):
+	'''
+	vars: tipo ID varsaux SEMICOLON
+	'''
+def p_varsaux(p):
+###MAYBE HAY ISSUE AQUI	
+	'''
+	varsaux:	arreglo asigna
+			|	arreglo arreglo asigna
+			|	EQUALS varscte
+			|	empty
+	'''
+
+
+def p_arreglo(p):
+	'''
+	arreglo:	LEFTBRACKET varscte RIGHTBRACKET
+	'''
+
+def p_asigna(p):
+#MAYBE HAY ISSUE AQUI 
+	'''
+	asigna	:	EQUALS unidimensional
+			|	EQUALS bidimensional
+			|	empty
+	'''
+
+def p_unidimensional(p):
+	'''
+	unidimensional:	LEFTKEY varscte unidime1 RIGHTKEY
+	'''
+def p_unidime1(p):
+	'''
+	unidime1:	COMMA varscte unidime1
+			|	empty
+	'''
+
+def p_bidimensional(p):
+	'''
+	bidimensional:	LEFTKEY unidimensional bidi1 RIGHTKEY
+	'''
+def p_bidi1(p):
+	'''
+	bidi1	:	COMMA unidimensional
+			|	empty
+	'''
+
+
+
+def p_expcomp(p):
+	'''
+	expcomp	:	exp expcomp1
+	'''
+def p_expcomp1(p):
+	'''
+	expcomp1:	expcomp2
+			|	empty
+	'''
+def p_expcomp2(p):
+	'''
+	expcomp2:	logicalexp exp
+			|	GTEQ exp
+			|	LTEQ exp
+			|	EQUIVALENTE exp
+			|	GT exp
+			|	LT exp
+			|	DIFFERENT exp
+	'''
+
+def p_logicalexp(p):
+	'''
+	logicalexp	:	OR
+				|	AND
+	'''
+
+def p_durante(p):
+	'''
+	durante	:	WHILE LEFTPARENTHESIS expcomp RIGHTPARENTHESIS bloque
+			
+	'''
+
+def p_exp(p):
+	'''
+	exp	:	termino exp1
+	'''
+def p_exp1(p):
+	'''
+	exp1:	PLUS exp
+		|	MINUS exp
+	'''
+
+def p_termino(p):
+	'''
+	termino	:	factor ter1
+	'''
+def p_ter1(p):
+	'''
+	ter	:	MULTIPLY termino
+		|	DIVIDE termino
+	'''
+
+def p_factor(p):
+	'''
+	factor	:	PLUS varscte
+			|	MINUS varscte
+			|	LEFTPARENTHESIS exp RIGHTPARENTHESIS
+	'''
+
+###
+###TE QUEDASTE EN FUNC
+###
 
 def p_empty(p):
     '''
