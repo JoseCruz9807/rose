@@ -15,7 +15,6 @@ Unused terminals:
     FACTORIAL
     FALSE
     FUNCTION
-    GET
     GRAPH
     GRAPH3D
     GTEQ
@@ -36,7 +35,6 @@ Unused terminals:
     QUOTE
     READ
     RETURN
-    SET
     SIN
     SORT
     SQRT
@@ -123,7 +121,6 @@ FACTORIAL            :
 FALSE                : 
 FLOAT                : 14
 FUNCTION             : 
-GET                  : 
 GLOBALS              : 9
 GRAPH                : 
 GRAPH3D              : 
@@ -161,7 +158,6 @@ RETURN               :
 RIGHTBRACKET         : 3
 RIGHTPARENTHESIS     : 16 30 39
 SEMICOLON            : 1 2 11 12 15 16 30
-SET                  : 
 SIN                  : 
 SORT                 : 
 SQRT                 : 

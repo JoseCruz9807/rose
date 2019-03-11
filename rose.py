@@ -70,11 +70,6 @@ tokens = [
     'AND',
     'TAN',
     'ABS',
-
-	###CHECAR SI ESTAS SE QUEDAN O SE VAN
-    'GET',
-    'SET',
-
     'QUOTE',
     'NOT',
     'OR'
@@ -130,12 +125,6 @@ t_READ= r'read'
 t_SQRT= r'sqrt'
 t_POW= r'pow'
 t_ABS= r'abs'
-
-###CHECAR SI SE QUEDAN O SE VAN SET Y GET
-t_GET= r'get'
-t_SET= r'set'
-###
-
 t_GRAPH= r'graph'
 t_STDEV= r'stdev'
 t_MEAN= r'mean'
@@ -201,17 +190,6 @@ def t_ID (t):
         t.type='READ'
     elif t.value=='return':
         t.type='RETURN'
-    
-
-
-	###CHECAR SI ESTOS SEQUEDAN O SE VAN
-    elif t.value=='set':
-        t.type='SET'
-    elif t.value=='get':
-        t.type='GET'
-
-
-
     elif t.value=='sin':
         t.type='SIN'
     elif t.value=='sort':
