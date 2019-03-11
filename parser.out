@@ -1,0 +1,1344 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> patito
+Rule 1     patito -> PROGRAM ID SEMICOLON vars bloque
+Rule 2     patito -> PROGRAM ID SEMICOLON bloque
+Rule 3     bloque -> LEFTBRACKET b RIGHTBRACKET
+Rule 4     b -> estatuto b
+Rule 5     b -> empty
+Rule 6     estatuto -> asignacion
+Rule 7     estatuto -> condicion
+Rule 8     estatuto -> escritura
+Rule 9     vars -> VAR c
+Rule 10    c -> ID COMMA c
+Rule 11    c -> ID COLON tipo SEMICOLON c
+Rule 12    c -> ID COLON tipo SEMICOLON
+Rule 13    tipo -> INT
+Rule 14    tipo -> FLOAT
+Rule 15    asignacion -> ID EQUALS expresion SEMICOLON
+Rule 16    escritura -> PRINT LEFTPARENTHESIS e RIGHTPARENTHESIS SEMICOLON
+Rule 17    e -> expresion PERIOD e
+Rule 18    e -> CTES PERIOD e
+Rule 19    e -> CTES
+Rule 20    e -> expresion
+Rule 21    e -> empty
+Rule 22    expresion -> exp GT exp
+Rule 23    expresion -> exp LT exp
+Rule 24    expresion -> exp DIFFERENT exp
+Rule 25    expresion -> exp
+Rule 26    exp -> termino g
+Rule 27    g -> PLUS termino g
+Rule 28    g -> MINUS termino g
+Rule 29    g -> empty
+Rule 30    condicion -> IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque h SEMICOLON
+Rule 31    h -> ELSE bloque
+Rule 32    h -> empty
+Rule 33    termino -> factor i
+Rule 34    termino -> factor
+Rule 35    i -> MULTIPLY factor i
+Rule 36    i -> DIVIDE factor i
+Rule 37    i -> MULTIPLY factor
+Rule 38    i -> DIVIDE factor
+Rule 39    factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+Rule 40    factor -> PLUS varcte
+Rule 41    factor -> MINUS varcte
+Rule 42    factor -> varcte
+Rule 43    varcte -> ID
+Rule 44    varcte -> CTEI
+Rule 45    varcte -> CTEF
+Rule 46    empty -> <empty>
+
+Terminals, with rules where they appear
+
+COLON                : 11 12
+COMMA                : 10
+CTEF                 : 45
+CTEI                 : 44
+CTES                 : 18 19
+DIFFERENT            : 24
+DIVIDE               : 36 38
+ELSE                 : 31
+EQUALS               : 15
+FLOAT                : 14
+GT                   : 22
+ID                   : 1 2 10 11 12 15 43
+IF                   : 30
+INT                  : 13
+LEFTBRACKET          : 3
+LEFTPARENTHESIS      : 16 30 39
+LT                   : 23
+MINUS                : 28 41
+MULTIPLY             : 35 37
+PERIOD               : 17 18
+PLUS                 : 27 40
+PRINT                : 16
+PROGRAM              : 1 2
+RIGHTBRACKET         : 3
+RIGHTPARENTHESIS     : 16 30 39
+SEMICOLON            : 1 2 11 12 15 16 30
+VAR                  : 9
+error                : 
+
+Nonterminals, with rules where they appear
+
+asignacion           : 6
+b                    : 3 4
+bloque               : 1 2 30 31
+c                    : 9 10 11
+condicion            : 7
+e                    : 16 17 18
+empty                : 5 21 29 32
+escritura            : 8
+estatuto             : 4
+exp                  : 22 22 23 23 24 24 25
+expresion            : 15 17 20 30 39
+factor               : 33 34 35 36 37 38
+g                    : 26 27 28
+h                    : 30
+i                    : 33 35 36
+patito               : 0
+termino              : 26 27 28
+tipo                 : 11 12
+varcte               : 40 41 42
+vars                 : 1
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . patito
+    (1) patito -> . PROGRAM ID SEMICOLON vars bloque
+    (2) patito -> . PROGRAM ID SEMICOLON bloque
+
+    PROGRAM         shift and go to state 2
+
+    patito                         shift and go to state 1
+
+state 1
+
+    (0) S' -> patito .
+
+
+
+state 2
+
+    (1) patito -> PROGRAM . ID SEMICOLON vars bloque
+    (2) patito -> PROGRAM . ID SEMICOLON bloque
+
+    ID              shift and go to state 3
+
+
+state 3
+
+    (1) patito -> PROGRAM ID . SEMICOLON vars bloque
+    (2) patito -> PROGRAM ID . SEMICOLON bloque
+
+    SEMICOLON       shift and go to state 4
+
+
+state 4
+
+    (1) patito -> PROGRAM ID SEMICOLON . vars bloque
+    (2) patito -> PROGRAM ID SEMICOLON . bloque
+    (9) vars -> . VAR c
+    (3) bloque -> . LEFTBRACKET b RIGHTBRACKET
+
+    VAR             shift and go to state 7
+    LEFTBRACKET     shift and go to state 6
+
+    bloque                         shift and go to state 8
+    vars                           shift and go to state 5
+
+state 5
+
+    (1) patito -> PROGRAM ID SEMICOLON vars . bloque
+    (3) bloque -> . LEFTBRACKET b RIGHTBRACKET
+
+    LEFTBRACKET     shift and go to state 6
+
+    bloque                         shift and go to state 9
+
+state 6
+
+    (3) bloque -> LEFTBRACKET . b RIGHTBRACKET
+    (4) b -> . estatuto b
+    (5) b -> . empty
+    (6) estatuto -> . asignacion
+    (7) estatuto -> . condicion
+    (8) estatuto -> . escritura
+    (46) empty -> .
+    (15) asignacion -> . ID EQUALS expresion SEMICOLON
+    (30) condicion -> . IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque h SEMICOLON
+    (16) escritura -> . PRINT LEFTPARENTHESIS e RIGHTPARENTHESIS SEMICOLON
+
+    RIGHTBRACKET    reduce using rule 46 (empty -> .)
+    ID              shift and go to state 16
+    IF              shift and go to state 15
+    PRINT           shift and go to state 14
+
+    b                              shift and go to state 10
+    asignacion                     shift and go to state 11
+    estatuto                       shift and go to state 12
+    condicion                      shift and go to state 13
+    empty                          shift and go to state 17
+    escritura                      shift and go to state 18
+
+state 7
+
+    (9) vars -> VAR . c
+    (10) c -> . ID COMMA c
+    (11) c -> . ID COLON tipo SEMICOLON c
+    (12) c -> . ID COLON tipo SEMICOLON
+
+    ID              shift and go to state 20
+
+    c                              shift and go to state 19
+
+state 8
+
+    (2) patito -> PROGRAM ID SEMICOLON bloque .
+
+    $end            reduce using rule 2 (patito -> PROGRAM ID SEMICOLON bloque .)
+
+
+state 9
+
+    (1) patito -> PROGRAM ID SEMICOLON vars bloque .
+
+    $end            reduce using rule 1 (patito -> PROGRAM ID SEMICOLON vars bloque .)
+
+
+state 10
+
+    (3) bloque -> LEFTBRACKET b . RIGHTBRACKET
+
+    RIGHTBRACKET    shift and go to state 21
+
+
+state 11
+
+    (6) estatuto -> asignacion .
+
+    ID              reduce using rule 6 (estatuto -> asignacion .)
+    IF              reduce using rule 6 (estatuto -> asignacion .)
+    PRINT           reduce using rule 6 (estatuto -> asignacion .)
+    RIGHTBRACKET    reduce using rule 6 (estatuto -> asignacion .)
+
+
+state 12
+
+    (4) b -> estatuto . b
+    (4) b -> . estatuto b
+    (5) b -> . empty
+    (6) estatuto -> . asignacion
+    (7) estatuto -> . condicion
+    (8) estatuto -> . escritura
+    (46) empty -> .
+    (15) asignacion -> . ID EQUALS expresion SEMICOLON
+    (30) condicion -> . IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque h SEMICOLON
+    (16) escritura -> . PRINT LEFTPARENTHESIS e RIGHTPARENTHESIS SEMICOLON
+
+    RIGHTBRACKET    reduce using rule 46 (empty -> .)
+    ID              shift and go to state 16
+    IF              shift and go to state 15
+    PRINT           shift and go to state 14
+
+    b                              shift and go to state 22
+    asignacion                     shift and go to state 11
+    estatuto                       shift and go to state 12
+    condicion                      shift and go to state 13
+    empty                          shift and go to state 17
+    escritura                      shift and go to state 18
+
+state 13
+
+    (7) estatuto -> condicion .
+
+    ID              reduce using rule 7 (estatuto -> condicion .)
+    IF              reduce using rule 7 (estatuto -> condicion .)
+    PRINT           reduce using rule 7 (estatuto -> condicion .)
+    RIGHTBRACKET    reduce using rule 7 (estatuto -> condicion .)
+
+
+state 14
+
+    (16) escritura -> PRINT . LEFTPARENTHESIS e RIGHTPARENTHESIS SEMICOLON
+
+    LEFTPARENTHESIS shift and go to state 23
+
+
+state 15
+
+    (30) condicion -> IF . LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque h SEMICOLON
+
+    LEFTPARENTHESIS shift and go to state 24
+
+
+state 16
+
+    (15) asignacion -> ID . EQUALS expresion SEMICOLON
+
+    EQUALS          shift and go to state 25
+
+
+state 17
+
+    (5) b -> empty .
+
+    RIGHTBRACKET    reduce using rule 5 (b -> empty .)
+
+
+state 18
+
+    (8) estatuto -> escritura .
+
+    ID              reduce using rule 8 (estatuto -> escritura .)
+    IF              reduce using rule 8 (estatuto -> escritura .)
+    PRINT           reduce using rule 8 (estatuto -> escritura .)
+    RIGHTBRACKET    reduce using rule 8 (estatuto -> escritura .)
+
+
+state 19
+
+    (9) vars -> VAR c .
+
+    LEFTBRACKET     reduce using rule 9 (vars -> VAR c .)
+
+
+state 20
+
+    (10) c -> ID . COMMA c
+    (11) c -> ID . COLON tipo SEMICOLON c
+    (12) c -> ID . COLON tipo SEMICOLON
+
+    COMMA           shift and go to state 27
+    COLON           shift and go to state 26
+
+
+state 21
+
+    (3) bloque -> LEFTBRACKET b RIGHTBRACKET .
+
+    ELSE            reduce using rule 3 (bloque -> LEFTBRACKET b RIGHTBRACKET .)
+    SEMICOLON       reduce using rule 3 (bloque -> LEFTBRACKET b RIGHTBRACKET .)
+    $end            reduce using rule 3 (bloque -> LEFTBRACKET b RIGHTBRACKET .)
+
+
+state 22
+
+    (4) b -> estatuto b .
+
+    RIGHTBRACKET    reduce using rule 4 (b -> estatuto b .)
+
+
+state 23
+
+    (16) escritura -> PRINT LEFTPARENTHESIS . e RIGHTPARENTHESIS SEMICOLON
+    (17) e -> . expresion PERIOD e
+    (18) e -> . CTES PERIOD e
+    (19) e -> . CTES
+    (20) e -> . expresion
+    (21) e -> . empty
+    (22) expresion -> . exp GT exp
+    (23) expresion -> . exp LT exp
+    (24) expresion -> . exp DIFFERENT exp
+    (25) expresion -> . exp
+    (46) empty -> .
+    (26) exp -> . termino g
+    (33) termino -> . factor i
+    (34) termino -> . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    CTES            shift and go to state 37
+    RIGHTPARENTHESIS reduce using rule 46 (empty -> .)
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    expresion                      shift and go to state 36
+    e                              shift and go to state 38
+    varcte                         shift and go to state 30
+    termino                        shift and go to state 28
+    exp                            shift and go to state 40
+    factor                         shift and go to state 32
+    empty                          shift and go to state 34
+
+state 24
+
+    (30) condicion -> IF LEFTPARENTHESIS . expresion RIGHTPARENTHESIS bloque h SEMICOLON
+    (22) expresion -> . exp GT exp
+    (23) expresion -> . exp LT exp
+    (24) expresion -> . exp DIFFERENT exp
+    (25) expresion -> . exp
+    (26) exp -> . termino g
+    (33) termino -> . factor i
+    (34) termino -> . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    expresion                      shift and go to state 42
+    varcte                         shift and go to state 30
+    termino                        shift and go to state 28
+    exp                            shift and go to state 40
+    factor                         shift and go to state 32
+
+state 25
+
+    (15) asignacion -> ID EQUALS . expresion SEMICOLON
+    (22) expresion -> . exp GT exp
+    (23) expresion -> . exp LT exp
+    (24) expresion -> . exp DIFFERENT exp
+    (25) expresion -> . exp
+    (26) exp -> . termino g
+    (33) termino -> . factor i
+    (34) termino -> . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    expresion                      shift and go to state 43
+    varcte                         shift and go to state 30
+    termino                        shift and go to state 28
+    exp                            shift and go to state 40
+    factor                         shift and go to state 32
+
+state 26
+
+    (11) c -> ID COLON . tipo SEMICOLON c
+    (12) c -> ID COLON . tipo SEMICOLON
+    (13) tipo -> . INT
+    (14) tipo -> . FLOAT
+
+    INT             shift and go to state 45
+    FLOAT           shift and go to state 46
+
+    tipo                           shift and go to state 44
+
+state 27
+
+    (10) c -> ID COMMA . c
+    (10) c -> . ID COMMA c
+    (11) c -> . ID COLON tipo SEMICOLON c
+    (12) c -> . ID COLON tipo SEMICOLON
+
+    ID              shift and go to state 20
+
+    c                              shift and go to state 47
+
+state 28
+
+    (26) exp -> termino . g
+    (27) g -> . PLUS termino g
+    (28) g -> . MINUS termino g
+    (29) g -> . empty
+    (46) empty -> .
+
+    PLUS            shift and go to state 49
+    MINUS           shift and go to state 51
+    GT              reduce using rule 46 (empty -> .)
+    LT              reduce using rule 46 (empty -> .)
+    DIFFERENT       reduce using rule 46 (empty -> .)
+    PERIOD          reduce using rule 46 (empty -> .)
+    RIGHTPARENTHESIS reduce using rule 46 (empty -> .)
+    SEMICOLON       reduce using rule 46 (empty -> .)
+
+    empty                          shift and go to state 48
+    g                              shift and go to state 50
+
+state 29
+
+    (41) factor -> MINUS . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    varcte                         shift and go to state 52
+
+state 30
+
+    (42) factor -> varcte .
+
+    MULTIPLY        reduce using rule 42 (factor -> varcte .)
+    DIVIDE          reduce using rule 42 (factor -> varcte .)
+    PLUS            reduce using rule 42 (factor -> varcte .)
+    MINUS           reduce using rule 42 (factor -> varcte .)
+    GT              reduce using rule 42 (factor -> varcte .)
+    LT              reduce using rule 42 (factor -> varcte .)
+    DIFFERENT       reduce using rule 42 (factor -> varcte .)
+    RIGHTPARENTHESIS reduce using rule 42 (factor -> varcte .)
+    PERIOD          reduce using rule 42 (factor -> varcte .)
+    SEMICOLON       reduce using rule 42 (factor -> varcte .)
+
+
+state 31
+
+    (40) factor -> PLUS . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    varcte                         shift and go to state 53
+
+state 32
+
+    (33) termino -> factor . i
+    (34) termino -> factor .
+    (35) i -> . MULTIPLY factor i
+    (36) i -> . DIVIDE factor i
+    (37) i -> . MULTIPLY factor
+    (38) i -> . DIVIDE factor
+
+    PLUS            reduce using rule 34 (termino -> factor .)
+    MINUS           reduce using rule 34 (termino -> factor .)
+    PERIOD          reduce using rule 34 (termino -> factor .)
+    RIGHTPARENTHESIS reduce using rule 34 (termino -> factor .)
+    SEMICOLON       reduce using rule 34 (termino -> factor .)
+    GT              reduce using rule 34 (termino -> factor .)
+    LT              reduce using rule 34 (termino -> factor .)
+    DIFFERENT       reduce using rule 34 (termino -> factor .)
+    MULTIPLY        shift and go to state 55
+    DIVIDE          shift and go to state 56
+
+    i                              shift and go to state 54
+
+state 33
+
+    (39) factor -> LEFTPARENTHESIS . expresion RIGHTPARENTHESIS
+    (22) expresion -> . exp GT exp
+    (23) expresion -> . exp LT exp
+    (24) expresion -> . exp DIFFERENT exp
+    (25) expresion -> . exp
+    (26) exp -> . termino g
+    (33) termino -> . factor i
+    (34) termino -> . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    expresion                      shift and go to state 57
+    varcte                         shift and go to state 30
+    termino                        shift and go to state 28
+    exp                            shift and go to state 40
+    factor                         shift and go to state 32
+
+state 34
+
+    (21) e -> empty .
+
+    RIGHTPARENTHESIS reduce using rule 21 (e -> empty .)
+
+
+state 35
+
+    (43) varcte -> ID .
+
+    MULTIPLY        reduce using rule 43 (varcte -> ID .)
+    DIVIDE          reduce using rule 43 (varcte -> ID .)
+    PLUS            reduce using rule 43 (varcte -> ID .)
+    MINUS           reduce using rule 43 (varcte -> ID .)
+    GT              reduce using rule 43 (varcte -> ID .)
+    LT              reduce using rule 43 (varcte -> ID .)
+    DIFFERENT       reduce using rule 43 (varcte -> ID .)
+    PERIOD          reduce using rule 43 (varcte -> ID .)
+    RIGHTPARENTHESIS reduce using rule 43 (varcte -> ID .)
+    SEMICOLON       reduce using rule 43 (varcte -> ID .)
+
+
+state 36
+
+    (17) e -> expresion . PERIOD e
+    (20) e -> expresion .
+
+    PERIOD          shift and go to state 58
+    RIGHTPARENTHESIS reduce using rule 20 (e -> expresion .)
+
+
+state 37
+
+    (18) e -> CTES . PERIOD e
+    (19) e -> CTES .
+
+    PERIOD          shift and go to state 59
+    RIGHTPARENTHESIS reduce using rule 19 (e -> CTES .)
+
+
+state 38
+
+    (16) escritura -> PRINT LEFTPARENTHESIS e . RIGHTPARENTHESIS SEMICOLON
+
+    RIGHTPARENTHESIS shift and go to state 60
+
+
+state 39
+
+    (45) varcte -> CTEF .
+
+    MULTIPLY        reduce using rule 45 (varcte -> CTEF .)
+    DIVIDE          reduce using rule 45 (varcte -> CTEF .)
+    PLUS            reduce using rule 45 (varcte -> CTEF .)
+    MINUS           reduce using rule 45 (varcte -> CTEF .)
+    GT              reduce using rule 45 (varcte -> CTEF .)
+    LT              reduce using rule 45 (varcte -> CTEF .)
+    DIFFERENT       reduce using rule 45 (varcte -> CTEF .)
+    PERIOD          reduce using rule 45 (varcte -> CTEF .)
+    RIGHTPARENTHESIS reduce using rule 45 (varcte -> CTEF .)
+    SEMICOLON       reduce using rule 45 (varcte -> CTEF .)
+
+
+state 40
+
+    (22) expresion -> exp . GT exp
+    (23) expresion -> exp . LT exp
+    (24) expresion -> exp . DIFFERENT exp
+    (25) expresion -> exp .
+
+    GT              shift and go to state 62
+    LT              shift and go to state 61
+    DIFFERENT       shift and go to state 63
+    RIGHTPARENTHESIS reduce using rule 25 (expresion -> exp .)
+    PERIOD          reduce using rule 25 (expresion -> exp .)
+    SEMICOLON       reduce using rule 25 (expresion -> exp .)
+
+
+state 41
+
+    (44) varcte -> CTEI .
+
+    MULTIPLY        reduce using rule 44 (varcte -> CTEI .)
+    DIVIDE          reduce using rule 44 (varcte -> CTEI .)
+    PLUS            reduce using rule 44 (varcte -> CTEI .)
+    MINUS           reduce using rule 44 (varcte -> CTEI .)
+    GT              reduce using rule 44 (varcte -> CTEI .)
+    LT              reduce using rule 44 (varcte -> CTEI .)
+    DIFFERENT       reduce using rule 44 (varcte -> CTEI .)
+    PERIOD          reduce using rule 44 (varcte -> CTEI .)
+    RIGHTPARENTHESIS reduce using rule 44 (varcte -> CTEI .)
+    SEMICOLON       reduce using rule 44 (varcte -> CTEI .)
+
+
+state 42
+
+    (30) condicion -> IF LEFTPARENTHESIS expresion . RIGHTPARENTHESIS bloque h SEMICOLON
+
+    RIGHTPARENTHESIS shift and go to state 64
+
+
+state 43
+
+    (15) asignacion -> ID EQUALS expresion . SEMICOLON
+
+    SEMICOLON       shift and go to state 65
+
+
+state 44
+
+    (11) c -> ID COLON tipo . SEMICOLON c
+    (12) c -> ID COLON tipo . SEMICOLON
+
+    SEMICOLON       shift and go to state 66
+
+
+state 45
+
+    (13) tipo -> INT .
+
+    SEMICOLON       reduce using rule 13 (tipo -> INT .)
+
+
+state 46
+
+    (14) tipo -> FLOAT .
+
+    SEMICOLON       reduce using rule 14 (tipo -> FLOAT .)
+
+
+state 47
+
+    (10) c -> ID COMMA c .
+
+    LEFTBRACKET     reduce using rule 10 (c -> ID COMMA c .)
+
+
+state 48
+
+    (29) g -> empty .
+
+    GT              reduce using rule 29 (g -> empty .)
+    LT              reduce using rule 29 (g -> empty .)
+    DIFFERENT       reduce using rule 29 (g -> empty .)
+    PERIOD          reduce using rule 29 (g -> empty .)
+    RIGHTPARENTHESIS reduce using rule 29 (g -> empty .)
+    SEMICOLON       reduce using rule 29 (g -> empty .)
+
+
+state 49
+
+    (27) g -> PLUS . termino g
+    (33) termino -> . factor i
+    (34) termino -> . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    varcte                         shift and go to state 30
+    termino                        shift and go to state 67
+    factor                         shift and go to state 32
+
+state 50
+
+    (26) exp -> termino g .
+
+    GT              reduce using rule 26 (exp -> termino g .)
+    LT              reduce using rule 26 (exp -> termino g .)
+    DIFFERENT       reduce using rule 26 (exp -> termino g .)
+    RIGHTPARENTHESIS reduce using rule 26 (exp -> termino g .)
+    SEMICOLON       reduce using rule 26 (exp -> termino g .)
+    PERIOD          reduce using rule 26 (exp -> termino g .)
+
+
+state 51
+
+    (28) g -> MINUS . termino g
+    (33) termino -> . factor i
+    (34) termino -> . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    varcte                         shift and go to state 30
+    termino                        shift and go to state 68
+    factor                         shift and go to state 32
+
+state 52
+
+    (41) factor -> MINUS varcte .
+
+    MULTIPLY        reduce using rule 41 (factor -> MINUS varcte .)
+    DIVIDE          reduce using rule 41 (factor -> MINUS varcte .)
+    PLUS            reduce using rule 41 (factor -> MINUS varcte .)
+    MINUS           reduce using rule 41 (factor -> MINUS varcte .)
+    GT              reduce using rule 41 (factor -> MINUS varcte .)
+    LT              reduce using rule 41 (factor -> MINUS varcte .)
+    DIFFERENT       reduce using rule 41 (factor -> MINUS varcte .)
+    RIGHTPARENTHESIS reduce using rule 41 (factor -> MINUS varcte .)
+    PERIOD          reduce using rule 41 (factor -> MINUS varcte .)
+    SEMICOLON       reduce using rule 41 (factor -> MINUS varcte .)
+
+
+state 53
+
+    (40) factor -> PLUS varcte .
+
+    MULTIPLY        reduce using rule 40 (factor -> PLUS varcte .)
+    DIVIDE          reduce using rule 40 (factor -> PLUS varcte .)
+    PLUS            reduce using rule 40 (factor -> PLUS varcte .)
+    MINUS           reduce using rule 40 (factor -> PLUS varcte .)
+    GT              reduce using rule 40 (factor -> PLUS varcte .)
+    LT              reduce using rule 40 (factor -> PLUS varcte .)
+    DIFFERENT       reduce using rule 40 (factor -> PLUS varcte .)
+    RIGHTPARENTHESIS reduce using rule 40 (factor -> PLUS varcte .)
+    PERIOD          reduce using rule 40 (factor -> PLUS varcte .)
+    SEMICOLON       reduce using rule 40 (factor -> PLUS varcte .)
+
+
+state 54
+
+    (33) termino -> factor i .
+
+    PLUS            reduce using rule 33 (termino -> factor i .)
+    MINUS           reduce using rule 33 (termino -> factor i .)
+    PERIOD          reduce using rule 33 (termino -> factor i .)
+    RIGHTPARENTHESIS reduce using rule 33 (termino -> factor i .)
+    SEMICOLON       reduce using rule 33 (termino -> factor i .)
+    GT              reduce using rule 33 (termino -> factor i .)
+    LT              reduce using rule 33 (termino -> factor i .)
+    DIFFERENT       reduce using rule 33 (termino -> factor i .)
+
+
+state 55
+
+    (35) i -> MULTIPLY . factor i
+    (37) i -> MULTIPLY . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    varcte                         shift and go to state 30
+    factor                         shift and go to state 69
+
+state 56
+
+    (36) i -> DIVIDE . factor i
+    (38) i -> DIVIDE . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    varcte                         shift and go to state 30
+    factor                         shift and go to state 70
+
+state 57
+
+    (39) factor -> LEFTPARENTHESIS expresion . RIGHTPARENTHESIS
+
+    RIGHTPARENTHESIS shift and go to state 71
+
+
+state 58
+
+    (17) e -> expresion PERIOD . e
+    (17) e -> . expresion PERIOD e
+    (18) e -> . CTES PERIOD e
+    (19) e -> . CTES
+    (20) e -> . expresion
+    (21) e -> . empty
+    (22) expresion -> . exp GT exp
+    (23) expresion -> . exp LT exp
+    (24) expresion -> . exp DIFFERENT exp
+    (25) expresion -> . exp
+    (46) empty -> .
+    (26) exp -> . termino g
+    (33) termino -> . factor i
+    (34) termino -> . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    CTES            shift and go to state 37
+    RIGHTPARENTHESIS reduce using rule 46 (empty -> .)
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    expresion                      shift and go to state 36
+    e                              shift and go to state 72
+    varcte                         shift and go to state 30
+    termino                        shift and go to state 28
+    exp                            shift and go to state 40
+    factor                         shift and go to state 32
+    empty                          shift and go to state 34
+
+state 59
+
+    (18) e -> CTES PERIOD . e
+    (17) e -> . expresion PERIOD e
+    (18) e -> . CTES PERIOD e
+    (19) e -> . CTES
+    (20) e -> . expresion
+    (21) e -> . empty
+    (22) expresion -> . exp GT exp
+    (23) expresion -> . exp LT exp
+    (24) expresion -> . exp DIFFERENT exp
+    (25) expresion -> . exp
+    (46) empty -> .
+    (26) exp -> . termino g
+    (33) termino -> . factor i
+    (34) termino -> . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    CTES            shift and go to state 37
+    RIGHTPARENTHESIS reduce using rule 46 (empty -> .)
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    expresion                      shift and go to state 36
+    e                              shift and go to state 73
+    varcte                         shift and go to state 30
+    termino                        shift and go to state 28
+    exp                            shift and go to state 40
+    factor                         shift and go to state 32
+    empty                          shift and go to state 34
+
+state 60
+
+    (16) escritura -> PRINT LEFTPARENTHESIS e RIGHTPARENTHESIS . SEMICOLON
+
+    SEMICOLON       shift and go to state 74
+
+
+state 61
+
+    (23) expresion -> exp LT . exp
+    (26) exp -> . termino g
+    (33) termino -> . factor i
+    (34) termino -> . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    varcte                         shift and go to state 30
+    termino                        shift and go to state 28
+    exp                            shift and go to state 75
+    factor                         shift and go to state 32
+
+state 62
+
+    (22) expresion -> exp GT . exp
+    (26) exp -> . termino g
+    (33) termino -> . factor i
+    (34) termino -> . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    varcte                         shift and go to state 30
+    termino                        shift and go to state 28
+    exp                            shift and go to state 76
+    factor                         shift and go to state 32
+
+state 63
+
+    (24) expresion -> exp DIFFERENT . exp
+    (26) exp -> . termino g
+    (33) termino -> . factor i
+    (34) termino -> . factor
+    (39) factor -> . LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+    (40) factor -> . PLUS varcte
+    (41) factor -> . MINUS varcte
+    (42) factor -> . varcte
+    (43) varcte -> . ID
+    (44) varcte -> . CTEI
+    (45) varcte -> . CTEF
+
+    LEFTPARENTHESIS shift and go to state 33
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 29
+    ID              shift and go to state 35
+    CTEI            shift and go to state 41
+    CTEF            shift and go to state 39
+
+    varcte                         shift and go to state 30
+    termino                        shift and go to state 28
+    exp                            shift and go to state 77
+    factor                         shift and go to state 32
+
+state 64
+
+    (30) condicion -> IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS . bloque h SEMICOLON
+    (3) bloque -> . LEFTBRACKET b RIGHTBRACKET
+
+    LEFTBRACKET     shift and go to state 6
+
+    bloque                         shift and go to state 78
+
+state 65
+
+    (15) asignacion -> ID EQUALS expresion SEMICOLON .
+
+    ID              reduce using rule 15 (asignacion -> ID EQUALS expresion SEMICOLON .)
+    IF              reduce using rule 15 (asignacion -> ID EQUALS expresion SEMICOLON .)
+    PRINT           reduce using rule 15 (asignacion -> ID EQUALS expresion SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 15 (asignacion -> ID EQUALS expresion SEMICOLON .)
+
+
+state 66
+
+    (11) c -> ID COLON tipo SEMICOLON . c
+    (12) c -> ID COLON tipo SEMICOLON .
+    (10) c -> . ID COMMA c
+    (11) c -> . ID COLON tipo SEMICOLON c
+    (12) c -> . ID COLON tipo SEMICOLON
+
+    LEFTBRACKET     reduce using rule 12 (c -> ID COLON tipo SEMICOLON .)
+    ID              shift and go to state 20
+
+    c                              shift and go to state 79
+
+state 67
+
+    (27) g -> PLUS termino . g
+    (27) g -> . PLUS termino g
+    (28) g -> . MINUS termino g
+    (29) g -> . empty
+    (46) empty -> .
+
+    PLUS            shift and go to state 49
+    MINUS           shift and go to state 51
+    GT              reduce using rule 46 (empty -> .)
+    LT              reduce using rule 46 (empty -> .)
+    DIFFERENT       reduce using rule 46 (empty -> .)
+    PERIOD          reduce using rule 46 (empty -> .)
+    RIGHTPARENTHESIS reduce using rule 46 (empty -> .)
+    SEMICOLON       reduce using rule 46 (empty -> .)
+
+    empty                          shift and go to state 48
+    g                              shift and go to state 80
+
+state 68
+
+    (28) g -> MINUS termino . g
+    (27) g -> . PLUS termino g
+    (28) g -> . MINUS termino g
+    (29) g -> . empty
+    (46) empty -> .
+
+    PLUS            shift and go to state 49
+    MINUS           shift and go to state 51
+    GT              reduce using rule 46 (empty -> .)
+    LT              reduce using rule 46 (empty -> .)
+    DIFFERENT       reduce using rule 46 (empty -> .)
+    PERIOD          reduce using rule 46 (empty -> .)
+    RIGHTPARENTHESIS reduce using rule 46 (empty -> .)
+    SEMICOLON       reduce using rule 46 (empty -> .)
+
+    empty                          shift and go to state 48
+    g                              shift and go to state 81
+
+state 69
+
+    (35) i -> MULTIPLY factor . i
+    (37) i -> MULTIPLY factor .
+    (35) i -> . MULTIPLY factor i
+    (36) i -> . DIVIDE factor i
+    (37) i -> . MULTIPLY factor
+    (38) i -> . DIVIDE factor
+
+    PLUS            reduce using rule 37 (i -> MULTIPLY factor .)
+    MINUS           reduce using rule 37 (i -> MULTIPLY factor .)
+    GT              reduce using rule 37 (i -> MULTIPLY factor .)
+    LT              reduce using rule 37 (i -> MULTIPLY factor .)
+    DIFFERENT       reduce using rule 37 (i -> MULTIPLY factor .)
+    PERIOD          reduce using rule 37 (i -> MULTIPLY factor .)
+    RIGHTPARENTHESIS reduce using rule 37 (i -> MULTIPLY factor .)
+    SEMICOLON       reduce using rule 37 (i -> MULTIPLY factor .)
+    MULTIPLY        shift and go to state 55
+    DIVIDE          shift and go to state 56
+
+    i                              shift and go to state 82
+
+state 70
+
+    (36) i -> DIVIDE factor . i
+    (38) i -> DIVIDE factor .
+    (35) i -> . MULTIPLY factor i
+    (36) i -> . DIVIDE factor i
+    (37) i -> . MULTIPLY factor
+    (38) i -> . DIVIDE factor
+
+    PLUS            reduce using rule 38 (i -> DIVIDE factor .)
+    MINUS           reduce using rule 38 (i -> DIVIDE factor .)
+    GT              reduce using rule 38 (i -> DIVIDE factor .)
+    LT              reduce using rule 38 (i -> DIVIDE factor .)
+    DIFFERENT       reduce using rule 38 (i -> DIVIDE factor .)
+    PERIOD          reduce using rule 38 (i -> DIVIDE factor .)
+    RIGHTPARENTHESIS reduce using rule 38 (i -> DIVIDE factor .)
+    SEMICOLON       reduce using rule 38 (i -> DIVIDE factor .)
+    MULTIPLY        shift and go to state 55
+    DIVIDE          shift and go to state 56
+
+    i                              shift and go to state 83
+
+state 71
+
+    (39) factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS .
+
+    MULTIPLY        reduce using rule 39 (factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS .)
+    DIVIDE          reduce using rule 39 (factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS .)
+    PLUS            reduce using rule 39 (factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS .)
+    MINUS           reduce using rule 39 (factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS .)
+    GT              reduce using rule 39 (factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS .)
+    LT              reduce using rule 39 (factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS .)
+    DIFFERENT       reduce using rule 39 (factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS .)
+    RIGHTPARENTHESIS reduce using rule 39 (factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS .)
+    PERIOD          reduce using rule 39 (factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS .)
+    SEMICOLON       reduce using rule 39 (factor -> LEFTPARENTHESIS expresion RIGHTPARENTHESIS .)
+
+
+state 72
+
+    (17) e -> expresion PERIOD e .
+
+    RIGHTPARENTHESIS reduce using rule 17 (e -> expresion PERIOD e .)
+
+
+state 73
+
+    (18) e -> CTES PERIOD e .
+
+    RIGHTPARENTHESIS reduce using rule 18 (e -> CTES PERIOD e .)
+
+
+state 74
+
+    (16) escritura -> PRINT LEFTPARENTHESIS e RIGHTPARENTHESIS SEMICOLON .
+
+    ID              reduce using rule 16 (escritura -> PRINT LEFTPARENTHESIS e RIGHTPARENTHESIS SEMICOLON .)
+    IF              reduce using rule 16 (escritura -> PRINT LEFTPARENTHESIS e RIGHTPARENTHESIS SEMICOLON .)
+    PRINT           reduce using rule 16 (escritura -> PRINT LEFTPARENTHESIS e RIGHTPARENTHESIS SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 16 (escritura -> PRINT LEFTPARENTHESIS e RIGHTPARENTHESIS SEMICOLON .)
+
+
+state 75
+
+    (23) expresion -> exp LT exp .
+
+    RIGHTPARENTHESIS reduce using rule 23 (expresion -> exp LT exp .)
+    PERIOD          reduce using rule 23 (expresion -> exp LT exp .)
+    SEMICOLON       reduce using rule 23 (expresion -> exp LT exp .)
+
+
+state 76
+
+    (22) expresion -> exp GT exp .
+
+    RIGHTPARENTHESIS reduce using rule 22 (expresion -> exp GT exp .)
+    PERIOD          reduce using rule 22 (expresion -> exp GT exp .)
+    SEMICOLON       reduce using rule 22 (expresion -> exp GT exp .)
+
+
+state 77
+
+    (24) expresion -> exp DIFFERENT exp .
+
+    RIGHTPARENTHESIS reduce using rule 24 (expresion -> exp DIFFERENT exp .)
+    PERIOD          reduce using rule 24 (expresion -> exp DIFFERENT exp .)
+    SEMICOLON       reduce using rule 24 (expresion -> exp DIFFERENT exp .)
+
+
+state 78
+
+    (30) condicion -> IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque . h SEMICOLON
+    (31) h -> . ELSE bloque
+    (32) h -> . empty
+    (46) empty -> .
+
+    ELSE            shift and go to state 85
+    SEMICOLON       reduce using rule 46 (empty -> .)
+
+    h                              shift and go to state 84
+    empty                          shift and go to state 86
+
+state 79
+
+    (11) c -> ID COLON tipo SEMICOLON c .
+
+    LEFTBRACKET     reduce using rule 11 (c -> ID COLON tipo SEMICOLON c .)
+
+
+state 80
+
+    (27) g -> PLUS termino g .
+
+    GT              reduce using rule 27 (g -> PLUS termino g .)
+    LT              reduce using rule 27 (g -> PLUS termino g .)
+    DIFFERENT       reduce using rule 27 (g -> PLUS termino g .)
+    PERIOD          reduce using rule 27 (g -> PLUS termino g .)
+    RIGHTPARENTHESIS reduce using rule 27 (g -> PLUS termino g .)
+    SEMICOLON       reduce using rule 27 (g -> PLUS termino g .)
+
+
+state 81
+
+    (28) g -> MINUS termino g .
+
+    GT              reduce using rule 28 (g -> MINUS termino g .)
+    LT              reduce using rule 28 (g -> MINUS termino g .)
+    DIFFERENT       reduce using rule 28 (g -> MINUS termino g .)
+    PERIOD          reduce using rule 28 (g -> MINUS termino g .)
+    RIGHTPARENTHESIS reduce using rule 28 (g -> MINUS termino g .)
+    SEMICOLON       reduce using rule 28 (g -> MINUS termino g .)
+
+
+state 82
+
+    (35) i -> MULTIPLY factor i .
+
+    PLUS            reduce using rule 35 (i -> MULTIPLY factor i .)
+    MINUS           reduce using rule 35 (i -> MULTIPLY factor i .)
+    GT              reduce using rule 35 (i -> MULTIPLY factor i .)
+    LT              reduce using rule 35 (i -> MULTIPLY factor i .)
+    DIFFERENT       reduce using rule 35 (i -> MULTIPLY factor i .)
+    PERIOD          reduce using rule 35 (i -> MULTIPLY factor i .)
+    RIGHTPARENTHESIS reduce using rule 35 (i -> MULTIPLY factor i .)
+    SEMICOLON       reduce using rule 35 (i -> MULTIPLY factor i .)
+
+
+state 83
+
+    (36) i -> DIVIDE factor i .
+
+    PLUS            reduce using rule 36 (i -> DIVIDE factor i .)
+    MINUS           reduce using rule 36 (i -> DIVIDE factor i .)
+    GT              reduce using rule 36 (i -> DIVIDE factor i .)
+    LT              reduce using rule 36 (i -> DIVIDE factor i .)
+    DIFFERENT       reduce using rule 36 (i -> DIVIDE factor i .)
+    PERIOD          reduce using rule 36 (i -> DIVIDE factor i .)
+    RIGHTPARENTHESIS reduce using rule 36 (i -> DIVIDE factor i .)
+    SEMICOLON       reduce using rule 36 (i -> DIVIDE factor i .)
+
+
+state 84
+
+    (30) condicion -> IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque h . SEMICOLON
+
+    SEMICOLON       shift and go to state 87
+
+
+state 85
+
+    (31) h -> ELSE . bloque
+    (3) bloque -> . LEFTBRACKET b RIGHTBRACKET
+
+    LEFTBRACKET     shift and go to state 6
+
+    bloque                         shift and go to state 88
+
+state 86
+
+    (32) h -> empty .
+
+    SEMICOLON       reduce using rule 32 (h -> empty .)
+
+
+state 87
+
+    (30) condicion -> IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque h SEMICOLON .
+
+    ID              reduce using rule 30 (condicion -> IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque h SEMICOLON .)
+    IF              reduce using rule 30 (condicion -> IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque h SEMICOLON .)
+    PRINT           reduce using rule 30 (condicion -> IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque h SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 30 (condicion -> IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque h SEMICOLON .)
+
+
+state 88
+
+    (31) h -> ELSE bloque .
+
+    SEMICOLON       reduce using rule 31 (h -> ELSE bloque .)
+
