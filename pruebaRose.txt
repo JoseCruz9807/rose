@@ -1,11 +1,11 @@
 program test; 
-globals arbol: int; 
-{ 
+globals int arbol = 3; 
+main { 
 arbol = 5; 
 if(arbol>6){
     print('Hay suficientes arboles');
 }
 else{
     print('No hay suficientes arboles');
-};
+}
 }

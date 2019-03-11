@@ -23,6 +23,7 @@ tokens = [
     'CTEI',
     'CTEF',
     'CTES',
+    'CTEB',
     'IF',
     'ELSE',
     'PROGRAM',
@@ -35,7 +36,7 @@ tokens = [
     'EXPORTCSV',
     'LINECHART',
     'TRANSPOSE',
-    'FUNCTION',
+    'FUNC',
     'PIECHART',
     'BARCHART',
     'ARRANGE',
@@ -46,7 +47,6 @@ tokens = [
     'MEDIAN',
     'LINREG',
     'APPEND',
-    'FALSE',
     'WHILE',
     'POW',
     'GRAPH',
@@ -58,7 +58,6 @@ tokens = [
     'LTEQ',
     'EQUIVALENTE',
     'BOOL',
-    'TRUE',
     'READ',
     'SQRT',
     'MEAN',
@@ -189,8 +188,8 @@ def t_ID (t):
         t.type='FACTORIAL'
     elif t.value=='linreg':
         t.type='LINREG'
-    elif t.value=='function':
-        t.type='FUNCTION'
+    elif t.value=='func':
+        t.type='FUNC'
     elif t.value=='append':
         t.type='APPEND'
     elif t.value=='main':
@@ -224,7 +223,7 @@ lexer = lex.lex()
 
 
 """
-lexer.input("program test; ")
+lexer.input("globals arbol: int; ")
 
 while True:
     tok = lexer.token()
@@ -248,34 +247,34 @@ def p_roseaux(p):
     '''
 def p_roseaux2(p):
     '''
-	roseaux2:	vars roseaux2
-			|	empty
+	roseaux2 :	vars roseaux2
+			 |	empty
 	'''
 def p_roseaux3(p):
     '''
-	roseaux3:	func roseaux3
-			|	empty
+	roseaux3 :	func roseaux3
+			 |	empty
 	'''
 
 def p_vars(p):
 	'''
-	vars: tipo ID varsaux SEMICOLON
+	vars : tipo ID varsaux SEMICOLON
 	'''
 def p_varsaux(p):
 	'''
-	varsaux:	arreglo varsaux1
+	varsaux :	arreglo varsaux1
 			|	EQUALS varscte
 			|	empty
 	'''
 def p_varsaux1(p):
 	'''
-	varsaux1:	asigna
-			|	arreglo asigna
+	varsaux1 :	asigna
+			 |	arreglo asigna
 	'''
 
 def p_arreglo(p):
 	'''
-	arreglo:	LEFTBRACKET varscte RIGHTBRACKET
+	arreglo :	LEFTBRACKET varscte RIGHTBRACKET
 	'''
 
 def p_asigna(p):
@@ -292,17 +291,17 @@ def p_asigna1(p):
 
 def p_unidimensional(p):
 	'''
-	unidimensional:	LEFTKEY varscte unidime1 RIGHTKEY
+	unidimensional :	LEFTKEY varscte unidime1 RIGHTKEY
 	'''
 def p_unidime1(p):
 	'''
-	unidime1:	COMMA varscte unidime1
-			|	empty
+	unidime1 :	COMMA varscte unidime1
+			 |	empty
 	'''
 
 def p_bidimensional(p):
 	'''
-	bidimensional:	LEFTKEY unidimensional bidi1 RIGHTKEY
+	bidimensional :	LEFTKEY unidimensional bidi1 RIGHTKEY
 	'''
 def p_bidi1(p):
 	'''
@@ -317,18 +316,18 @@ def p_expcomp(p):
 	'''
 def p_expcomp1(p):
 	'''
-	expcomp1:	expcomp2
-			|	empty
+	expcomp1 :	expcomp2
+			 |	empty
 	'''
 def p_expcomp2(p):
 	'''
-	expcomp2:	logicalexp exp
-			|	GTEQ exp
-			|	LTEQ exp
-			|	EQUIVALENTE exp
-			|	GT exp
-			|	LT exp
-			|	DIFFERENT exp
+	expcomp2 :	logicalexp exp
+			 |	GTEQ exp
+			 |	LTEQ exp
+			 |	EQUIVALENTE exp
+			 |	GT exp
+			 |	LT exp
+			 |	DIFFERENT exp
 	'''
 
 def p_logicalexp(p):
@@ -349,8 +348,9 @@ def p_exp(p):
 	'''
 def p_exp1(p):
 	'''
-	exp1:	PLUS exp
-		|	MINUS exp
+	exp1 :	PLUS exp
+		 |	MINUS exp
+         |  empty
 	'''
 
 def p_termino(p):
@@ -359,8 +359,9 @@ def p_termino(p):
 	'''
 def p_ter1(p):
 	'''
-	ter1:	MULTIPLY termino
-		|	DIVIDE termino
+	ter1 :	MULTIPLY termino
+		 |	DIVIDE termino
+         |  empty
 	'''
 
 def p_factor(p):
@@ -406,8 +407,8 @@ def p_tiposid(p):
     '''
 def p_tiposid1(p):
     '''
-    tiposid1: LEFTBRACKET exp RIGHTBRACKET
-    		| empty
+    tiposid1 : LEFTBRACKET exp RIGHTBRACKET
+    		 | empty
     '''
 
 def p_condition(p):
@@ -466,7 +467,7 @@ def p_asignacion(p):
 
 def p_escritura(p):
 	'''
-    lectura : PRINT LEFTPARENTHESISI escri1 RIGHTPARENTHESIS SEMICOLON
+    escritura : PRINT LEFTPARENTHESIS escri1 RIGHTPARENTHESIS SEMICOLON
     ''' 
 def p_escri1(p):
 	'''
@@ -493,32 +494,46 @@ def p_specfun(p):
 ########################
 def p_specfun1(p):
 	'''
-    specfun1: SQRT
-    		| POW
-    		| ABS
-    		| STDEV
-    		| MEAN
-    		| MEDIAN
-    		| MODE
-    		| FACTORIAL
-    		| SORT
-    		| SIN
-    		| COS
-    		| TRANSPOSE
-    		| EXPORTCSV
-    		| ARRANGE
+    specfun1 : SQRT
+    		 | POW
+    		 | ABS
+    		 | STDEV
+    		 | MEAN
+    		 | MEDIAN
+    		 | MODE
+    		 | FACTORIAL
+    		 | SORT
+    		 | SIN
+    		 | COS
+    		 | TRANSPOSE
+    		 | EXPORTCSV
+    		 | ARRANGE
     		
     ''' 
 def p_specfun2(p):
 	'''
-    specfun2: varscte specfun3
-    		| empty
+    specfun2 : varscte specfun3
+    		 | empty
     ''' 
 def p_specfun3(p):
 	'''
-    specfun3: COMMA specfun2
-    		| empty
+    specfun3 : COMMA specfun2
+    		 | empty
 	'''
+
+def p_main(p):
+    '''
+    main : bloque
+    ''' 
+
+def p_tipo(p):
+    '''
+    tipo    : INT
+            | FLOAT
+            | STRING
+            | BOOL 
+    ''' 
+
 
 
 def p_empty(p):
@@ -532,7 +547,7 @@ def p_error(p):
 parser = yacc.yacc() 
 
 #Cambiar el nombre del archivo de entrada para tener probar el codigo incorrecto
-name='codigoCorrecto.txt'
+name='pruebaRose.txt'
 with open(name, 'r') as myfile:
     s=myfile.read().replace('\n', '')
 print(name)
