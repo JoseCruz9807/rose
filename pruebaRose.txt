@@ -1,7 +1,12 @@
 program test; 
 globals int arbol = 3; 
+
+func myfunk(int ola;){
+}
+
 main { 
 arbol = 5; 
+myfunk(ola,crayola);
 if(arbol>6){
     print('Hay suficientes arboles');
 }

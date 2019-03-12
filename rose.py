@@ -223,7 +223,7 @@ lexer = lex.lex()
 
 
 """
-lexer.input("globals arbol: int; ")
+lexer.input('func myFunk(){}')
 
 while True:
     tok = lexer.token()
@@ -384,16 +384,17 @@ def p_factor(p):
 
 def p_func(p):
 	'''
-	func	:	func1 LEFTPARENTHESIS func2 RIGHTPARENTHESIS bloque
+	func	:	func1 ID LEFTPARENTHESIS func2 RIGHTPARENTHESIS bloque
 	'''
 def p_func1(p):
 	'''
-	func1	:	tipo
+	func1	:	tipo 
 			|	FUNC
 	'''
 def p_func2(p):
 	'''
 	func2	:	tipo func3
+            |   empty
 	'''
 def p_func3(p):
 	'''
@@ -469,6 +470,7 @@ def p_llamafunc(p):
 def p_llamafunc1(p):
 	'''
     llamafunc1 : ID tiposid llamafunc2
+                | empty
     ''' 
 def p_llamafunc2(p):
 	'''
