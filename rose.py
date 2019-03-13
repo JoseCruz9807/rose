@@ -37,6 +37,7 @@ tokens = [
     'LINECHART',
     'TRANSPOSE',
     'FUNC',
+    'VOID',
     'PIECHART',
     'BARCHART',
     'ARRANGE',
@@ -190,6 +191,8 @@ def t_ID (t):
         t.type='LINREG'
     elif t.value=='func':
         t.type='FUNC'
+    elif t.value=='void':
+        t.type='VOID'
     elif t.value=='append':
         t.type='APPEND'
     elif t.value=='main':
@@ -234,293 +237,202 @@ while True:
 
 def p_rose(p):
     '''
-    rose : PROGRAM ID SEMICOLON roseaux MAIN main
+    rose : PROGRAM ID SEMICOLON roseauxvars roseauxfunc MAIN main
     '''
     print("Exito")
 
+def p_roseauxvars(p):
+    '''
+    roseauxvars : GLOBALS vars roseauxvars
+            | empty
+    '''
 
-def p_roseaux(p):
+def p_roseauxfunc(p):
     '''
-	roseaux :	GLOBALS vars roseaux2 roseaux3
-			| 	func roseaux3
-			|	empty
+    roseauxfunc : func roseauxfunc
+                | empty
     '''
-def p_roseaux2(p):
+def p_main(p):
     '''
-	roseaux2 :	vars roseaux2
-			 |	empty
-	'''
-def p_roseaux3(p):
+    main : LEFTPARENTHESIS RIGHTPARENTHESIS bloque
     '''
-	roseaux3 :	func roseaux3
-			 |	empty
-	'''
 
 def p_vars(p):
-	'''
-	vars : tipo ID varsaux SEMICOLON
-	'''
-def p_varsaux(p):
-	'''
-	varsaux :	arreglo varsaux1
-			|	EQUALS varscte
-			|	empty
-	'''
-def p_varsaux1(p):
-	'''
-	varsaux1 :	asigna
-			 |	arreglo asigna
-	'''
+    '''
+    vars : tipo ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET EQUALS LEFTKEY asignacionmatriz  RIGHTKEY SEMICOLON
+        | tipo ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET SEMICOLON
+        | tipo ID LEFTBRACKET CTEI RIGHTBRACKET EQUALS LEFTKEY asignacionarreglo RIGHTKEY SEMICOLON
+        | tipo ID LEFTBRACKET CTEI RIGHTBRACKET SEMICOLON
+        | tipo ID EQUALS vars_cte SEMICOLON
+        | tipo ID SEMICOLON
+    '''
 
-def p_arreglo(p):
-	'''
-	arreglo :	LEFTBRACKET varscte RIGHTBRACKET
-	'''
+def p_asignacionmatriz(p):
+    '''
+    asignacionmatriz : LEFTKEY asignacionarreglo RIGHTKEY COMMA asignacionmatriz
+                    | LEFTKEY asignacionarreglo RIGHTKEY
+    '''
 
-def p_asigna(p):
-	'''
-	asigna	:	EQUALS asigna1
-			|	empty
-	'''
-def p_asigna1(p):
-	'''
-	asigna1	:	unidimensional
-			|	bidimensional
-	'''
+def p_asignacionarreglo(p):
+    '''
+    asignacionarreglo : vars_cte COMMA asignacionarreglo
+                    | vars_cte
+    '''
 
-
-def p_unidimensional(p):
-	'''
-	unidimensional :	LEFTKEY varscte unidime1 RIGHTKEY
-	'''
-def p_unidime1(p):
-	'''
-	unidime1 :	COMMA varscte unidime1
-			 |	empty
-	'''
-
-def p_bidimensional(p):
-	'''
-	bidimensional :	LEFTKEY unidimensional bidi1 RIGHTKEY
-	'''
-def p_bidi1(p):
-	'''
-	bidi1	:	COMMA unidimensional
-			|	empty
-	'''
-
-
-def p_megaexp(p):
-	'''
-	megaexp	:	expcomp megaexp1
-	'''
-def p_megaexp1(p):
-	'''
-	megaexp1	:	logicalexp
-				|	empty
-	'''
-
-
-def p_expcomp(p):
-	'''
-	expcomp	:	exp expcomp1
-	'''
-def p_expcomp1(p):
-	'''
-	expcomp1 :	expcomp2
-			 |	empty
-	'''
-def p_expcomp2(p):
-	'''
-	expcomp2 :	GTEQ exp
-			 |	LTEQ exp
-			 |	EQUIVALENTE exp
-			 |	GT exp
-			 |	LT exp
-			 |	DIFFERENT exp
-	'''
-
-def p_logicalexp(p):
-	'''
-	logicalexp	:	OR
-				|	AND
-	'''
+def p_tipo(p):
+    '''
+    tipo : INT
+        | FLOAT
+        | STRING
+        | BOOL
+    '''
 
 def p_durante(p):
-	'''
-	durante	:	WHILE LEFTPARENTHESIS megaexp RIGHTPARENTHESIS bloque
-			
-	'''
-
-def p_exp(p):
-	'''
-	exp	:	termino exp1
-	'''
-def p_exp1(p):
-	'''
-	exp1 :	PLUS exp
-		 |	MINUS exp
-         |  empty
-	'''
-
-def p_termino(p):
-	'''
-	termino	:	factor ter1
-	'''
-def p_ter1(p):
-	'''
-	ter1 :	MULTIPLY termino
-		 |	DIVIDE termino
-         |  empty
-	'''
-
-def p_factor(p):
-	'''
-	factor	:	PLUS varscte
-			|	MINUS varscte
-			|	varscte
-			|	LEFTPARENTHESIS exp RIGHTPARENTHESIS
-	'''
-
-def p_func(p):
-	'''
-	func	:	func1 ID LEFTPARENTHESIS func2 RIGHTPARENTHESIS bloque
-	'''
-def p_func1(p):
-	'''
-	func1	:	tipo 
-			|	FUNC
-	'''
-def p_func2(p):
-	'''
-	func2	:	tipo func3
-            |   empty
-	'''
-def p_func3(p):
-	'''
-	func3	:	ID tiposid func4
-	'''
-def p_func4(p):
-	'''
-	func4	:	COMMA ID func3
-			| 	SEMICOLON func5
-	'''
-def p_func5(p):
-	'''
-	func5	:	func2
-			| 	empty
-	'''
-
-def p_tiposid(p):
     '''
-    tiposid : LEFTBRACKET exp RIGHTBRACKET tiposid1
-    		| empty
-    '''
-def p_tiposid1(p):
-    '''
-    tiposid1 : LEFTBRACKET exp RIGHTBRACKET
-    		 | empty
+    durante : WHILE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS sudo_bloque
     '''
 
 def p_condition(p):
     '''
-    condition 	: IF LEFTPARENTHESIS megaexp RIGHTPARENTHESIS bloque condi1
+    condition : IF LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS sudo_bloque else
     '''
-def p_condi1(p):
+
+def p_else(p):
     '''
-    condi1 	: 	ELSE bloque
-    		|	empty
+    else : ELSE sudo_bloque
+        | empty
+    '''
+
+def p_mega_exp(p):
+    '''
+    mega_exp : expression_compare mega_expaux
+    '''
+
+def p_mega_expaux(p):
+    '''
+    mega_expaux : OR expression_compare mega_expaux
+                | AND expression_compare mega_expaux
+                | empty
+    '''
+
+def p_expression_compare(p):
+    '''
+    expression_compare : exp DIFFERENT exp 
+                    | exp GTEQ exp
+                    | exp LTEQ exp 
+                    | exp EQUIVALENTE exp
+                    | exp GT exp
+                    | exp LT exp
+                    | exp
+    '''
+
+def p_exp(p):
+    '''
+    exp : termino expaux
+    '''
+
+def p_expaux(p):
+    '''
+    expaux : PLUS termino expaux
+            | MINUS termino expaux
+            | empty 
+    '''
+
+def p_termino(p):
+    '''
+    termino : factor terminoaux
+    '''
+
+def p_terminoaux(p):
+    '''
+    terminoaux : DIVIDE factor terminoaux
+                | MULTIPLY factor terminoaux
+                | empty
+    '''
+
+def p_factor(p):
+    '''
+    factor : PLUS vars_cte
+            | MINUS vars_cte
+            | vars_cte
+            | LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS
+    '''
+
+def p_func(p):
+    '''
+    func : FUNC VOID restofuncion
+        | FUNC tipo restofuncion
+    '''
+
+def p_restofuncion(p):
+    '''
+    restofuncion : ID LEFTPARENTHESIS argumentos RIGHTPARENTHESIS bloque
+    '''
+
+def p_argumentos(p):
+    '''
+    argumentos : tipo mismotipo SEMICOLON argumentos
+                | empty
+    '''
+
+def p_mismotipo(p):
+    '''
+    mismotipo : ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET COMMA mismotipo
+                | ID LEFTBRACKET CTEI RIGHTBRACKET COMMA mismotipo
+                | ID COMMA mismotipo
+                | ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET  
+                | ID LEFTBRACKET CTEI RIGHTBRACKET  
+                | ID  
+
     '''
 
 def p_bloque(p):
     '''
-    bloque 	: 	LEFTKEY bloque1 RIGHTKEY
-    '''
-def p_bloque1(p):
-    '''
-    bloque1	: 	estatuto
-    		|	empty
+    bloque : LEFTKEY estatuto RIGHTKEY
     '''
 
 def p_estatuto(p):
     '''
-    estatuto 	: 	estatuto1 estatuto2
-    '''
-def p_estatuto1(p):
-    '''
-    estatuto1 	: 	vars estatuto1
-    			|	empty
-    '''
-def p_estatuto2(p):
-    '''
-    estatuto2 	: 	condition estatuto2
-    			|	escritura estatuto2
-    			|	lectura estatuto2
-    			|	specfun estatuto2
-    			|	asignacion estatuto2
-    			|	durante estatuto2
-    			| 	llamafunc estatuto2
-    			|	empty
+    estatuto : declaracionvariables aplicaciones
     '''
 
-def p_llamafunc(p):
-	'''
-    llamafunc : ID LEFTPARENTHESIS llamafunc1 RIGHTPARENTHESIS SEMICOLON
-    ''' 
-def p_llamafunc1(p):
-	'''
-    llamafunc1 : ID tiposid llamafunc2
+def p_declaracionvariables(p):
+    '''
+    declaracionvariables : vars declaracionvariables
+                        | empty
+    '''
+def p_aplicaciones(p):
+    '''
+    aplicaciones : condition aplicaciones
+                | escritura aplicaciones
+                | lectura aplicaciones
+                | spec_func aplicaciones
+                | asignacion aplicaciones
+                | durante aplicaciones
+                | llama_func aplicaciones
                 | empty
-    ''' 
-def p_llamafunc2(p):
-	'''
-    llamafunc2  : COMMA llamafunc1
-    			| empty
-    ''' 
-
-
-
-def p_varscte(p):
-	'''
-    varscte : ID tiposid
-    		| CTEI
-    		| CTEF
-    		| CTES
-    		| CTEB
-    ''' 
-
-def p_asignacion(p):
-	'''
-    asignacion : ID tiposid EQUALS exp SEMICOLON
-    ''' 
-
-def p_escritura(p):
-	'''
-    escritura : PRINT LEFTPARENTHESIS escri1 RIGHTPARENTHESIS SEMICOLON
-    ''' 
-def p_escri1(p):
-	'''
-    escri1 : megaexp escri2
-    ''' 
-def p_escri2(p):
-	'''
-    escri2 	: PLUS escri1
-			| empty
-    ''' 
-
-def p_lectura(p):
-	'''
-    lectura : READ LEFTPARENTHESIS ID tiposid LEFTPARENTHESIS SEMICOLON
     '''
 
-def p_specfun(p):
-	'''
-    specfun : specfun1 LEFTPARENTHESIS specfun2 RIGHTPARENTHESIS SEMICOLON
-    ''' 
+def p_sudo_bloque(p):
+    '''
+    sudo_bloque : LEFTKEY sudo_estatuto RIGHTKEY
+    '''
+
+def p_sudo_estatuto(p):
+    '''
+    sudo_estatuto : aplicaciones
+    '''
+
+def p_vars_cte(p):
+    '''
+    vars_cte : empty
+    '''
 
 ########################
 # Nombres de funciones #
 ########################
+
+"""
 def p_specfun1(p):
 	'''
     specfun1 : SQRT
@@ -539,6 +451,8 @@ def p_specfun1(p):
     		 | ARRANGE
     		
     ''' 
+
+
 def p_specfun2(p):
 	'''
     specfun2 : varscte specfun3
@@ -550,18 +464,7 @@ def p_specfun3(p):
     		 | empty
 	'''
 
-def p_main(p):
-    '''
-    main : bloque
-    ''' 
-
-def p_tipo(p):
-    '''
-    tipo    : INT
-            | FLOAT
-            | STRING
-            | BOOL 
-    ''' 
+"""
 
 
 
@@ -575,7 +478,7 @@ def p_error(p):
 
 parser = yacc.yacc() 
 
-#Cambiar el nombre del archivo de entrada para tener probar el codigo incorrecto
+#Cambiar el nombre del archivo de entrada para probar el codigo
 name='pruebaRose.txt'
 with open(name, 'r') as myfile:
     s=myfile.read().replace('\n', '')
