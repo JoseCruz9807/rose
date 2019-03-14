@@ -214,7 +214,7 @@ def t_ID (t):
     return t
 
 def t_CTES (t):
-    r'\'[a-zA-Z_ 0-9]+\''
+    r'\"[a-zA-Z_ 0-9]+\"'
     t.type = 'CTES'
     return t
 
@@ -226,7 +226,7 @@ lexer = lex.lex()
 
 
 """
-lexer.input('func myFunk(){}')
+lexer.input('program test; globals int arbol = 3; func void myfunk(int ola;){ } main (){ int arbol = 5; if(arbol>6){print(arbol);}else{ print(arbol);};}')
 
 while True:
     tok = lexer.token()
@@ -406,7 +406,7 @@ def p_aplicaciones(p):
     aplicaciones : condition aplicaciones
                 | escritura aplicaciones
                 | lectura aplicaciones
-                | spec_func aplicaciones
+                | llama_spec_func aplicaciones
                 | asignacion aplicaciones
                 | durante aplicaciones
                 | llama_func aplicaciones
@@ -425,9 +425,78 @@ def p_sudo_estatuto(p):
 
 def p_vars_cte(p):
     '''
-    vars_cte : empty
+    vars_cte : spec_func
+            | ID LEFTBRACKET mega_exp RIGHTBRACKET LEFTBRACKET mega_exp RIGHTBRACKET
+            | ID LEFTBRACKET mega_exp RIGHTBRACKET
+            | ID LEFTPARENTHESIS params RIGHTPARENTHESIS
+            | ID
+            | CTEI
+            | CTEF
+            | CTES 
+            | CTEB
     '''
 
+def p_params(p):
+    '''
+    params : paramsaux
+            | empty
+    '''
+def p_paramsaux(p):
+    '''
+    paramsaux : mega_exp COMMA paramsaux
+                | mega_exp
+    '''
+
+def p_asignacion(p):
+    '''
+    asignacion : ID LEFTBRACKET mega_exp RIGHTBRACKET LEFTBRACKET mega_exp RIGHTBRACKET EQUALS mega_exp SEMICOLON
+               | ID LEFTBRACKET mega_exp RIGHTBRACKET EQUALS mega_exp SEMICOLON
+               | ID EQUALS mega_exp SEMICOLON
+    '''
+
+def p_escritura(p):
+    '''
+    escritura : PRINT LEFTPARENTHESIS escrito RIGHTPARENTHESIS SEMICOLON
+    '''
+def p_escrito(p):
+    '''
+    escrito : mega_exp PLUS escrito
+            | mega_exp
+    '''
+def p_lectura(p):
+    '''
+    lectura : READ LEFTPARENTHESIS ID LEFTBRACKET mega_exp RIGHTBRACKET LEFTBRACKET mega_exp RIGHTBRACKET RIGHTPARENTHESIS SEMICOLON
+            | READ LEFTPARENTHESIS ID LEFTBRACKET mega_exp RIGHTBRACKET RIGHTPARENTHESIS SEMICOLON
+            | READ LEFTPARENTHESIS ID RIGHTPARENTHESIS SEMICOLON
+    '''
+
+def p_llama_spec_func(p):
+    '''
+    llama_spec_func : spec_func SEMICOLON
+    '''
+
+def p_spec_func(p):
+    '''
+    spec_func : SQRT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+                | POW LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS 
+                | ABS LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+                | STDEV LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+                | MEAN LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+                | MEDIAN LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+                | MODE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+                | FACTORIAL LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+                | SORT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+                | SIN LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+                | COS LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+                | TRANSPOSE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+                | EXPORTCSV LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS 
+                | ARRANGE LEFTPARENTHESIS mega_exp COMMA mega_exp COMMA mega_exp RIGHTPARENTHESIS 
+    '''
+
+def p_llama_func(p):
+    '''
+    llama_func : ID LEFTPARENTHESIS params RIGHTPARENTHESIS SEMICOLON
+    '''
 ########################
 # Nombres de funciones #
 ########################

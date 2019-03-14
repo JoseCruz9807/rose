@@ -1,9 +1,24 @@
 program test; 
-globals int arbol = 3; 
+globals int arbol = 3;
 
-func myfunk(int ola;){
+func void myfunk(int ola;){
+int variable = ola;
+int variable2;
 }
 
-main { 
+main (){ 
+int arbol = 5; 
+int ola [4][6]={{3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3}};
+if(ola[3][3+ ola[1][1]]>6/5){
+    print(arbol+ola[4][4]);
+}
+else{
+    print("arbol");
+}
 
 }
