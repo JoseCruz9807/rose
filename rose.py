@@ -219,13 +219,17 @@ def t_CTES (t):
     t.type = 'CTES'
     return t
 
+
+def t_multi_comment_ignore(t): 
+    r'(/[*][^*]*[*]+([^/*][^*]*[*]+)*/|//[^\n]*)'
+    pass
+
+
 def t_error(t):
     print("Caracteres no reconocidos")
     t.lexer.skip(1)
 
 lexer = lex.lex()
-
-
 """
 lexer.input('program test; globals int arbol = 3; func void myfunk(int ola;){ } main (){ int arbol = 5; if(arbol>6){print(arbol);}else{ print(arbol);};}')
 
@@ -486,7 +490,7 @@ def p_spec_func(p):
                 | LINECHART LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS
                 | BARCHART LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS
                 | LINREG LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS
-                | NOT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS
+                | NOT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
     '''
 
 def p_returnx(p):

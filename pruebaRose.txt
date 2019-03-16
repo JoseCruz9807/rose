@@ -2,6 +2,13 @@ program test;
 globals int arbol = 3;
 globals int funca=4;
 
+/*
+void globals func == 34 int (]
+
+void globals func == 34 int (]
+*/
+//voidglobalsfunc
+
 func void myfunk(int ola, crayola; float xd;){
 int variable = "soasadas";
 int variable2= 2.3;
