@@ -1,9 +1,11 @@
 program test; 
 globals int arbol = 3;
+globals int funca=4;
 
-func void myfunk(int ola;){
-int variable = ola;
-int variable2;
+func void myfunk(int ola, crayola; float xd;){
+int variable = "soasadas";
+int variable2= 2.3;
+exportCSVV=2;
 }
 
 main (){ 
@@ -19,6 +21,7 @@ if(ola[3][3+ ola[1][1]]>6/5){
 }
 else{
     print("arbol");
+    myfunk(ola[2][2]);
 }
 
 }

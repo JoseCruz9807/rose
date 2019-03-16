@@ -44,7 +44,7 @@ tokens = [
     'GRAPH3D',
     'GLOBALS',
     'STRING',
-    'RETURN',
+    'RETURNX',
     'MEDIAN',
     'LINREG',
     'APPEND',
@@ -95,7 +95,6 @@ t_MULTIPLY= r'\*'
 t_QUOTE= r'\"'
 
 t_DIFFERENT= r'\!\='
-t_NOT= r'\!'
 t_GTEQ= r'\>\='
 t_LTEQ= r'\<\='
 t_EQUIVALENTE= r'\=\='
@@ -148,7 +147,7 @@ def t_ID (t):
     elif t.value=='read':
         t.type='READ'
     elif t.value=='return':
-        t.type='RETURN'
+        t.type='RETURNX'
     elif t.value=='sin':
         t.type='SIN'
     elif t.value=='sort':
@@ -208,7 +207,9 @@ def t_ID (t):
     elif t.value=='barChart':
         t.type='BARCHART'
     elif t.value=='histogramChart':
-        t.type='histogramChart'
+        t.type='HISTOGRAMCHART'
+    elif t.value=='not':
+        t.type='NOT'
     else:
         t.type = 'ID'
     return t
@@ -237,7 +238,7 @@ while True:
 
 def p_rose(p):
     '''
-    rose : PROGRAM ID SEMICOLON roseauxvars roseauxfunc MAIN main
+    rose : PROGRAM ID SEMICOLON roseauxvars roseauxfunc main
     '''
     print("Exito")
 
@@ -254,7 +255,7 @@ def p_roseauxfunc(p):
     '''
 def p_main(p):
     '''
-    main : LEFTPARENTHESIS RIGHTPARENTHESIS bloque
+    main : MAIN LEFTPARENTHESIS RIGHTPARENTHESIS bloque
     '''
 
 def p_vars(p):
@@ -263,7 +264,7 @@ def p_vars(p):
         | tipo ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET SEMICOLON
         | tipo ID LEFTBRACKET CTEI RIGHTBRACKET EQUALS LEFTKEY asignacionarreglo RIGHTKEY SEMICOLON
         | tipo ID LEFTBRACKET CTEI RIGHTBRACKET SEMICOLON
-        | tipo ID EQUALS vars_cte SEMICOLON
+        | tipo ID EQUALS ctes SEMICOLON
         | tipo ID SEMICOLON
     '''
 
@@ -275,8 +276,8 @@ def p_asignacionmatriz(p):
 
 def p_asignacionarreglo(p):
     '''
-    asignacionarreglo : vars_cte COMMA asignacionarreglo
-                    | vars_cte
+    asignacionarreglo : ctes COMMA asignacionarreglo
+                    | ctes
     '''
 
 def p_tipo(p):
@@ -289,17 +290,17 @@ def p_tipo(p):
 
 def p_durante(p):
     '''
-    durante : WHILE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS sudo_bloque
+    durante : WHILE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS bloque
     '''
 
 def p_condition(p):
     '''
-    condition : IF LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS sudo_bloque else
+    condition : IF LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS bloque else
     '''
 
 def p_else(p):
     '''
-    else : ELSE sudo_bloque
+    else : ELSE bloque
         | empty
     '''
 
@@ -410,17 +411,8 @@ def p_aplicaciones(p):
                 | asignacion aplicaciones
                 | durante aplicaciones
                 | llama_func aplicaciones
+                | returnx aplicaciones
                 | empty
-    '''
-
-def p_sudo_bloque(p):
-    '''
-    sudo_bloque : LEFTKEY sudo_estatuto RIGHTKEY
-    '''
-
-def p_sudo_estatuto(p):
-    '''
-    sudo_estatuto : aplicaciones
     '''
 
 def p_vars_cte(p):
@@ -430,10 +422,7 @@ def p_vars_cte(p):
             | ID LEFTBRACKET mega_exp RIGHTBRACKET
             | ID LEFTPARENTHESIS params RIGHTPARENTHESIS
             | ID
-            | CTEI
-            | CTEF
-            | CTES 
-            | CTEB
+            | ctes
     '''
 
 def p_params(p):
@@ -491,6 +480,26 @@ def p_spec_func(p):
                 | TRANSPOSE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
                 | EXPORTCSV LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS 
                 | ARRANGE LEFTPARENTHESIS mega_exp COMMA mega_exp COMMA mega_exp RIGHTPARENTHESIS 
+                | GRAPH3D LEFTPARENTHESIS mega_exp COMMA mega_exp COMMA mega_exp RIGHTPARENTHESIS 
+                | PIECHART LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS
+                | HISTOGRAMCHART LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS
+                | LINECHART LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS
+                | BARCHART LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS
+                | LINREG LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS
+                | NOT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS
+    '''
+
+def p_returnx(p):
+    '''
+    returnx : RETURNX mega_exp SEMICOLON
+    '''
+
+def p_ctes(p):
+    '''
+    ctes : CTEI
+        | CTEF
+        | CTES
+        | CTEB
     '''
 
 def p_llama_func(p):
@@ -500,42 +509,6 @@ def p_llama_func(p):
 ########################
 # Nombres de funciones #
 ########################
-
-"""
-def p_specfun1(p):
-	'''
-    specfun1 : SQRT
-    		 | POW
-    		 | ABS
-    		 | STDEV
-    		 | MEAN
-    		 | MEDIAN
-    		 | MODE
-    		 | FACTORIAL
-    		 | SORT
-    		 | SIN
-    		 | COS
-    		 | TRANSPOSE
-    		 | EXPORTCSV
-    		 | ARRANGE
-    		
-    ''' 
-
-
-def p_specfun2(p):
-	'''
-    specfun2 : varscte specfun3
-    		 | empty
-    ''' 
-def p_specfun3(p):
-	'''
-    specfun3 : COMMA specfun2
-    		 | empty
-	'''
-
-"""
-
-
 
 def p_empty(p):
 	'''
