@@ -1,5 +1,5 @@
 program test; 
-var arbol: int; 
+globals arbol: int; 
 { 
 arbol = 5; 
 if(arbol>6){
