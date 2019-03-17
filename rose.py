@@ -37,13 +37,14 @@ tokens = [
     'LINECHART',
     'TRANSPOSE',
     'FUNC',
+    'VOID',
     'PIECHART',
     'BARCHART',
     'ARRANGE',
     'GRAPH3D',
     'GLOBALS',
     'STRING',
-    'RETURN',
+    'RETURNX',
     'MEDIAN',
     'LINREG',
     'APPEND',
@@ -53,7 +54,6 @@ tokens = [
     'STDEV',
     'MULTICOMOP',
     'MULTICOMCL',
-    'COMMENT',
     'GTEQ',
     'LTEQ',
     'EQUIVALENTE',
@@ -73,7 +73,9 @@ tokens = [
     'NOT',
     'OR' ,
 	'LEFTKEY',
-	'RIGHTKEY'
+	'RIGHTKEY',
+	'NEWLINE',
+	'COMENTARIO'
 ]
 
 #MultiCommentOpen
@@ -81,7 +83,6 @@ t_MULTICOMOP= r'\/\*'
 #MultiCommentClose
 t_MULTICOMCL= r'\*\/'
 
-t_COMMENT= r'\/\/'
 
 t_COLON= r'\:'
 t_SEMICOLON= r'\;'
@@ -94,7 +95,6 @@ t_MULTIPLY= r'\*'
 t_QUOTE= r'\"'
 
 t_DIFFERENT= r'\!\='
-t_NOT= r'\!'
 t_GTEQ= r'\>\='
 t_LTEQ= r'\<\='
 t_EQUIVALENTE= r'\=\='
@@ -108,9 +108,6 @@ t_LEFTKEY= r'\{'
 t_RIGHTKEY= r'\}'
 t_LEFTPARENTHESIS= r'\('
 t_RIGHTPARENTHESIS= r'\)'
-
-
-t_ignore = r' '
 
 def t_CTEF (t):
     r'\d+\.\d+'
@@ -147,7 +144,7 @@ def t_ID (t):
     elif t.value=='read':
         t.type='READ'
     elif t.value=='return':
-        t.type='RETURN'
+        t.type='RETURNX'
     elif t.value=='sin':
         t.type='SIN'
     elif t.value=='sort':
@@ -190,6 +187,8 @@ def t_ID (t):
         t.type='LINREG'
     elif t.value=='func':
         t.type='FUNC'
+    elif t.value=='void':
+        t.type='VOID'
     elif t.value=='append':
         t.type='APPEND'
     elif t.value=='main':
@@ -205,25 +204,42 @@ def t_ID (t):
     elif t.value=='barChart':
         t.type='BARCHART'
     elif t.value=='histogramChart':
-        t.type='histogramChart'
+        t.type='HISTOGRAMCHART'
+    elif t.value=='not':
+        t.type='NOT'
     else:
         t.type = 'ID'
     return t
 
 def t_CTES (t):
-    r'\'[a-zA-Z_ 0-9]+\''
+    r'\"[a-zA-Z_ 0-9]+\"'
     t.type = 'CTES'
     return t
 
+def t_NEWLINE(t):
+    r'\n'
+    #print("Salto de linea " + str(lexer.lineno) )
+    t.lexer.lineno += 1
+    return t
+
+def t_COMENTARIO(t): 
+    r'(\/\/.*)'
+    #print("commentario en " + str(t.lexer.lineno) + ": " + str(t.value))
+    return t
+
+def t_tabulador(t):
+    r'\t'
+    pass
+
 def t_error(t):
-    print("Caracteres no reconocidos")
+    print("Caracteres no reconocidos " + str(t.type))
     t.lexer.skip(1)
 
+t_ignore = r' '
+
 lexer = lex.lex()
-
-
 """
-lexer.input("globals arbol: int; ")
+lexer.input('program test; globals int arbol = 3; func void myfunk(int ola;){ } main (){ int arbol = 5; if(arbol>6){print(arbol);}else{ print(arbol);};}')
 
 while True:
     tok = lexer.token()
@@ -234,334 +250,288 @@ while True:
 
 def p_rose(p):
     '''
-    rose : PROGRAM ID SEMICOLON roseaux MAIN main
+    rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
     '''
-    print("Exito")
+    print("Exito. # salto de linea: " + str(lexer.lineno))
 
+def p_roseauxvars(p):
+    '''
+    roseauxvars : GLOBALS comments_nl vars comments_nl roseauxvars comments_nl
+            | empty
+    '''
 
-def p_roseaux(p):
+def p_roseauxfunc(p):
     '''
-	roseaux :	GLOBALS vars roseaux2 roseaux3
-			| 	func roseaux3
-			|	empty
+    roseauxfunc : func comments_nl roseauxfunc comments_nl
+                | empty
     '''
-def p_roseaux2(p):
+def p_main(p):
     '''
-	roseaux2 :	vars roseaux2
-			 |	empty
-	'''
-def p_roseaux3(p):
+    main : MAIN comments_nl LEFTPARENTHESIS comments_nl RIGHTPARENTHESIS comments_nl bloque comments_nl
     '''
-	roseaux3 :	func roseaux3
-			 |	empty
-	'''
 
 def p_vars(p):
-	'''
-	vars : tipo ID varsaux SEMICOLON
-	'''
-def p_varsaux(p):
-	'''
-	varsaux :	arreglo varsaux1
-			|	EQUALS varscte
-			|	empty
-	'''
-def p_varsaux1(p):
-	'''
-	varsaux1 :	asigna
-			 |	arreglo asigna
-	'''
+    '''
+    vars : tipo comments_nl ID comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionmatriz comments_nl  RIGHTKEY comments_nl SEMICOLON comments_nl
+        | tipo comments_nl ID comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl SEMICOLON comments_nl
+        | tipo comments_nl ID comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionarreglo comments_nl RIGHTKEY comments_nl SEMICOLON comments_nl
+        | tipo comments_nl ID comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl SEMICOLON comments_nl
+        | tipo comments_nl ID comments_nl EQUALS comments_nl ctes comments_nl SEMICOLON comments_nl
+        | tipo comments_nl ID comments_nl SEMICOLON comments_nl
+    '''
 
-def p_arreglo(p):
-	'''
-	arreglo :	LEFTBRACKET varscte RIGHTBRACKET
-	'''
+def p_asignacionmatriz(p):
+    '''
+    asignacionmatriz : LEFTKEY comments_nl asignacionarreglo comments_nl RIGHTKEY comments_nl COMMA comments_nl asignacionmatriz comments_nl
+                    | LEFTKEY comments_nl asignacionarreglo comments_nl RIGHTKEY comments_nl
+    '''
 
-def p_asigna(p):
-	'''
-	asigna	:	EQUALS asigna1
-			|	empty
-	'''
-def p_asigna1(p):
-	'''
-	asigna1	:	unidimensional
-			|	bidimensional
-	'''
+def p_asignacionarreglo(p):
+    '''
+    asignacionarreglo : ctes comments_nl COMMA comments_nl asignacionarreglo comments_nl
+                    | ctes comments_nl
+    '''
 
-
-def p_unidimensional(p):
-	'''
-	unidimensional :	LEFTKEY varscte unidime1 RIGHTKEY
-	'''
-def p_unidime1(p):
-	'''
-	unidime1 :	COMMA varscte unidime1
-			 |	empty
-	'''
-
-def p_bidimensional(p):
-	'''
-	bidimensional :	LEFTKEY unidimensional bidi1 RIGHTKEY
-	'''
-def p_bidi1(p):
-	'''
-	bidi1	:	COMMA unidimensional
-			|	empty
-	'''
-
-
-def p_megaexp(p):
-	'''
-	megaexp	:	expcomp megaexp1
-	'''
-def p_megaexp1(p):
-	'''
-	megaexp1	:	logicalexp
-				|	empty
-	'''
-
-
-def p_expcomp(p):
-	'''
-	expcomp	:	exp expcomp1
-	'''
-def p_expcomp1(p):
-	'''
-	expcomp1 :	expcomp2
-			 |	empty
-	'''
-def p_expcomp2(p):
-	'''
-	expcomp2 :	GTEQ exp
-			 |	LTEQ exp
-			 |	EQUIVALENTE exp
-			 |	GT exp
-			 |	LT exp
-			 |	DIFFERENT exp
-	'''
-
-def p_logicalexp(p):
-	'''
-	logicalexp	:	OR
-				|	AND
-	'''
+def p_tipo(p):
+    '''
+    tipo : INT comments_nl
+        | FLOAT comments_nl
+        | STRING comments_nl
+        | BOOL comments_nl
+    '''
 
 def p_durante(p):
-	'''
-	durante	:	WHILE LEFTPARENTHESIS megaexp RIGHTPARENTHESIS bloque
-			
-	'''
-
-def p_exp(p):
-	'''
-	exp	:	termino exp1
-	'''
-def p_exp1(p):
-	'''
-	exp1 :	PLUS exp
-		 |	MINUS exp
-         |  empty
-	'''
-
-def p_termino(p):
-	'''
-	termino	:	factor ter1
-	'''
-def p_ter1(p):
-	'''
-	ter1 :	MULTIPLY termino
-		 |	DIVIDE termino
-         |  empty
-	'''
-
-def p_factor(p):
-	'''
-	factor	:	PLUS varscte
-			|	MINUS varscte
-			|	varscte
-			|	LEFTPARENTHESIS exp RIGHTPARENTHESIS
-	'''
-
-def p_func(p):
-	'''
-	func	:	func1 LEFTPARENTHESIS func2 RIGHTPARENTHESIS bloque
-	'''
-def p_func1(p):
-	'''
-	func1	:	tipo
-			|	FUNC
-	'''
-def p_func2(p):
-	'''
-	func2	:	tipo func3
-	'''
-def p_func3(p):
-	'''
-	func3	:	ID tiposid func4
-	'''
-def p_func4(p):
-	'''
-	func4	:	COMMA ID func3
-			| 	SEMICOLON func5
-	'''
-def p_func5(p):
-	'''
-	func5	:	func2
-			| 	empty
-	'''
-
-def p_tiposid(p):
     '''
-    tiposid : LEFTBRACKET exp RIGHTBRACKET tiposid1
-    		| empty
-    '''
-def p_tiposid1(p):
-    '''
-    tiposid1 : LEFTBRACKET exp RIGHTBRACKET
-    		 | empty
+    durante : WHILE comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl bloque comments_nl
     '''
 
 def p_condition(p):
     '''
-    condition 	: IF LEFTPARENTHESIS megaexp RIGHTPARENTHESIS bloque condi1
+    condition : IF comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl bloque comments_nl else comments_nl
     '''
-def p_condi1(p):
+
+def p_else(p):
     '''
-    condi1 	: 	ELSE bloque
-    		|	empty
+    else : ELSE comments_nl bloque comments_nl
+        | empty
+    '''
+
+def p_mega_exp(p):
+    '''
+    mega_exp : expression_compare comments_nl mega_expaux comments_nl
+    '''
+
+def p_mega_expaux(p):
+    '''
+    mega_expaux : OR comments_nl expression_compare comments_nl mega_expaux comments_nl
+                | AND comments_nl expression_compare comments_nl mega_expaux comments_nl
+                | empty
+    '''
+
+def p_expression_compare(p):
+    '''
+    expression_compare : exp comments_nl DIFFERENT comments_nl exp comments_nl 
+                    | exp comments_nl GTEQ comments_nl exp comments_nl
+                    | exp comments_nl LTEQ comments_nl exp comments_nl 
+                    | exp comments_nl EQUIVALENTE comments_nl exp comments_nl
+                    | exp comments_nl GT comments_nl exp comments_nl
+                    | exp comments_nl LT comments_nl exp comments_nl
+                    | exp comments_nl
+    '''
+
+def p_exp(p):
+    '''
+    exp : termino comments_nl expaux comments_nl
+    '''
+
+def p_expaux(p):
+    '''
+    expaux : PLUS comments_nl termino comments_nl expaux comments_nl
+            | MINUS comments_nl termino comments_nl expaux comments_nl
+            | empty 
+    '''
+
+def p_termino(p):
+    '''
+    termino : factor comments_nl terminoaux comments_nl
+    '''
+
+def p_terminoaux(p):
+    '''
+    terminoaux : DIVIDE comments_nl factor comments_nl terminoaux comments_nl
+                | MULTIPLY comments_nl factor comments_nl terminoaux comments_nl
+                | empty
+    '''
+
+def p_factor(p):
+    '''
+    factor : PLUS comments_nl vars_cte comments_nl
+            | MINUS comments_nl vars_cte comments_nl
+            | vars_cte comments_nl
+            | LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
+    '''
+
+def p_func(p):
+    '''
+    func : FUNC comments_nl VOID comments_nl restofuncion comments_nl
+        | FUNC comments_nl tipo comments_nl restofuncion comments_nl
+    '''
+
+def p_restofuncion(p):
+    '''
+    restofuncion : ID comments_nl LEFTPARENTHESIS comments_nl argumentos comments_nl RIGHTPARENTHESIS comments_nl bloque comments_nl
+    '''
+
+def p_argumentos(p):
+    '''
+    argumentos : tipo comments_nl mismotipo comments_nl SEMICOLON comments_nl argumentos comments_nl
+                | empty
+    '''
+
+def p_mismotipo(p):
+    '''
+    mismotipo : ID comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl COMMA comments_nl mismotipo comments_nl
+                | ID comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl COMMA comments_nl mismotipo comments_nl
+                | ID comments_nl COMMA comments_nl mismotipo comments_nl
+                | ID comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl
+                | ID comments_nl LEFTBRACKET comments_nl CTEI comments_nl RIGHTBRACKET comments_nl
+                | ID comments_nl  
+
     '''
 
 def p_bloque(p):
     '''
-    bloque 	: 	LEFTKEY bloque1 RIGHTKEY
-    '''
-def p_bloque1(p):
-    '''
-    bloque1	: 	estatuto
-    		|	empty
+    bloque : LEFTKEY comments_nl estatuto comments_nl RIGHTKEY comments_nl
     '''
 
 def p_estatuto(p):
     '''
-    estatuto 	: 	estatuto1 estatuto2
-    '''
-def p_estatuto1(p):
-    '''
-    estatuto1 	: 	vars estatuto1
-    			|	empty
-    '''
-def p_estatuto2(p):
-    '''
-    estatuto2 	: 	condition estatuto2
-    			|	escritura estatuto2
-    			|	lectura estatuto2
-    			|	specfun estatuto2
-    			|	asignacion estatuto2
-    			|	durante estatuto2
-    			| 	llamafunc estatuto2
-    			|	empty
+    estatuto : declaracionvariables comments_nl aplicaciones comments_nl
     '''
 
-def p_llamafunc(p):
-	'''
-    llamafunc : ID LEFTPARENTHESIS llamafunc1 RIGHTPARENTHESIS SEMICOLON
-    ''' 
-def p_llamafunc1(p):
-	'''
-    llamafunc1 : ID tiposid llamafunc2
-    ''' 
-def p_llamafunc2(p):
-	'''
-    llamafunc2  : COMMA llamafunc1
-    			| empty
-    ''' 
+def p_declaracionvariables(p):
+    '''
+    declaracionvariables : vars comments_nl declaracionvariables comments_nl
+                        | empty
+    '''
+def p_aplicaciones(p):
+    '''
+    aplicaciones : condition comments_nl aplicaciones comments_nl
+                | escritura comments_nl aplicaciones comments_nl
+                | lectura comments_nl aplicaciones comments_nl
+                | llama_spec_func comments_nl aplicaciones comments_nl
+                | asignacion comments_nl aplicaciones comments_nl
+                | durante comments_nl aplicaciones comments_nl
+                | llama_func comments_nl aplicaciones comments_nl
+                | returnx comments_nl aplicaciones comments_nl
+                | empty
+    '''
 
+def p_vars_cte(p):
+    '''
+    vars_cte : spec_func
+            | ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl
+            | ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl
+            | ID comments_nl LEFTPARENTHESIS comments_nl params comments_nl RIGHTPARENTHESIS comments_nl
+            | ID comments_nl
+            | ctes comments_nl
+    '''
 
-
-def p_varscte(p):
-	'''
-    varscte : ID tiposid
-    		| CTEI
-    		| CTEF
-    		| CTES
-    		| CTEB
-    ''' 
+def p_params(p):
+    '''
+    params : paramsaux comments_nl
+            | empty
+    '''
+def p_paramsaux(p):
+    '''
+    paramsaux : mega_exp comments_nl COMMA comments_nl paramsaux comments_nl
+                | mega_exp
+    '''
 
 def p_asignacion(p):
-	'''
-    asignacion : ID tiposid EQUALS exp SEMICOLON
-    ''' 
+    '''
+    asignacion : ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp comments_nl SEMICOLON comments_nl
+               | ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp comments_nl SEMICOLON comments_nl
+               | ID comments_nl EQUALS comments_nl mega_exp comments_nl SEMICOLON comments_nl
+    '''
 
 def p_escritura(p):
-	'''
-    escritura : PRINT LEFTPARENTHESIS escri1 RIGHTPARENTHESIS SEMICOLON
-    ''' 
-def p_escri1(p):
-	'''
-    escri1 : megaexp escri2
-    ''' 
-def p_escri2(p):
-	'''
-    escri2 	: PLUS escri1
-			| empty
-    ''' 
-
+    '''
+    escritura : PRINT comments_nl LEFTPARENTHESIS comments_nl escrito comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON comments_nl
+    '''
+def p_escrito(p):
+    '''
+    escrito : mega_exp comments_nl PLUS comments_nl escrito comments_nl
+            | mega_exp comments_nl
+    '''
 def p_lectura(p):
-	'''
-    lectura : READ LEFTPARENTHESIS ID tiposid LEFTPARENTHESIS SEMICOLON
+    '''
+    lectura : READ comments_nl LEFTPARENTHESIS comments_nl ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON comments_nl
+            | READ comments_nl LEFTPARENTHESIS comments_nl ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON comments_nl
+            | READ comments_nl LEFTPARENTHESIS comments_nl ID comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON comments_nl
     '''
 
-def p_specfun(p):
-	'''
-    specfun : specfun1 LEFTPARENTHESIS specfun2 RIGHTPARENTHESIS SEMICOLON
-    ''' 
-
-########################
-# Nombres de funciones #
-########################
-def p_specfun1(p):
-	'''
-    specfun1 : SQRT
-    		 | POW
-    		 | ABS
-    		 | STDEV
-    		 | MEAN
-    		 | MEDIAN
-    		 | MODE
-    		 | FACTORIAL
-    		 | SORT
-    		 | SIN
-    		 | COS
-    		 | TRANSPOSE
-    		 | EXPORTCSV
-    		 | ARRANGE
-    		
-    ''' 
-def p_specfun2(p):
-	'''
-    specfun2 : varscte specfun3
-    		 | empty
-    ''' 
-def p_specfun3(p):
-	'''
-    specfun3 : COMMA specfun2
-    		 | empty
-	'''
-
-def p_main(p):
+def p_llama_spec_func(p):
     '''
-    main : bloque
-    ''' 
-
-def p_tipo(p):
+    llama_spec_func : spec_func comments_nl SEMICOLON comments_nl
     '''
-    tipo    : INT
-            | FLOAT
-            | STRING
-            | BOOL 
-    ''' 
 
+def p_spec_func(p):
+    '''
+    spec_func : SQRT comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | POW comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | ABS comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | STDEV comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | MEAN comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | MEDIAN comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | MODE comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | FACTORIAL comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | SORT comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | SIN comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | COS comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | TRANSPOSE comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | EXPORTCSV comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | ARRANGE comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | GRAPH3D comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
+                | PIECHART comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
+                | HISTOGRAMCHART comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
+                | LINECHART comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
+                | BARCHART comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
+                | LINREG comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
+                | NOT comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
+    '''
 
+def p_returnx(p):
+    '''
+    returnx : RETURNX comments_nl mega_exp comments_nl SEMICOLON comments_nl
+    '''
+
+def p_ctes(p):
+    '''
+    ctes : CTEI comments_nl
+        | CTEF comments_nl
+        | CTES comments_nl
+        | CTEB comments_nl
+    '''
+
+def p_llama_func(p):
+    '''
+    llama_func : ID comments_nl LEFTPARENTHESIS comments_nl params comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON comments_nl
+    '''
+
+def p_comments_nl(p):
+	'''
+	comments_nl : NEWLINE comments_nl
+				| COMENTARIO comentarioaux
+				| empty
+	'''
+
+def p_comentarioaux(p):
+    '''
+    comentarioaux 	: NEWLINE comentarioaux comments_nl
+    				| empty
+        
+    '''
 
 def p_empty(p):
 	'''
@@ -569,14 +539,14 @@ def p_empty(p):
     ''' 
 
 def p_error(p):
-    print ("Error de compilacion")
+    print ("Syntax error in line " + str(lexer.lineno))
 
 parser = yacc.yacc() 
 
-#Cambiar el nombre del archivo de entrada para tener probar el codigo incorrecto
+#Cambiar el nombre del archivo de entrada para probar el codigo
 name='pruebaRose.txt'
 with open(name, 'r') as myfile:
-    s=myfile.read().replace('\n', '')
+    s=myfile.read()
 print(name)
 parser.parse(s)
 
