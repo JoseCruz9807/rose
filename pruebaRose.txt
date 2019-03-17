@@ -5,6 +5,7 @@ test;
 //Las que hago
 globals int arbol = 3;
 globals int finca=4;
+
 func void myfunk(int ola, crayola; float xd; bool mat[8][3], arr[9];)
 //comment para tantear donde va el comments_nl
 {
