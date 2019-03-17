@@ -1,11 +1,13 @@
-program test; 
+program 
+test; 
 globals int arbol = 3;
 globals int funca=4;
 
-func void myfunk(int ola, crayola; float xd;){
+func void myfunk(int ola, crayola; float xd; bool mat[8][3], arr[9];){
 int variable = "soasadas";
 int variable2= 2.3;
 exportCSVV=2;
+return n;
 }
 
 main (){ 
@@ -15,13 +17,16 @@ int ola [4][6]={{3,4,3,3},
                 {3,4,3,3},
                 {3,4,3,3},
                 {3,4,3,3},
-                {3,4,3,3}};
-if(ola[3][3+ ola[1][1]]>6/5){
+                {3,4,3,3},
+                {2}};
+string strPrueba = "Prueba de string";
+if(ola[3][3+ ola[1][1]]>6/5 AND 3*9 OR pol){
     print(arbol+ola[4][4]);
 }
-else{
-    print("arbol");
-    myfunk(ola[2][2]);
-}
-
+else
+	{
+	print("arbol");
+	myfunk(ola[2][2]);
+	print(strPrueba);
+	}
 }

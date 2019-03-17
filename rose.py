@@ -74,7 +74,8 @@ tokens = [
     'NOT',
     'OR' ,
 	'LEFTKEY',
-	'RIGHTKEY'
+	'RIGHTKEY',
+	'NEWLINE'
 ]
 
 #MultiCommentOpen
@@ -108,9 +109,6 @@ t_LEFTKEY= r'\{'
 t_RIGHTKEY= r'\}'
 t_LEFTPARENTHESIS= r'\('
 t_RIGHTPARENTHESIS= r'\)'
-
-
-t_ignore = r' '
 
 def t_CTEF (t):
     r'\d+\.\d+'
@@ -219,9 +217,18 @@ def t_CTES (t):
     t.type = 'CTES'
     return t
 
+def t_NEWLINE(t):
+    r'\n'
+    t.lexer.lineno += 1
+    print("Salto de linea " + str(lexer.lineno))
+    return t
+
+
 def t_error(t):
-    print("Caracteres no reconocidos")
+    print("Caracteres no reconocidos " + str(t.type))
     t.lexer.skip(1)
+
+t_ignore = r' '
 
 lexer = lex.lex()
 
@@ -238,277 +245,280 @@ while True:
 
 def p_rose(p):
     '''
-    rose : PROGRAM ID SEMICOLON roseauxvars roseauxfunc main
+    rose : PROGRAM eol ID eol SEMICOLON eol roseauxvars eol roseauxfunc eol main eol
     '''
-    print("Exito")
+    print("Exito. # salto de linea: " + str(lexer.lineno))
 
 def p_roseauxvars(p):
     '''
-    roseauxvars : GLOBALS vars roseauxvars
+    roseauxvars : GLOBALS eol vars eol roseauxvars eol
             | empty
     '''
 
 def p_roseauxfunc(p):
     '''
-    roseauxfunc : func roseauxfunc
+    roseauxfunc : func eol roseauxfunc eol
                 | empty
     '''
 def p_main(p):
     '''
-    main : MAIN LEFTPARENTHESIS RIGHTPARENTHESIS bloque
+    main : MAIN eol LEFTPARENTHESIS eol RIGHTPARENTHESIS eol bloque eol
     '''
 
 def p_vars(p):
     '''
-    vars : tipo ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET EQUALS LEFTKEY asignacionmatriz  RIGHTKEY SEMICOLON
-        | tipo ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET SEMICOLON
-        | tipo ID LEFTBRACKET CTEI RIGHTBRACKET EQUALS LEFTKEY asignacionarreglo RIGHTKEY SEMICOLON
-        | tipo ID LEFTBRACKET CTEI RIGHTBRACKET SEMICOLON
-        | tipo ID EQUALS ctes SEMICOLON
-        | tipo ID SEMICOLON
+    vars : tipo eol ID eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol EQUALS eol LEFTKEY eol asignacionmatriz eol  RIGHTKEY eol SEMICOLON eol
+        | tipo eol ID eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol SEMICOLON eol
+        | tipo eol ID eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol EQUALS eol LEFTKEY eol asignacionarreglo eol RIGHTKEY eol SEMICOLON eol
+        | tipo eol ID eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol SEMICOLON eol
+        | tipo eol ID eol EQUALS eol ctes eol SEMICOLON eol
+        | tipo eol ID eol SEMICOLON eol
     '''
 
 def p_asignacionmatriz(p):
     '''
-    asignacionmatriz : LEFTKEY asignacionarreglo RIGHTKEY COMMA asignacionmatriz
-                    | LEFTKEY asignacionarreglo RIGHTKEY
+    asignacionmatriz : LEFTKEY eol asignacionarreglo eol RIGHTKEY eol COMMA eol asignacionmatriz eol
+                    | LEFTKEY eol asignacionarreglo eol RIGHTKEY eol
     '''
 
 def p_asignacionarreglo(p):
     '''
-    asignacionarreglo : ctes COMMA asignacionarreglo
-                    | ctes
+    asignacionarreglo : ctes eol COMMA eol asignacionarreglo eol
+                    | ctes eol
     '''
 
 def p_tipo(p):
     '''
-    tipo : INT
-        | FLOAT
-        | STRING
-        | BOOL
+    tipo : INT eol
+        | FLOAT eol
+        | STRING eol
+        | BOOL eol
     '''
 
 def p_durante(p):
     '''
-    durante : WHILE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS bloque
+    durante : WHILE eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol bloque eol
     '''
 
 def p_condition(p):
     '''
-    condition : IF LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS bloque else
+    condition : IF eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol bloque eol else eol
     '''
 
 def p_else(p):
     '''
-    else : ELSE bloque
+    else : ELSE eol bloque eol
         | empty
     '''
 
 def p_mega_exp(p):
     '''
-    mega_exp : expression_compare mega_expaux
+    mega_exp : expression_compare eol mega_expaux eol
     '''
 
 def p_mega_expaux(p):
     '''
-    mega_expaux : OR expression_compare mega_expaux
-                | AND expression_compare mega_expaux
+    mega_expaux : OR eol expression_compare eol mega_expaux eol
+                | AND eol expression_compare eol mega_expaux eol
                 | empty
     '''
 
 def p_expression_compare(p):
     '''
-    expression_compare : exp DIFFERENT exp 
-                    | exp GTEQ exp
-                    | exp LTEQ exp 
-                    | exp EQUIVALENTE exp
-                    | exp GT exp
-                    | exp LT exp
-                    | exp
+    expression_compare : exp eol DIFFERENT eol exp eol 
+                    | exp eol GTEQ eol exp eol
+                    | exp eol LTEQ eol exp eol 
+                    | exp eol EQUIVALENTE eol exp eol
+                    | exp eol GT eol exp eol
+                    | exp eol LT eol exp eol
+                    | exp eol
     '''
 
 def p_exp(p):
     '''
-    exp : termino expaux
+    exp : termino eol expaux eol
     '''
 
 def p_expaux(p):
     '''
-    expaux : PLUS termino expaux
-            | MINUS termino expaux
+    expaux : PLUS eol termino eol expaux eol
+            | MINUS eol termino eol expaux eol
             | empty 
     '''
 
 def p_termino(p):
     '''
-    termino : factor terminoaux
+    termino : factor eol terminoaux eol
     '''
 
 def p_terminoaux(p):
     '''
-    terminoaux : DIVIDE factor terminoaux
-                | MULTIPLY factor terminoaux
+    terminoaux : DIVIDE eol factor eol terminoaux eol
+                | MULTIPLY eol factor eol terminoaux eol
                 | empty
     '''
 
 def p_factor(p):
     '''
-    factor : PLUS vars_cte
-            | MINUS vars_cte
-            | vars_cte
-            | LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS
+    factor : PLUS eol vars_cte eol
+            | MINUS eol vars_cte eol
+            | vars_cte eol
+            | LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol
     '''
 
 def p_func(p):
     '''
-    func : FUNC VOID restofuncion
-        | FUNC tipo restofuncion
+    func : FUNC eol VOID eol restofuncion eol
+        | FUNC eol tipo eol restofuncion eol
     '''
 
 def p_restofuncion(p):
     '''
-    restofuncion : ID LEFTPARENTHESIS argumentos RIGHTPARENTHESIS bloque
+    restofuncion : ID eol LEFTPARENTHESIS eol argumentos eol RIGHTPARENTHESIS eol bloque eol
     '''
 
 def p_argumentos(p):
     '''
-    argumentos : tipo mismotipo SEMICOLON argumentos
+    argumentos : tipo eol mismotipo eol SEMICOLON eol argumentos eol
                 | empty
     '''
 
 def p_mismotipo(p):
     '''
-    mismotipo : ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET COMMA mismotipo
-                | ID LEFTBRACKET CTEI RIGHTBRACKET COMMA mismotipo
-                | ID COMMA mismotipo
-                | ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET  
-                | ID LEFTBRACKET CTEI RIGHTBRACKET  
-                | ID  
+    mismotipo : ID eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol COMMA eol mismotipo eol
+                | ID eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol COMMA eol mismotipo eol
+                | ID eol COMMA eol mismotipo eol
+                | ID eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol
+                | ID eol LEFTBRACKET eol CTEI eol RIGHTBRACKET eol
+                | ID eol  
 
     '''
 
 def p_bloque(p):
     '''
-    bloque : LEFTKEY estatuto RIGHTKEY
+    bloque : LEFTKEY eol estatuto eol RIGHTKEY eol
     '''
 
 def p_estatuto(p):
     '''
-    estatuto : declaracionvariables aplicaciones
+    estatuto : declaracionvariables eol aplicaciones eol
     '''
 
 def p_declaracionvariables(p):
     '''
-    declaracionvariables : vars declaracionvariables
+    declaracionvariables : vars eol declaracionvariables eol
                         | empty
     '''
 def p_aplicaciones(p):
     '''
-    aplicaciones : condition aplicaciones
-                | escritura aplicaciones
-                | lectura aplicaciones
-                | llama_spec_func aplicaciones
-                | asignacion aplicaciones
-                | durante aplicaciones
-                | llama_func aplicaciones
-                | returnx aplicaciones
+    aplicaciones : condition eol aplicaciones eol
+                | escritura eol aplicaciones eol
+                | lectura eol aplicaciones eol
+                | llama_spec_func eol aplicaciones eol
+                | asignacion eol aplicaciones eol
+                | durante eol aplicaciones eol
+                | llama_func eol aplicaciones eol
+                | returnx eol aplicaciones eol
                 | empty
     '''
 
 def p_vars_cte(p):
     '''
     vars_cte : spec_func
-            | ID LEFTBRACKET mega_exp RIGHTBRACKET LEFTBRACKET mega_exp RIGHTBRACKET
-            | ID LEFTBRACKET mega_exp RIGHTBRACKET
-            | ID LEFTPARENTHESIS params RIGHTPARENTHESIS
-            | ID
-            | ctes
+            | ID eol LEFTBRACKET eol mega_exp eol RIGHTBRACKET eol LEFTBRACKET eol mega_exp eol RIGHTBRACKET eol
+            | ID eol LEFTBRACKET eol mega_exp eol RIGHTBRACKET eol
+            | ID eol LEFTPARENTHESIS eol params eol RIGHTPARENTHESIS eol
+            | ID eol
+            | ctes eol
     '''
 
 def p_params(p):
     '''
-    params : paramsaux
+    params : paramsaux eol
             | empty
     '''
 def p_paramsaux(p):
     '''
-    paramsaux : mega_exp COMMA paramsaux
+    paramsaux : mega_exp eol COMMA eol paramsaux eol
                 | mega_exp
     '''
 
 def p_asignacion(p):
     '''
-    asignacion : ID LEFTBRACKET mega_exp RIGHTBRACKET LEFTBRACKET mega_exp RIGHTBRACKET EQUALS mega_exp SEMICOLON
-               | ID LEFTBRACKET mega_exp RIGHTBRACKET EQUALS mega_exp SEMICOLON
-               | ID EQUALS mega_exp SEMICOLON
+    asignacion : ID eol LEFTBRACKET eol mega_exp eol RIGHTBRACKET eol LEFTBRACKET eol mega_exp eol RIGHTBRACKET eol EQUALS eol mega_exp eol SEMICOLON eol
+               | ID eol LEFTBRACKET eol mega_exp eol RIGHTBRACKET eol EQUALS eol mega_exp eol SEMICOLON eol
+               | ID eol EQUALS eol mega_exp eol SEMICOLON eol
     '''
 
 def p_escritura(p):
     '''
-    escritura : PRINT LEFTPARENTHESIS escrito RIGHTPARENTHESIS SEMICOLON
+    escritura : PRINT eol LEFTPARENTHESIS eol escrito eol RIGHTPARENTHESIS eol SEMICOLON eol
     '''
 def p_escrito(p):
     '''
-    escrito : mega_exp PLUS escrito
-            | mega_exp
+    escrito : mega_exp eol PLUS eol escrito eol
+            | mega_exp eol
     '''
 def p_lectura(p):
     '''
-    lectura : READ LEFTPARENTHESIS ID LEFTBRACKET mega_exp RIGHTBRACKET LEFTBRACKET mega_exp RIGHTBRACKET RIGHTPARENTHESIS SEMICOLON
-            | READ LEFTPARENTHESIS ID LEFTBRACKET mega_exp RIGHTBRACKET RIGHTPARENTHESIS SEMICOLON
-            | READ LEFTPARENTHESIS ID RIGHTPARENTHESIS SEMICOLON
+    lectura : READ eol LEFTPARENTHESIS eol ID eol LEFTBRACKET eol mega_exp eol RIGHTBRACKET eol LEFTBRACKET eol mega_exp eol RIGHTBRACKET eol RIGHTPARENTHESIS eol SEMICOLON eol
+            | READ eol LEFTPARENTHESIS eol ID eol LEFTBRACKET eol mega_exp eol RIGHTBRACKET eol RIGHTPARENTHESIS eol SEMICOLON eol
+            | READ eol LEFTPARENTHESIS eol ID eol RIGHTPARENTHESIS eol SEMICOLON eol
     '''
 
 def p_llama_spec_func(p):
     '''
-    llama_spec_func : spec_func SEMICOLON
+    llama_spec_func : spec_func eol SEMICOLON eol
     '''
 
 def p_spec_func(p):
     '''
-    spec_func : SQRT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
-                | POW LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS 
-                | ABS LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
-                | STDEV LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
-                | MEAN LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
-                | MEDIAN LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
-                | MODE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
-                | FACTORIAL LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
-                | SORT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
-                | SIN LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
-                | COS LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
-                | TRANSPOSE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
-                | EXPORTCSV LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS 
-                | ARRANGE LEFTPARENTHESIS mega_exp COMMA mega_exp COMMA mega_exp RIGHTPARENTHESIS 
-                | GRAPH3D LEFTPARENTHESIS mega_exp COMMA mega_exp COMMA mega_exp RIGHTPARENTHESIS 
-                | PIECHART LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS
-                | HISTOGRAMCHART LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS
-                | LINECHART LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS
-                | BARCHART LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS
-                | LINREG LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS
-                | NOT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS
+    spec_func : SQRT eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol 
+                | POW eol LEFTPARENTHESIS eol mega_exp eol COMMA eol mega_exp eol RIGHTPARENTHESIS eol 
+                | ABS eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol 
+                | STDEV eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol 
+                | MEAN eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol 
+                | MEDIAN eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol 
+                | MODE eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol 
+                | FACTORIAL eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol 
+                | SORT eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol 
+                | SIN eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol 
+                | COS eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol 
+                | TRANSPOSE eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol 
+                | EXPORTCSV eol LEFTPARENTHESIS eol mega_exp eol COMMA eol mega_exp eol RIGHTPARENTHESIS eol 
+                | ARRANGE eol LEFTPARENTHESIS eol mega_exp eol COMMA eol mega_exp eol COMMA eol mega_exp eol RIGHTPARENTHESIS eol 
+                | GRAPH3D eol LEFTPARENTHESIS eol mega_exp eol COMMA eol mega_exp eol COMMA eol mega_exp eol RIGHTPARENTHESIS eol 
+                | PIECHART eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol
+                | HISTOGRAMCHART eol LEFTPARENTHESIS eol mega_exp eol COMMA eol mega_exp eol RIGHTPARENTHESIS eol
+                | LINECHART eol LEFTPARENTHESIS eol mega_exp eol COMMA eol mega_exp eol RIGHTPARENTHESIS eol
+                | BARCHART eol LEFTPARENTHESIS eol mega_exp eol COMMA eol mega_exp eol RIGHTPARENTHESIS eol
+                | LINREG eol LEFTPARENTHESIS eol mega_exp eol COMMA eol mega_exp eol RIGHTPARENTHESIS eol
+                | NOT eol LEFTPARENTHESIS eol mega_exp eol RIGHTPARENTHESIS eol
     '''
 
 def p_returnx(p):
     '''
-    returnx : RETURNX mega_exp SEMICOLON
+    returnx : RETURNX eol mega_exp eol SEMICOLON eol
     '''
 
 def p_ctes(p):
     '''
-    ctes : CTEI
-        | CTEF
-        | CTES
-        | CTEB
+    ctes : CTEI eol
+        | CTEF eol
+        | CTES eol
+        | CTEB eol
     '''
 
 def p_llama_func(p):
     '''
-    llama_func : ID LEFTPARENTHESIS params RIGHTPARENTHESIS SEMICOLON
+    llama_func : ID eol LEFTPARENTHESIS eol params eol RIGHTPARENTHESIS eol SEMICOLON eol
     '''
-########################
-# Nombres de funciones #
-########################
+def p_eol(p):
+	'''
+	eol : NEWLINE eol
+		| empty
+	'''
+	#print("Nueva linea" + str(p.lineno(1)))
 
 def p_empty(p):
 	'''
@@ -516,14 +526,14 @@ def p_empty(p):
     ''' 
 
 def p_error(p):
-    print ("Error de compilacion")
+    print ("Syntax error in line " + str(lexer.lineno))
 
 parser = yacc.yacc() 
 
 #Cambiar el nombre del archivo de entrada para probar el codigo
 name='pruebaRose.txt'
 with open(name, 'r') as myfile:
-    s=myfile.read().replace('\n', '')
+    s=myfile.read()
 print(name)
 parser.parse(s)
 
