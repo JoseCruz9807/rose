@@ -269,8 +269,6 @@ def p_rose(p):
     rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
     '''
     print(list(dirFunc.val))
-    for funcion in dirFunc:
-    	print(dirFunc.val[funcion][1])
     print("Exito. # salto de linea: " + str(lexer.lineno))
 
 def p_roseauxvars(p):
@@ -291,12 +289,12 @@ def p_main(p):
 
 def p_vars(p):
     '''
-    vars : tipo np_obtener_tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionmatriz comments_nl RIGHTKEY comments_nl SEMICOLON np_anadir_variable comments_nl
-        | tipo np_obtener_tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_anadir_variable comments_nl
-        | tipo np_obtener_tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionarreglo comments_nl RIGHTKEY comments_nl SEMICOLON np_asignar_arreglo comments_nl
-        | tipo np_obtener_tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_asignar_arreglo comments_nl
-        | tipo np_obtener_tipo comments_nl ID np_obtener_nombre_var comments_nl EQUALS comments_nl ctes comments_nl SEMICOLON np_asignar_fil_col comments_nl
-        | tipo np_obtener_tipo comments_nl ID np_obtener_nombre_var comments_nl SEMICOLON np_asignar_fil_col comments_nl
+    vars : tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionmatriz comments_nl RIGHTKEY comments_nl SEMICOLON np_anadir_variable comments_nl
+        | tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_anadir_variable comments_nl
+        | tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionarreglo comments_nl RIGHTKEY comments_nl SEMICOLON np_asignar_arreglo comments_nl
+        | tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_asignar_arreglo comments_nl
+        | tipo comments_nl ID np_obtener_nombre_var comments_nl EQUALS comments_nl ctes comments_nl SEMICOLON np_asignar_fil_col comments_nl
+        | tipo comments_nl ID np_obtener_nombre_var comments_nl SEMICOLON np_asignar_fil_col comments_nl
     '''
 
 def p_asignacionmatriz(p):
@@ -313,10 +311,10 @@ def p_asignacionarreglo(p):
 
 def p_tipo(p):
     '''
-    tipo : INT comments_nl
-        | FLOAT comments_nl
-        | STRING comments_nl
-        | BOOL comments_nl
+    tipo : INT np_obtener_tipo comments_nl
+        | FLOAT np_obtener_tipo comments_nl
+        | STRING np_obtener_tipo comments_nl
+        | BOOL np_obtener_tipo comments_nl
     '''
 
 def p_durante(p):
@@ -393,7 +391,7 @@ def p_factor(p):
 def p_func(p):
     '''
     func : FUNC comments_nl VOID np_obtener_tipo comments_nl restofuncion comments_nl
-        | FUNC comments_nl tipo np_obtener_tipo comments_nl restofuncion comments_nl
+        | FUNC comments_nl tipo comments_nl restofuncion comments_nl
     '''
 
 def p_restofuncion(p):
@@ -403,7 +401,7 @@ def p_restofuncion(p):
 
 def p_argumentos(p):
     '''
-    argumentos : tipo np_obtener_tipo comments_nl mismotipo comments_nl SEMICOLON comments_nl argumentos comments_nl
+    argumentos : tipo comments_nl mismotipo comments_nl SEMICOLON comments_nl argumentos comments_nl
                 | empty
     '''
 
@@ -561,41 +559,43 @@ def p_error(p):
 
 
 def p_np_obtener_tipo(p):
-	'''
-	np_obtener_tipo : empty
-	'''
-	tipoDato = str(p.value)
+    '''
+    np_obtener_tipo : empty
+    '''
+    print(p[-1])
+    tipoDato = str(p[-1])
 
 def p_np_obtener_nombre_func(p):
 	'''
 	np_obtener_nombre_func : empty
 	'''
-	nombreFunc = str(p.value)
+	nombreFunc = str(p[-1])
 	dirFunc.addFunc(nombreFunc, tipoDato)
 
 def p_np_obtener_nombre_var(p):
-	'''
-	np_obtener_nombre_var : empty
-	'''
-	nombreVar = str(p.value)
+    '''
+    np_obtener_nombre_var : empty
+    '''
+    print(p[-1])
+    nombreVar = str(p[-1])
 
 def p_np_obtener_filas(p):
 	'''
 	np_obtener_filas : empty
 	'''
-	iVarFilas = int(p.value)
+	iVarFilas = int(p[-1])
 
 def p_np_obtener_columnas(p):
 	'''
 	np_obtener_columnas : empty
 	'''
-	iVarColumnas = int(p.value)
+	iVarColumnas = int(p[-1])
 
 def p_np_anadir_variable(p):
 	'''
 	np_anadir_variable : empty
 	'''
-	dirFunc.addVariable(nombreFunc, nombreVar, iVarFilas, iVarColumnas)
+	dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas)
 
 def p_np_asignar_fil_col(p):
 	'''
@@ -603,20 +603,20 @@ def p_np_asignar_fil_col(p):
 	'''
 	iVarFilas = 0
 	iVarColumnas = 0
-	dirFunc.addVariable(nombreFunc, nombreVar, iVarFilas, iVarColumnas)
+	dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas)
 
 def p_np_asignar_arreglo(p):
 	'''
 	np_asignar_arreglo : empty
 	'''
 	iVarColumnas = 0
-	dirFunc.addVariable(nombreFunc, nombreVar, iVarFilas, iVarColumnas)
+	dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas)
 
 def p_np_main_func(p):
 	'''
 	np_main_func : 
 	'''
-	nombreFunc = str(p.value)
+	nombreFunc = str(p[-1])
 	tipoDato = 'void'
 	dirFunc.addFunc(nombreFunc, tipoDato)
 

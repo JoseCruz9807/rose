@@ -22,11 +22,12 @@ class DirFunc:
              nombre : Nombre de la función a añadir.
              tipo   : Tipo de dato que le pertenece a la función.
         """
-        if (nombre in DirFunc.instance.val):
-            print('Function {} previously defined.'.format(nombre))
-            sys.exit()
-        else:
-            DirFunc.instance.val[nombre] = (tipo, {} )
+        if (not nombre==""):
+            if (nombre in DirFunc.instance.val):
+                print('Function {} previously defined.'.format(nombre))
+                sys.exit()
+            else:
+                DirFunc.instance.val[nombre] = (tipo, {} )
 
     def addVariable(self, nameFunc, variable, tipo, filas, columnas):
         """ Adjunta la variable a la función especificada 
@@ -37,10 +38,11 @@ class DirFunc:
              filas      : Cantidad de filas en la variable.
              columnas   : Cantidad de columnas en la variable.
         """
-        if (variable in self.val[nameFunc][1]):
-            print('Variable {} previously defined.'.format(variable))
-            sys.exit()
-        else:
-            tableVars = self.val[nameFunc][1]  
-            tableVars[variable] = tipo
-            self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, filas, columnas)
+        if (not variable==""):
+            if (variable in self.val[nameFunc][1]):
+                print('Variable {} previously defined.'.format(variable))
+                sys.exit()
+            else:
+                tableVars = self.val[nameFunc][1]  
+                tableVars[variable] = tipo
+                self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, filas, columnas)
