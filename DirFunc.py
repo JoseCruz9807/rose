@@ -37,6 +37,7 @@ class DirFunc:
              filas      : Cantidad de filas en la variable.
              columnas   : Cantidad de columnas en la variable.
         """
+
         if (variable in self.val[nameFunc][1]):
             print('Variable {} previously defined.'.format(variable))
             sys.exit()
@@ -44,3 +45,4 @@ class DirFunc:
             tableVars = self.val[nameFunc][1]  
             tableVars[variable] = tipo
             self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, filas, columnas)
+        
