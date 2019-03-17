@@ -44,3 +44,4 @@ class DirFunc:
             tableVars = self.val[nameFunc][1]  
             tableVars[variable] = tipo
             self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, filas, columnas)
+        

@@ -265,11 +265,10 @@ dirFunc = DirFunc(nombreFunc,tipoDato)
 
 
 def p_rose(p):
-    '''
-    rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
-    '''
-    print(list(dirFunc.val))
-    print("Exito. # salto de linea: " + str(lexer.lineno))
+	'''
+	rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
+	'''
+	print("Exito.")
 
 def p_roseauxvars(p):
     '''
@@ -562,13 +561,15 @@ def p_np_obtener_tipo(p):
     '''
     np_obtener_tipo : empty
     '''
-    print(p[-1])
+    global tipoDato 
     tipoDato = str(p[-1])
+
 
 def p_np_obtener_nombre_func(p):
 	'''
 	np_obtener_nombre_func : empty
 	'''
+	global nombreFunc
 	nombreFunc = str(p[-1])
 	dirFunc.addFunc(nombreFunc, tipoDato)
 
@@ -576,19 +577,21 @@ def p_np_obtener_nombre_var(p):
     '''
     np_obtener_nombre_var : empty
     '''
-    print(p[-1])
+    global nombreVar
     nombreVar = str(p[-1])
 
 def p_np_obtener_filas(p):
 	'''
 	np_obtener_filas : empty
 	'''
+	global iVarFilas
 	iVarFilas = int(p[-1])
 
 def p_np_obtener_columnas(p):
 	'''
 	np_obtener_columnas : empty
 	'''
+	global iVarColumnas
 	iVarColumnas = int(p[-1])
 
 def p_np_anadir_variable(p):
@@ -601,6 +604,8 @@ def p_np_asignar_fil_col(p):
 	'''
 	np_asignar_fil_col : empty
 	'''
+	global iVarFilas
+	global iVarColumnas
 	iVarFilas = 0
 	iVarColumnas = 0
 	dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas)
@@ -609,13 +614,16 @@ def p_np_asignar_arreglo(p):
 	'''
 	np_asignar_arreglo : empty
 	'''
+	global iVarColumnas
 	iVarColumnas = 0
 	dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas)
 
 def p_np_main_func(p):
 	'''
-	np_main_func : 
+	np_main_func : empty
 	'''
+	global nombreFunc
+	global tipoDato
 	nombreFunc = str(p[-1])
 	tipoDato = 'void'
 	dirFunc.addFunc(nombreFunc, tipoDato)
