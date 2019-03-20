@@ -186,3 +186,5 @@ class CuboSemantico:
 		}
 	def resultType(self, op1, op2, operator):
 		return self.semantica[op1,op2,operator]
+
+semantica = CuboSemantico()

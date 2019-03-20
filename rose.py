@@ -2,6 +2,7 @@ import ply.lex as lex
 import ply.yacc as yacc
 import sys
 from DirFunc import *
+from CuboSemantico import *
 
 tokens = [
     'COLON',
@@ -263,12 +264,15 @@ iVarColumnas = 0
 # Directorio donde se almacenan las funciones y sus variables
 dirFunc = DirFunc(nombreFunc,tipoDato)
 
+# Variable que se encarga de manejar el tipo de operaciones que se pueden realizar entre los diferentes tipos de datos válidos en rose
+semantica = CuboSemantico()
+
 
 def p_rose(p):
 	'''
 	rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
 	'''
-	print("Exito.")
+	print(dirFunc.val['globals'])
 
 def p_roseauxvars(p):
     '''
