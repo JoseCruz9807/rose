@@ -267,12 +267,74 @@ dirFunc = DirFunc(nombreFunc,tipoDato)
 # Variable que se encarga de manejar el tipo de operaciones que se pueden realizar entre los diferentes tipos de datos válidos en rose
 semantica = CuboSemantico()
 
+# Pila que almacena las direcciones de memoria de los Operandos
+pilaOperando = []
 
+# Pila que almacena los tipos de los Operandos
+pilaTipos = []
+
+# Pila que almacena los Operadores de la expresión
+pilaOperadores = []
+
+# Pila que almacena los Cuadruplos del programa
+pilaCuad = []
+
+# Valor que apunta el siguiente espacio de memoria disponible
+iMemoryAdd = 0;
+
+############################
+### FUNCIONES AUXILIARES ###
+############################
+def getMemAdd():
+    global iMemoryAdd
+    iMemoryAdd += 1
+    return iMemoryAdd-1
+
+def setTipoDato(tipo):
+    global tipoDato
+    tipoDato = tipo
+
+def setNombreFunc(name):
+    global nombreFunc
+    nombreFunc = name
+
+def setNombreVar(nameVar):
+    global nombreVar
+    nombreVar = nameVar
+
+def setIVarFilas(numFil):
+    global iVarFilas
+    iVarFilas = numFil
+
+def setIVarColumnas(numCol):
+    global iVarColumnas
+    iVarColumnas = numCol
+
+def anadirVar():
+    global nombreFunc
+    global nombreVar
+    global tipoDato
+    global iVarFilas
+    global iVarColumnas
+    iAddress = getMemAdd()
+    dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas, iAddress)
+
+def anadirFunc():
+    global nombreFunc
+    global tipoDato
+    dirFunc.addFunc(nombreFunc, tipoDato)
+
+
+#################
+### GRAMÁTICA ###
+#################
 def p_rose(p):
-	'''
-	rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
-	'''
-	print(dirFunc.val['globals'])
+    '''
+    rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
+    '''
+    print(dirFunc.val)
+    print(dirFunc.val['globals'])
+    print("Exito compilando")
 
 def p_roseauxvars(p):
     '''
@@ -565,72 +627,67 @@ def p_np_obtener_tipo(p):
     '''
     np_obtener_tipo : empty
     '''
-    global tipoDato 
-    tipoDato = str(p[-1])
-
-
+    dataType = str(p[-1])
+    setTipoDato(dataType)
+    
 def p_np_obtener_nombre_func(p):
-	'''
-	np_obtener_nombre_func : empty
-	'''
-	global nombreFunc
-	nombreFunc = str(p[-1])
-	dirFunc.addFunc(nombreFunc, tipoDato)
+    '''
+    np_obtener_nombre_func : empty
+    '''
+    funName = str(p[-1])
+    setNombreFunc(funName)
+    anadirFunc()
 
 def p_np_obtener_nombre_var(p):
     '''
     np_obtener_nombre_var : empty
     '''
-    global nombreVar
-    nombreVar = str(p[-1])
+    varName = str(p[-1])
+    setNombreVar(varName)
 
 def p_np_obtener_filas(p):
-	'''
-	np_obtener_filas : empty
-	'''
-	global iVarFilas
-	iVarFilas = int(p[-1])
+    '''
+    np_obtener_filas : empty
+    '''
+    numFilas = int(p[-1])
+    setIVarFilas(numFilas)
 
 def p_np_obtener_columnas(p):
-	'''
-	np_obtener_columnas : empty
-	'''
-	global iVarColumnas
-	iVarColumnas = int(p[-1])
+    '''
+    np_obtener_columnas : empty
+    '''
+    numCol = int(p[-1])
+    setIVarColumnas(numCol)
 
 def p_np_anadir_variable(p):
 	'''
 	np_anadir_variable : empty
 	'''
-	dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas)
+	anadirVar()
 
 def p_np_asignar_fil_col(p):
-	'''
-	np_asignar_fil_col : empty
-	'''
-	global iVarFilas
-	global iVarColumnas
-	iVarFilas = 0
-	iVarColumnas = 0
-	dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas)
+    '''
+    np_asignar_fil_col : empty
+    '''
+    setIVarFilas(0)
+    setIVarColumnas(0)
+    anadirVar()
 
 def p_np_asignar_arreglo(p):
 	'''
 	np_asignar_arreglo : empty
 	'''
-	global iVarColumnas
-	iVarColumnas = 0
-	dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas)
+	setIVarColumnas(0)
+	anadirVar()
 
 def p_np_main_func(p):
-	'''
-	np_main_func : empty
-	'''
-	global nombreFunc
-	global tipoDato
-	nombreFunc = str(p[-1])
-	tipoDato = 'void'
-	dirFunc.addFunc(nombreFunc, tipoDato)
+    '''
+    np_main_func : empty
+    '''
+    funName = str(p[-1])
+    setNombreFunc(funName)
+    setTipoDato('void')
+    anadirFunc()
 
 parser = yacc.yacc() 
 
