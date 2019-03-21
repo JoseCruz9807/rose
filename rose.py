@@ -112,12 +112,12 @@ t_LEFTPARENTHESIS= r'\('
 t_RIGHTPARENTHESIS= r'\)'
 
 def t_CTEF (t):
-    r'\d+\.\d+'
+    r'-?\d+\.\d+'
     t.value = float(t.value)
     return t
 
 def t_CTEI (t):
-    r'\d+'
+    r'-?\d+'
     t.value = int(t.value)
     return t
 
@@ -220,13 +220,11 @@ def t_CTES (t):
 
 def t_NEWLINE(t):
     r'\n'
-    #print("Salto de linea " + str(lexer.lineno) )
     t.lexer.lineno += 1
     return t
 
 def t_COMENTARIO(t): 
     r'(\/\/.*)'
-    #print("commentario en " + str(t.lexer.lineno) + ": " + str(t.value))
     return t
 
 def t_tabulador(t):
@@ -279,8 +277,11 @@ pilaOperadores = []
 # Pila que almacena los Cuadruplos del programa
 pilaCuad = []
 
-# Valor que apunta el siguiente espacio de memoria disponible
+# Valor que apunta al siguiente espacio de memoria disponible
 iMemoryAdd = 0;
+
+# Valor que apunta al siguiente espacio temporal disponible
+iMemoryAvail = 0;
 
 ############################
 ### FUNCIONES AUXILIARES ###
@@ -324,6 +325,12 @@ def anadirFunc():
     global tipoDato
     dirFunc.addFunc(nombreFunc, tipoDato)
 
+"""
+CHECAR BIEN CÓMO VA A JALAR ESTA PARTE DEL AVAIL
+"""
+def getAvailMem():
+    return 
+
 
 #################
 ### GRAMÁTICA ###
@@ -333,7 +340,6 @@ def p_rose(p):
     rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
     '''
     print(dirFunc.val)
-    print(dirFunc.val['globals'])
     print("Exito compilando")
 
 def p_roseauxvars(p):
@@ -447,9 +453,7 @@ def p_terminoaux(p):
 
 def p_factor(p):
     '''
-    factor : PLUS comments_nl vars_cte comments_nl
-            | MINUS comments_nl vars_cte comments_nl
-            | vars_cte comments_nl
+    factor : vars_cte comments_nl
             | LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
     '''
 

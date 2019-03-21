@@ -3,14 +3,13 @@ program
 //Son pruebas
 test; 
 //Las que hago
-globals int arbol = 3;
+globals int arbol = -3.12;
 globals int finca=4;
 
 func void myfunk(int ola, crayola; float xd; bool mat[8][3], arr[9];)
 //comment para tantear donde va el comments_nl
 {
 //void globals func == 34 int ()
-
 //void globals func == 34 int () //prueba de comment en comment
 //voidglobalsfunc
 
@@ -21,7 +20,7 @@ return n;
 }
 
 main (){ 
-int arbol = 5; 
+int arbol[3] = {5}; 
 int ola [4][6]={{3,4,3,3},
                 {3,4,3,3},
                 {3,4,3,3},
