@@ -388,6 +388,63 @@ def popTipos():
 	global pilaTipos
 	return pilaTipos.pop()
 
+def arithmeticOperator():
+	
+	print("arithmeticOp")
+
+	
+
+	rightOperand = popOperando()
+	rightType = popTipos()
+	leftOperand = popOperando()
+	leftType = popTipos()
+	tempOperator = popOperadores()
+	resultType = semantica.resultType(leftType, rightType, tempOperator)
+
+	if resultType != 'error':
+		result = getAvail()
+		addQuad(tempOperator, leftOperand, rightOperand, result)
+		addOperandoToStack(result)
+		addTipoToStack(resultType)
+		##Regresar el temp al AVAIL
+	else:
+		print("In line {}, type mismatch".format(lexer.lineno))
+		sys.exit()
+
+
+def assignOperator():
+
+	print("assignOp")
+
+	rightOperand = popOperando()
+	rightType = popTipos()
+	leftOperand = popOperando()
+	leftType = popTipos()
+	tempOperator = popOperadores()
+	resultType = semantica.resultType(leftType, rightType, tempOperator)
+
+	if resultType != 'error':
+		#result = getAvail()
+		addQuad(tempOperator, rightOperand, '', leftOperand)
+		##Regresar el temp al AVAIL
+	else:
+		print("In line {}, type mismatch".format(lexer.lineno))
+		sys.exit()
+
+
+def switchOperator(arg):
+	switcher = {
+		1: arithmeticOperator,
+		2: assignOperator
+	}
+	return switcher.get(arg)
+
+
+def operacionesEnPilasId(operators, tipoFunc):
+	if (getTopOperator() in operators):
+		func = switchOperator(tipoFunc)
+		func()
+
 #################
 ### GRAMÁTICA ###
 #################
@@ -395,10 +452,6 @@ def p_rose(p):
     '''
     rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
     '''
-    print(dirFunc.val)
-    print(pilaOperando)
-    print(pilaTipos)
-    print(pilaOperadores)
     print(arrCuad)
     print("Éxito compilando")
 
@@ -599,8 +652,8 @@ def p_asignacion(p):
     '''
     asignacion : ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp comments_nl SEMICOLON comments_nl
                | ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp comments_nl SEMICOLON comments_nl
-               | ID comments_nl EQUALS  comments_nl mega_exp comments_nl SEMICOLON comments_nl
-    '''
+               | ID np_asignacion_quad1 comments_nl EQUALS np_asignacion_quad2 comments_nl mega_exp comments_nl SEMICOLON np_asignacion_quad4 comments_nl
+    '''	
 
 def p_escritura(p):
     '''
@@ -764,12 +817,27 @@ def p_np_factor_quad1(p):
 	tempIdName = str(p[-1])
 	addIdToStack(tempIdName)
 
+def p_np_asignacion_quad1(p):
+	'''
+	np_asignacion_quad1 : empty
+	'''
+	tempIdName = str(p[-1])
+	addIdToStack(tempIdName)
+
 def p_np_terminoaux_quad2(p):
 	'''
 	np_terminoaux_quad2 : empty
 	'''
 	tempOperator = str(p[-1])
 	addOperadorToStack(tempOperator)
+
+def p_np_asignacion_quad2(p):
+	'''
+	np_asignacion_quad2 : empty
+	'''
+	tempOperator = str(p[-1])
+	addOperadorToStack(tempOperator)
+
 
 def p_np_expaux_quad3(p):
 	'''
@@ -782,51 +850,26 @@ def p_np_expaux_quad4(p):
 	'''
 	np_expaux_quad4 : empty
 	'''
+	tuplaOperadores = ('+','-')
+	operacionesEnPilasId(tuplaOperadores, 1)
 
-	print("Operando(+,-) ")
+def p_np_asignacion_quad4(p):
+	'''
+	np_asignacion_quad4 : empty
+	'''
+	print("Asignacion_quad4: ")
+	print(pilaOperadores)
 	print(pilaOperando)
-	
-	if (getTopOperator() == '+' or getTopOperator() == '-'):
-		rightOperand = popOperando()
-		rightType = popTipos()
-		leftOperand = popOperando()
-		leftType = popTipos()
-		tempOperator = popOperadores()
-		resultType = semantica.resultType(leftType, rightType, tempOperator)
-
-		if resultType != 'error':
-			result = getAvail()
-			addQuad(tempOperator, leftOperand, rightOperand, result)
-			addOperandoToStack(result)
-			addTipoToStack(resultType)
-			##Regresar el temp al AVAIL
-		else:
-			print("In line {}, type mismatch".format(lexer.lineno))
+	print(pilaTipos)
+	tuplaOperadores = ('=')
+	operacionesEnPilasId(tuplaOperadores, 2)
 
 def p_np_terminoaux_quad5(p):
 	'''
 	np_terminoaux_quad5 : empty
 	'''
-	print("Operando(*,/) ")
-	print(pilaOperando)
-
-	if (getTopOperator() == '*' or getTopOperator() == '/'):
-		rightOperand = popOperando()
-		rightType = popTipos()
-		leftOperand = popOperando()
-		leftType = popTipos()
-		tempOperator = popOperadores()
-		resultType = semantica.resultType(leftType, rightType, tempOperator)
-
-		if resultType != 'error':
-			result = getAvail()
-			addQuad(tempOperator, leftOperand, rightOperand, result)
-			addOperandoToStack(result)
-			addTipoToStack(resultType)
-			##Regresar el temp al AVAIL
-		else:
-			print("In line {}, type mismatch".format(lexer.lineno))
-
+	tuplaOperadores = ('*','/')
+	operacionesEnPilasId(tuplaOperadores, 1)
 
 parser = yacc.yacc() 
 
