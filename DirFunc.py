@@ -28,7 +28,7 @@ class DirFunc:
         else:
             DirFunc.instance.val[nombre] = (tipo, {} )
 
-    def addVariable(self, nameFunc, variable, tipo, filas, columnas, memAddr):
+    def addVariable(self, nameFunc, variable, tipo, filas, columnas):
         """ Adjunta la variable a la función especificada 
             Args:
              nameFunc   : Nombre de la función a la que se le añadirán las variables.
@@ -42,6 +42,6 @@ class DirFunc:
             sys.exit()
         else:
             tableVars = self.val[nameFunc][1]  
-            tableVars[variable] = (tipo, filas, columnas, memAddr)
+            tableVars[variable] = (tipo, filas, columnas)
             self.val[nameFunc] =  (self.val[nameFunc][0], tableVars)
         

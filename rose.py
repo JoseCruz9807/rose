@@ -1,3 +1,4 @@
+
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
@@ -112,12 +113,12 @@ t_LEFTPARENTHESIS= r'\('
 t_RIGHTPARENTHESIS= r'\)'
 
 def t_CTEF (t):
-    r'-?\d+\.\d+'
+    r'\d+\.\d+'
     t.value = float(t.value)
     return t
 
 def t_CTEI (t):
-    r'-?\d+'
+    r'\d+'
     t.value = int(t.value)
     return t
 
@@ -238,8 +239,9 @@ def t_error(t):
 t_ignore = r' '
 
 lexer = lex.lex()
+
 """
-lexer.input('program test; globals int arbol = 3; func void myfunk(int ola;){ } main (){ int arbol = 5; if(arbol>6){print(arbol);}else{ print(arbol);};}')
+lexer.input('program test; globals int arbol = 3; main (){ int arbol; arbol = arbol-3; if(arbol>6){print(arbol);}else{ print(arbol);};}')
 
 while True:
     tok = lexer.token()
@@ -268,20 +270,24 @@ semantica = CuboSemantico()
 # Pila que almacena las direcciones de memoria de los Operandos
 pilaOperando = []
 
-# Pila que almacena los tipos de los Operandos
+# Pila que almacena los Tipos de los Operandos
 pilaTipos = []
 
 # Pila que almacena los Operadores de la expresión
 pilaOperadores = []
 
-# Pila que almacena los Cuadruplos del programa
-pilaCuad = []
+# Vector que almacena los Cuadruplos del programa
+arrCuad = []
 
 # Valor que apunta al siguiente espacio de memoria disponible
 iMemoryAdd = 0;
 
 # Valor que apunta al siguiente espacio temporal disponible
-iMemoryAvail = 0;
+iAvail = 1;
+
+# Valor que almacena el nombre del ID
+idName = ''
+
 
 ############################
 ### FUNCIONES AUXILIARES ###
@@ -289,7 +295,7 @@ iMemoryAvail = 0;
 def getMemAdd():
     global iMemoryAdd
     iMemoryAdd += 1
-    return iMemoryAdd-1
+    return iMemoryAdd
 
 def setTipoDato(tipo):
     global tipoDato
@@ -317,20 +323,70 @@ def anadirVar():
     global tipoDato
     global iVarFilas
     global iVarColumnas
-    iAddress = getMemAdd()
-    dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas, iAddress)
+    dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas)
 
 def anadirFunc():
     global nombreFunc
     global tipoDato
     dirFunc.addFunc(nombreFunc, tipoDato)
 
-"""
-CHECAR BIEN CÓMO VA A JALAR ESTA PARTE DEL AVAIL
-"""
-def getAvailMem():
-    return 
+def getAvail():
+	global iAvail
+	iAvail += 1
+	strAvail = 'temp' + str(iAvail-1)
+	return strAvail
 
+
+def addQuad(operador, operandoUno, operandoDos, valorGuardar):
+	global arrCuad
+	tupla = (operador, operandoUno, operandoDos, valorGuardar)
+	arrCuad.append(tupla)
+	return getMemAdd()
+
+def addIdToStack(nameId):
+	global idName
+	global nombreFunc
+	global pilaOperando
+	global pilaTipos
+	idName = nameId
+		
+	if (idName in dirFunc.val[nombreFunc][1] or idName in dirFunc.val['globals'][1]):
+		tipoTemp = dirFunc.val[nombreFunc][1][idName][0]
+		addOperandoToStack(idName)
+		addTipoToStack(tipoTemp)
+	else:
+		print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
+		sys.exit()
+
+def addOperadorToStack(operator):
+	global pilaOperadores
+	pilaOperadores.append(operator)
+
+def getTopOperator():
+	global pilaOperadores
+	pilaSize = len(pilaOperadores)
+	lastIndex = pilaSize-1
+	return pilaOperadores[lastIndex]
+
+def addOperandoToStack(operando):
+	global pilaOperando
+	pilaOperando.append(operando)
+
+def addTipoToStack(tipoResult):
+	global pilaTipos
+	pilaTipos.append(tipoResult)
+
+def popOperando():
+	global pilaOperando
+	return pilaOperando.pop()
+
+def popOperadores():
+	global pilaOperadores
+	return pilaOperadores.pop()
+
+def popTipos():
+	global pilaTipos
+	return pilaTipos.pop()
 
 #################
 ### GRAMÁTICA ###
@@ -340,7 +396,11 @@ def p_rose(p):
     rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
     '''
     print(dirFunc.val)
-    print("Exito compilando")
+    print(pilaOperando)
+    print(pilaTipos)
+    print(pilaOperadores)
+    print(arrCuad)
+    print("Éxito compilando")
 
 def p_roseauxvars(p):
     '''
@@ -434,8 +494,8 @@ def p_exp(p):
 
 def p_expaux(p):
     '''
-    expaux : PLUS comments_nl termino comments_nl expaux comments_nl
-            | MINUS comments_nl termino comments_nl expaux comments_nl
+    expaux : PLUS np_expaux_quad3 comments_nl termino np_expaux_quad4 comments_nl expaux comments_nl
+            | MINUS np_expaux_quad3 comments_nl termino np_expaux_quad4 comments_nl expaux comments_nl
             | empty 
     '''
 
@@ -446,14 +506,16 @@ def p_termino(p):
 
 def p_terminoaux(p):
     '''
-    terminoaux : DIVIDE comments_nl factor comments_nl terminoaux comments_nl
-                | MULTIPLY comments_nl factor comments_nl terminoaux comments_nl
+    terminoaux : DIVIDE np_terminoaux_quad2 comments_nl factor np_terminoaux_quad5 comments_nl terminoaux comments_nl
+                | MULTIPLY np_terminoaux_quad2 comments_nl factor np_terminoaux_quad5 comments_nl terminoaux comments_nl
                 | empty
     '''
 
 def p_factor(p):
     '''
     factor : vars_cte comments_nl
+    		| PLUS comments_nl vars_cte comments_nl
+            | MINUS comments_nl vars_cte comments_nl
             | LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
     '''
 
@@ -518,7 +580,7 @@ def p_vars_cte(p):
             | ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl
             | ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl
             | ID comments_nl LEFTPARENTHESIS comments_nl params comments_nl RIGHTPARENTHESIS comments_nl
-            | ID comments_nl
+            | ID np_factor_quad1 comments_nl
             | ctes comments_nl
     '''
 
@@ -537,18 +599,20 @@ def p_asignacion(p):
     '''
     asignacion : ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp comments_nl SEMICOLON comments_nl
                | ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp comments_nl SEMICOLON comments_nl
-               | ID comments_nl EQUALS comments_nl mega_exp comments_nl SEMICOLON comments_nl
+               | ID comments_nl EQUALS  comments_nl mega_exp comments_nl SEMICOLON comments_nl
     '''
 
 def p_escritura(p):
     '''
     escritura : PRINT comments_nl LEFTPARENTHESIS comments_nl escrito comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON comments_nl
     '''
+
 def p_escrito(p):
     '''
     escrito : mega_exp comments_nl PLUS comments_nl escrito comments_nl
             | mega_exp comments_nl
     '''
+
 def p_lectura(p):
     '''
     lectura : READ comments_nl LEFTPARENTHESIS comments_nl ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON comments_nl
@@ -692,6 +756,77 @@ def p_np_main_func(p):
     setNombreFunc(funName)
     setTipoDato('void')
     anadirFunc()
+
+def p_np_factor_quad1(p):
+	'''
+	np_factor_quad1 : empty
+	'''
+	tempIdName = str(p[-1])
+	addIdToStack(tempIdName)
+
+def p_np_terminoaux_quad2(p):
+	'''
+	np_terminoaux_quad2 : empty
+	'''
+	tempOperator = str(p[-1])
+	addOperadorToStack(tempOperator)
+
+def p_np_expaux_quad3(p):
+	'''
+	np_expaux_quad3 : empty
+	'''
+	tempOperator = str(p[-1])
+	addOperadorToStack(tempOperator)
+
+def p_np_expaux_quad4(p):
+	'''
+	np_expaux_quad4 : empty
+	'''
+
+	print("Operando(+,-) ")
+	print(pilaOperando)
+	
+	if (getTopOperator() == '+' or getTopOperator() == '-'):
+		rightOperand = popOperando()
+		rightType = popTipos()
+		leftOperand = popOperando()
+		leftType = popTipos()
+		tempOperator = popOperadores()
+		resultType = semantica.resultType(leftType, rightType, tempOperator)
+
+		if resultType != 'error':
+			result = getAvail()
+			addQuad(tempOperator, leftOperand, rightOperand, result)
+			addOperandoToStack(result)
+			addTipoToStack(resultType)
+			##Regresar el temp al AVAIL
+		else:
+			print("In line {}, type mismatch".format(lexer.lineno))
+
+def p_np_terminoaux_quad5(p):
+	'''
+	np_terminoaux_quad5 : empty
+	'''
+	print("Operando(*,/) ")
+	print(pilaOperando)
+
+	if (getTopOperator() == '*' or getTopOperator() == '/'):
+		rightOperand = popOperando()
+		rightType = popTipos()
+		leftOperand = popOperando()
+		leftType = popTipos()
+		tempOperator = popOperadores()
+		resultType = semantica.resultType(leftType, rightType, tempOperator)
+
+		if resultType != 'error':
+			result = getAvail()
+			addQuad(tempOperator, leftOperand, rightOperand, result)
+			addOperandoToStack(result)
+			addTipoToStack(resultType)
+			##Regresar el temp al AVAIL
+		else:
+			print("In line {}, type mismatch".format(lexer.lineno))
+
 
 parser = yacc.yacc() 
 
