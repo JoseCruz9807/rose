@@ -1,0 +1,26 @@
+program 
+test; 
+globals int arbol = 3.12;
+globals int finca=4;
+
+func void myfunk(int ola, crayola; float xd; bool mat[8][3], arr[9];)
+{
+
+int variable = 3;
+int variable2= 2;
+variable = variable + variable2;
+}
+
+main (){ 
+int arbol[3] = {5}; 
+int ola [4][6]={{3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3},
+                {2}};
+string strPrueba = "Prueba de string";
+
+arbol = arbol+ola;
+}

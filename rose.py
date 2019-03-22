@@ -831,7 +831,9 @@ def p_np_terminoaux_quad5(p):
 parser = yacc.yacc() 
 
 #Cambiar el nombre del archivo de entrada para probar el codigo
-name='pruebaRose.txt'
+#name='pruebaRose.txt'
+name='pruebaCuad1.txt'
+
 with open(name, 'r') as myfile:
     s=myfile.read()
 print(name)
