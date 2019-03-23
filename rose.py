@@ -363,13 +363,13 @@ def addIdToStack(nameId):
 
 def addValueToStack(value):
 	if type(value) == int:
-		addOperadorToStack(value)
+		addOperandoToStack(value)
 		addTipoToStack('int')
 	if type(value) == float:
-		addOperadorToStack(value)
+		addOperandoToStack(value)
 		addTipoToStack('float')
 	if type(value) == str:
-		addOperadorToStack(value)
+		addOperandoToStack(value)
 		if (value == 'true' or value == 'false'):
 			addTipoToStack('bool')
 		else:
@@ -407,10 +407,6 @@ def popTipos():
 	return pilaTipos.pop()
 
 def arithmeticOperator():
-	
-	print("arithmeticOp")
-
-
 	rightOperand = popOperando()
 	rightType = popTipos()
 	leftOperand = popOperando()
@@ -430,10 +426,6 @@ def arithmeticOperator():
 
 
 def assignOperator():
-
-	print("assignOp")
-
-
 	rightOperand = popOperando()
 	rightType = popTipos()
 	leftOperand = popOperando()
@@ -550,12 +542,12 @@ def p_mega_expaux(p):
 
 def p_expression_compare(p):
     '''
-    expression_compare : exp comments_nl DIFFERENT comments_nl exp comments_nl 
-                    | exp comments_nl GTEQ comments_nl exp comments_nl
-                    | exp comments_nl LTEQ comments_nl exp comments_nl 
-                    | exp comments_nl EQUIVALENTE comments_nl exp comments_nl
-                    | exp comments_nl GT comments_nl exp comments_nl
-                    | exp comments_nl LT comments_nl exp comments_nl
+    expression_compare : exp comments_nl DIFFERENT comments_nl exp np_expression_compare_quad1 comments_nl 
+                    | exp comments_nl GTEQ comments_nl exp np_expression_compare_quad1 comments_nl
+                    | exp comments_nl LTEQ comments_nl exp np_expression_compare_quad1 comments_nl 
+                    | exp comments_nl EQUIVALENTE comments_nl exp np_expression_compare_quad1 comments_nl
+                    | exp comments_nl GT comments_nl exp np_expression_compare_quad1 comments_nl
+                    | exp comments_nl LT comments_nl exp np_expression_compare_quad1 comments_nl
                     | exp comments_nl
     '''
 
@@ -729,7 +721,7 @@ def p_returnx(p):
 
 def p_ctes(p):
     '''
-    ctes : CTEI np_ctes_quad1 comments_nl
+    ctes : CTEI  np_ctes_quad1 comments_nl
         | CTEF np_ctes_quad1 comments_nl
         | CTES np_ctes_quad1 comments_nl
         | CTEB np_ctes_quad1 comments_nl
@@ -843,12 +835,12 @@ def p_np_asignacion_quad1(p):
 	tempIdName = str(p[-1])
 	addIdToStack(tempIdName)
 
-def np_ctes_quad1(p):
+def p_np_ctes_quad1(p):
 	'''
 	np_ctes_quad1 : empty
 	'''
 	tempIdName = p[-1]
-	addIdToStack(tempIdName)
+	addValueToStack(tempIdName)
 
 
 def p_np_terminoaux_quad2(p):
@@ -893,6 +885,16 @@ def p_np_terminoaux_quad5(p):
 	'''
 	tuplaOperadores = ('*','/')
 	operacionesEnPilasId(tuplaOperadores, 1)
+
+def p_np_expression_compare_quad1(p):
+    '''
+    np_expression_compare_quad1 : empty
+    '''
+    tuplaOperadores=('>','<','!=','<=','>=','==')
+    operacionesEnPilasId(tuplaOperadores,3)
+
+
+def p_np
 
 parser = yacc.yacc() 
 

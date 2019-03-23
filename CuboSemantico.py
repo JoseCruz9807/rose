@@ -66,7 +66,7 @@ class CuboSemantico:
 		('bool',		'bool',		'AND'	)	:'bool'	,
 		('bool',		'bool',		'OR'	)	:'bool'	,
 		('bool',		'bool',		'=='	)	:'bool'	,
-		('bool',		'string',	'+',	)	:'error'	,
+		('bool',		'string',	'+',	)	:'error'	
 		}
 	def resultType(self, op1, op2, operator):
 		#return self.semantica[op1,op2,operator]
