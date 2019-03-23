@@ -351,12 +351,30 @@ def addIdToStack(nameId):
 	idName = nameId
 		
 	if (idName in dirFunc.val[nombreFunc][1] or idName in dirFunc.val['globals'][1]):
-		tipoTemp = dirFunc.val[nombreFunc][1][idName][0]
+		try:
+			tipoTemp = dirFunc.val[nombreFunc][1][idName][0]
+		except:
+			tipoTemp = dirFunc.val['globals'][1][idName][0]
 		addOperandoToStack(idName)
 		addTipoToStack(tipoTemp)
 	else:
 		print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
 		sys.exit()
+
+def addValueToStack(value):
+	if type(value) == int:
+		addOperadorToStack(value)
+		addTipoToStack('int')
+	if type(value) == float:
+		addOperadorToStack(value)
+		addTipoToStack('float')
+	if type(value) == str:
+		addOperadorToStack(value)
+		if (value == 'true' or value == 'false'):
+			addTipoToStack('bool')
+		else:
+			addTipoToStack('string')
+
 
 def addOperadorToStack(operator):
 	global pilaOperadores
@@ -392,7 +410,6 @@ def arithmeticOperator():
 	
 	print("arithmeticOp")
 
-	
 
 	rightOperand = popOperando()
 	rightType = popTipos()
@@ -415,6 +432,7 @@ def arithmeticOperator():
 def assignOperator():
 
 	print("assignOp")
+
 
 	rightOperand = popOperando()
 	rightType = popTipos()
@@ -452,6 +470,7 @@ def p_rose(p):
     '''
     rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
     '''
+    print(dirFunc.val)
     print(arrCuad)
     print("Éxito compilando")
 
@@ -710,11 +729,11 @@ def p_returnx(p):
 
 def p_ctes(p):
     '''
-    ctes : CTEI comments_nl
-        | CTEF comments_nl
-        | CTES comments_nl
-        | CTEB comments_nl
-    '''
+    ctes : CTEI np_ctes_quad1 comments_nl
+        | CTEF np_ctes_quad1 comments_nl
+        | CTES np_ctes_quad1 comments_nl
+        | CTEB np_ctes_quad1 comments_nl
+    '''	
 
 def p_llama_func(p):
     '''
@@ -824,6 +843,14 @@ def p_np_asignacion_quad1(p):
 	tempIdName = str(p[-1])
 	addIdToStack(tempIdName)
 
+def np_ctes_quad1(p):
+	'''
+	np_ctes_quad1 : empty
+	'''
+	tempIdName = p[-1]
+	addIdToStack(tempIdName)
+
+
 def p_np_terminoaux_quad2(p):
 	'''
 	np_terminoaux_quad2 : empty
@@ -857,10 +884,6 @@ def p_np_asignacion_quad4(p):
 	'''
 	np_asignacion_quad4 : empty
 	'''
-	print("Asignacion_quad4: ")
-	print(pilaOperadores)
-	print(pilaOperando)
-	print(pilaTipos)
 	tuplaOperadores = ('=')
 	operacionesEnPilasId(tuplaOperadores, 2)
 

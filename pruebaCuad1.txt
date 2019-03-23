@@ -12,7 +12,7 @@ variable = variable + variable2;
 }
 
 main (){ 
-int arbol[3] = {5}; 
+int arbol2[3] = {5}; 
 int ola [4][6]={{3,4,3,3},
                 {3,4,3,3},
                 {3,4,3,3},
@@ -21,6 +21,7 @@ int ola [4][6]={{3,4,3,3},
                 {3,4,3,3},
                 {2}};
 string strPrueba = "Prueba de string";
+//finca = 1+3;
 
-arbol = arbol+ola;
+arbol = arbol+finca;
 }
