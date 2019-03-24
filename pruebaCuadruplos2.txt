@@ -1,0 +1,20 @@
+program 
+test; 
+main (){ 
+bool a;
+bool b;
+int arbol2=3;
+int ola [4][6]={{3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3},
+                {3,4,3,3},
+                {2}};
+a = arbol2 != ola;
+read(a);
+read(b);
+read(arbol2);
+print("Hola");
+arbol2=(arbol2+1)*(5+3);
+}

@@ -1,5 +1,5 @@
 
-#Cubo semántico
+#Cubo semantico
 class CuboSemantico:
 	def __init__(self):
 		self.semantica = {
@@ -16,6 +16,7 @@ class CuboSemantico:
 		('int',		'int',		'>'		)	:'bool'		,
 		('int',		'int',		'>='	)	:'bool'		,
 		('int',		'int',		'=='	)	:'bool'		,
+		('int',		'int',		'!='	)	:'bool'		,
 		('int',		'float',	'+',	)	:'float'	,
 		('int',		'float',	'-',	)	:'float'	,
 		('int',		'float',	'*',	)	:'float'	,
@@ -27,6 +28,7 @@ class CuboSemantico:
 		('int',		'float',	'>'		)	:'bool'		,
 		('int',		'float',	'>='	)	:'bool'		,
 		('int',		'float',	'=='	)	:'bool'		,
+		('int',		'float',	'!='	)	:'bool'		,
 
 		('float',		'int',		'+'		)	:'float'		,
 		('float',		'int',		'-'		)	:'float'		,
@@ -39,6 +41,7 @@ class CuboSemantico:
 		('float',		'int',		'>'		)	:'bool'		,
 		('float',		'int',		'>='	)	:'bool'		,
 		('float',		'int',		'=='	)	:'bool'		,
+		('float',		'int',		'!='	)	:'bool'		,
 		('float',		'float',	'+',	)	:'float'	,
 		('float',		'float',	'-',	)	:'float'	,
 		('float',		'float',	'*',	)	:'float'	,
@@ -61,12 +64,26 @@ class CuboSemantico:
 		('string',		'string',	'<='	)	:'string'	,
 		('string',		'string',	'>'		)	:'string'	,
 		('string',		'string',	'>='	)	:'string'	,
+		('string',		'string',	'='		)	:'string'	,
 		('string',		'string',	'=='	)	:'string'	,
 		
+		('bool',		'bool',		'='		)	:'bool'	,
+		('bool',		'bool',		'!='	)	:'bool'	,
 		('bool',		'bool',		'AND'	)	:'bool'	,
 		('bool',		'bool',		'OR'	)	:'bool'	,
 		('bool',		'bool',		'=='	)	:'bool'	,
-		('bool',		'string',	'+',	)	:'error'	
+		('bool',		'string',	'+'		)	:'error',
+
+
+		('print',		'string',	''	)	:	'string',
+		('print',		'bool',		''	)	:	'string',
+		('print',		'int',		''	)	:	'string',
+		('print',		'float',	''	)	:	'string',	
+		
+		('read',		'string',	''	)	:	'string',
+		('read',		'bool',		''	)	:	'bool',
+		('read',		'int',		''	)	:	'int',
+		('read',		'float',	''	)	:	'float',	
 		}
 	def resultType(self, op1, op2, operator):
 		#return self.semantica[op1,op2,operator]
