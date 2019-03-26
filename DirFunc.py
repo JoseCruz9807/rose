@@ -17,10 +17,10 @@ class DirFunc:
         return getattr(self.instance, table)
 
     def addFunc(self, nombre, tipo):
-        """ Adjunta la función especificada al Directorio de Funciones 
+        """ Adjunta la funcion especificada al Directorio de Funciones 
             Args:
-             nombre : Nombre de la función a añadir.
-             tipo   : Tipo de dato que le pertenece a la función.
+             nombre : Nombre de la funcion a aniadir.
+             tipo   : Tipo de dato que le pertenece a la funcion.
         """
         if (nombre in DirFunc.instance.val):
             print('Function {} previously defined.'.format(nombre))
@@ -29,10 +29,10 @@ class DirFunc:
             DirFunc.instance.val[nombre] = (tipo, {} )
 
     def addVariable(self, nameFunc, variable, tipo, filas, columnas):
-        """ Adjunta la variable a la función especificada 
+        """ Adjunta la variable a la funcion especificada 
             Args:
-             nameFunc   : Nombre de la función a la que se le añadirán las variables.
-             variable   : Nombre de la variable a añadir.
+             nameFunc   : Nombre de la funcion a la que se le aniadiran las variables.
+             variable   : Nombre de la variable a aniadir.
              tipo       : Tipo de dato que le pertenece a 'variable'.
              filas      : Cantidad de filas en la variable.
              columnas   : Cantidad de columnas en la variable.
@@ -42,6 +42,6 @@ class DirFunc:
             sys.exit()
         else:
             tableVars = self.val[nameFunc][1]  
-            tableVars[variable] = tipo
-            self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, filas, columnas)
+            tableVars[variable] = (tipo, filas, columnas)
+            self.val[nameFunc] =  (self.val[nameFunc][0], tableVars)
         

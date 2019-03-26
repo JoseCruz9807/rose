@@ -3,25 +3,24 @@ program
 //Son pruebas
 test; 
 //Las que hago
-globals int arbol = 3;
+globals int arbol = 3.12;
 globals int finca=4;
 
 func void myfunk(int ola, crayola; float xd; bool mat[8][3], arr[9];)
 //comment para tantear donde va el comments_nl
 {
 //void globals func == 34 int ()
-
 //void globals func == 34 int () //prueba de comment en comment
 //voidglobalsfunc
 
 int variable = "soasadas";
 int variable2= 2.3;
 //exportCSVV=2;
-return n;
+//return variable;
 }
 
 main (){ 
-int arbol = 5; 
+int arbol[3] = {5}; 
 int ola [4][6]={{3,4,3,3},
                 {3,4,3,3},
                 {3,4,3,3},
@@ -30,7 +29,10 @@ int ola [4][6]={{3,4,3,3},
                 {3,4,3,3},
                 {2}};
 string strPrueba = "Prueba de string";
-if(ola[3][3+ ola[1][1]]>6/5 AND 3*9 OR pol){
+
+arbol=arbol+ola;
+
+if(ola[3][3+ ola[1][1]]>6/5 AND 3*9 OR arbol){
     print(arbol+ola[4][4]);
 }
 else
