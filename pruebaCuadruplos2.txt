@@ -5,5 +5,14 @@ bool a;
 bool b;
 while(a==b){
     a= not(b);
+    if(a AND b) {
+    	a = b;
+    }
+    else
+    {
+    	b=a;
+    	b=b;
+    	a=a;
+    }
 }
 }

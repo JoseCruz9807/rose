@@ -418,7 +418,7 @@ def popOperando():
 def popOperadores():
 	global pilaOperadores
 	return pilaOperadores.pop()
-#
+#Saca en top de la pila de saltos
 def popSalto():
     global pilaSaltos
     return pilaSaltos.pop()
@@ -441,8 +441,7 @@ def arithmeticOperator():
         addTipoToStack(resultType)
         ##Regresar el temp al AVAIL
     else:
-        print("In line {}, type mismatch".format(lexer.lineno))
-        sys.exit()
+        typeMismatch()
 #Se hace la creacion del cuadruplo para la operacion de asignacion
 def assignOperator():
 	rightOperand = popOperando()
@@ -456,8 +455,7 @@ def assignOperator():
 		addQuad(tempOperator, rightOperand, '', leftOperand)
 		##Regresar el temp al AVAIL
 	else:
-		print("In line {}, type mismatch".format(lexer.lineno))
-		sys.exit()
+		typeMismatch()
 #Creacion del cuadruplo de print
 def printFun():
     printOperand=popOperando()
@@ -470,8 +468,7 @@ def printFun():
 		##Regresar el temp al AVAIL
         popOperando()
     else:
-        print("In line {}, type mismatch".format(lexer.lineno))
-        sys.exit()
+        typeMismatch()
 #Creacion del cuadruplo de print
 def readFunc():
     readOperand=popOperando()
@@ -484,8 +481,12 @@ def readFunc():
         addTipoToStack(resultType)
         ##Regresar el temp al AVAIL
     else:
-        print("In line {}, type mismatch".format(lexer.lineno))
-        sys.exit()
+        typeMismatch()
+
+def typeMismatch():
+	print("In line {}, type mismatch".format(lexer.lineno))
+	sys.exit()
+#Función que elimina el páréntesis que esté en el top de la pila
 def delParentesis():
     tempOperator = popOperadores()
     if  '('!= tempOperator:
@@ -497,10 +498,14 @@ def durante1():
     addSaltoToStack(len(arrCuad))
 
 def durante2():
-    global arrCuad
-    operand = popOperando()
-    addQuad('GoToF', operand, '', '')
-    addSaltoToStack(len(arrCuad)-1)
+	global arrCuad
+	bResultado = popTipos()
+	if bResultado == 'bool':
+		operand = popOperando()
+		addQuad('GoToF', operand, '', '')
+		addSaltoToStack(len(arrCuad)-1)
+	else:
+		typeMismatch()
 
 def durante3():
     global arrCuad
@@ -511,14 +516,28 @@ def durante3():
     arrCuad[falso]=tupla
 
 def condicion1():
-    pass
+	bResultado = popTipos()
+	print("bResultado = {}".format(bResultado) )
+	if bResultado == 'bool':
+		valor = popOperando()
+		addQuad('GoToF', valor, '', '')
+		addSaltoToStack(len(arrCuad)-1)
+	else:
+		typeMismatch()
 
 def condicion2():
-    pass
+    global arrCuad
+    addQuad('GoTo', '', '', '')
+    falso = popSalto()
+    addSaltoToStack(len(arrCuad)-1)
+    tupla = (arrCuad[falso][0], arrCuad[falso][1], arrCuad[falso][2], len(arrCuad))
+    arrCuad[falso] = tupla
 
 def condicion3():
-    pass
-
+    global arrCuad
+    end = popSalto()
+    tupla = (arrCuad[end][0], arrCuad[end][1], arrCuad[end][2], len(arrCuad))
+    arrCuad[end] = tupla
 
 #Regresa la funcion que se debe usar en base a los operadores dados
 def switchOperator(arg):
@@ -616,7 +635,7 @@ def p_durante(p):
 
 def p_condition(p):
     '''
-    condition : IF comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl bloque comments_nl else comments_nl
+    condition : IF comments_nl LEFTPARENTHESIS comments_nl mega_exp np_condition_quad1 comments_nl RIGHTPARENTHESIS comments_nl bloque comments_nl np_condition_quad2 else np_condition_quad3
     '''
 
 def p_else(p):
@@ -1074,6 +1093,23 @@ def p_np_durante_quad3(p):
     '''
     operacionesEnPilasBrincos(3)
 
+def p_np_condition_quad1(p):
+	'''
+	np_condition_quad1 : empty
+	'''
+	operacionesEnPilasBrincos(4)
+
+def p_np_condition_quad2(p):
+	'''
+	np_condition_quad2 : empty
+	'''
+	operacionesEnPilasBrincos(5)
+
+def p_np_condition_quad3(p):
+	'''
+	np_condition_quad3 : empty
+	'''
+	operacionesEnPilasBrincos(6)
 
 parser = yacc.yacc() 
 
