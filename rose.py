@@ -285,6 +285,9 @@ pilaTipos = []
 # Pila que almacena los Operadores de la expresion
 pilaOperadores = []
 
+# Pila que almacena los saltos para los ifs
+pilaSaltos = []
+
 # Vector que almacena los Cuadruplos del programa
 arrCuad = []
 
@@ -389,14 +392,20 @@ def addOperadorToStack(operator):
 	pilaOperadores.append(operator)
 #Regresa el top de la pila de operadores
 def getTopOperator():
-	global pilaOperadores
-	pilaSize = len(pilaOperadores)
-	lastIndex = pilaSize-1
-	return pilaOperadores[lastIndex]
+    global pilaOperadores
+    pilaSize = len(pilaOperadores)
+    lastIndex = pilaSize-1
+    if(lastIndex<0):
+        return 'vacio'
+    return pilaOperadores[lastIndex]
 #Agrega el operador a la pila de operadores
 def addOperandoToStack(operando):
 	global pilaOperando
 	pilaOperando.append(operando)
+#Agrega el nuevo salto a la pila
+def addSaltoToStack(salto):
+    global pilaSaltos
+    pilaSaltos.append(salto)
 #Agrega el tipo a la pila de tipos
 def addTipoToStack(tipoResult):
 	global pilaTipos
@@ -409,6 +418,10 @@ def popOperando():
 def popOperadores():
 	global pilaOperadores
 	return pilaOperadores.pop()
+#
+def popSalto():
+    global pilaSaltos
+    return pilaSaltos.pop()
 #Saca el top de la pila de tipos
 def popTipos():
 	global pilaTipos
@@ -478,6 +491,35 @@ def delParentesis():
     if  '('!= tempOperator:
         print("In line {}, unexpected token )".format(lexer.lineno))
         sys.exit()
+
+def durante1():
+    global arrCuad
+    addSaltoToStack(len(arrCuad))
+
+def durante2():
+    global arrCuad
+    operand = popOperando()
+    addQuad('GoToF', operand, '', '')
+    addSaltoToStack(len(arrCuad)-1)
+
+def durante3():
+    global arrCuad
+    falso = popSalto()
+    retorno = popSalto()
+    addQuad('GoTo', '','',retorno)
+    tupla=(arrCuad[falso][0], arrCuad[falso][1],arrCuad[falso][2], len(arrCuad))
+    arrCuad[falso]=tupla
+
+def condicion1():
+    pass
+
+def condicion2():
+    pass
+
+def condicion3():
+    pass
+
+
 #Regresa la funcion que se debe usar en base a los operadores dados
 def switchOperator(arg):
 	switcher = {
@@ -493,6 +535,22 @@ def operacionesEnPilasId(operators, tipoFunc):
 	if (getTopOperator() in operators):
 		func = switchOperator(tipoFunc)
 		func()
+
+def switchFuncion(arg):
+    switcher = {
+        1: durante1,
+        2: durante2,
+        3: durante3,
+        4: condicion1,
+        5: condicion2,
+        6: condicion3
+    }
+    return switcher.get(arg)
+
+def operacionesEnPilasBrincos(tipoFunc):
+    func = switchFuncion(tipoFunc)
+    func()
+    
 
 #################
 ### GRAMATICA ###
@@ -553,7 +611,7 @@ def p_tipo(p):
 
 def p_durante(p):
     '''
-    durante : WHILE comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl bloque comments_nl
+    durante : WHILE np_durante_quad1 comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS np_durante_quad2 comments_nl bloque np_durante_quad3 comments_nl
     '''
 
 def p_condition(p):
@@ -996,6 +1054,25 @@ def p_np_parentesis_quad2(p):
     '''
     tuplaOperadores=('(')
     operacionesEnPilasId(tuplaOperadores,5)
+
+def p_np_durante_quad1(p):
+    '''
+    np_durante_quad1 : empty
+    '''
+    operacionesEnPilasBrincos(1)
+
+
+def p_np_durante_quad2(p):
+    '''
+    np_durante_quad2 : empty
+    '''
+    operacionesEnPilasBrincos(2)
+
+def p_np_durante_quad3(p):
+    '''
+    np_durante_quad3 : empty
+    '''
+    operacionesEnPilasBrincos(3)
 
 
 parser = yacc.yacc() 
