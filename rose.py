@@ -218,7 +218,8 @@ def t_ID (t):
 
 ###Definicion regex de constantes tipo string###
 def t_CTES (t):
-    r'\"[a-zA-Z_ 0-9]+\"'
+    ##r'\"[a-zA-Z_ 0-9]+\"'
+    r'\".*\"'
     t.type = 'CTES'
     return t
 
@@ -517,7 +518,6 @@ def durante3():
 
 def condicion1():
 	bResultado = popTipos()
-	print("bResultado = {}".format(bResultado) )
 	if bResultado == 'bool':
 		valor = popOperando()
 		addQuad('GoToF', valor, '', '')
@@ -695,8 +695,6 @@ def p_terminoaux(p):
 def p_factor(p):
     '''
     factor : vars_cte comments_nl
-    		| PLUS comments_nl vars_cte comments_nl
-            | MINUS comments_nl vars_cte comments_nl
             | LEFTPARENTHESIS np_parentesis_quad1 comments_nl mega_exp comments_nl RIGHTPARENTHESIS np_parentesis_quad2 comments_nl
     '''
 
@@ -832,11 +830,23 @@ def p_returnx(p):
 
 def p_ctes(p):
     '''
-    ctes : CTEI  np_ctes_quad1 comments_nl
-        | CTEF np_ctes_quad1 comments_nl
+    ctes : floatPostNeg comments_nl
+        | intPostNeg comments_nl
         | CTES np_ctes_quad1 comments_nl
         | CTEB np_ctes_quad1 comments_nl
     '''	
+
+def p_intPostNeg(p):
+    '''
+    intPostNeg : MINUS CTEI np_ctes_quad2
+                | CTEI np_ctes_quad1
+    '''
+
+def p_floatPostNeg(p):
+    '''
+    floatPostNeg : MINUS CTEF np_ctes_quad2
+                | CTEF np_ctes_quad1
+    '''
 
 def p_llama_func(p):
     '''
@@ -952,6 +962,13 @@ def p_np_ctes_quad1(p):
 	'''
 	tempIdName = p[-1]
 	addValueToStack(tempIdName)
+
+def p_np_ctes_quad2(p):
+	'''
+	np_ctes_quad2 : empty
+	'''
+	tempIdName = p[-1]
+	addValueToStack(tempIdName*-1)
 
 
 def p_np_terminoaux_quad2(p):

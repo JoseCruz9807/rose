@@ -1,8 +1,12 @@
 program 
 test; 
+
 main (){ 
 bool a;
 bool b;
+float z;
+string s;
+s="nasufnewd   lua _ - 31312 ^? !"+"asdadwa";
 while(a==b){
     a= not(b);
     if(a AND b) {
@@ -13,6 +17,7 @@ while(a==b){
     	b=a;
     	b=b;
     	a=a;
+        z=-4-(-3.1);
     }
 }
 }
