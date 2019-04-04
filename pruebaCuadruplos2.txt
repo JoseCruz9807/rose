@@ -1,20 +1,23 @@
 program 
 test; 
+
 main (){ 
 bool a;
 bool b;
-int arbol2=3;
-int ola [4][6]={{3,4,3,3},
-                {3,4,3,3},
-                {3,4,3,3},
-                {3,4,3,3},
-                {3,4,3,3},
-                {3,4,3,3},
-                {2}};
-a = arbol2 != ola;
-read(a);
-read(b);
-read(arbol2);
-print("Hola");
-arbol2=(arbol2+1)*(5+3);
+float z;
+string s;
+s="nasufnewd   lua _ - 31312 ^? !"+"asdadwa";
+while(a==b){
+    a= not(b);
+    if(a AND b) {
+    	a = b;
+    }
+    else
+    {
+    	b=a;
+    	b=b;
+    	a=a;
+        z=-4-(-3.1);
+    }
+}
 }
