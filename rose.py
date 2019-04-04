@@ -576,7 +576,7 @@ def operacionesEnPilasBrincos(tipoFunc):
 #################
 def p_rose(p):
     '''
-    rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars comments_nl roseauxfunc comments_nl main comments_nl
+    rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars roseauxfunc main
     '''
     print(dirFunc.val)
     print(arrCuad)
@@ -584,40 +584,40 @@ def p_rose(p):
 
 def p_roseauxvars(p):
     '''
-    roseauxvars : GLOBALS comments_nl vars comments_nl roseauxvars comments_nl
+    roseauxvars : GLOBALS comments_nl vars roseauxvars comments_nl
             | empty
     '''
 
 def p_roseauxfunc(p):
     '''
-    roseauxfunc : func comments_nl roseauxfunc comments_nl
+    roseauxfunc : func roseauxfunc comments_nl
                 | empty
     '''
 def p_main(p):
     '''
-    main : MAIN np_main_func comments_nl LEFTPARENTHESIS comments_nl RIGHTPARENTHESIS comments_nl bloque comments_nl
+    main : MAIN np_main_func comments_nl LEFTPARENTHESIS comments_nl RIGHTPARENTHESIS comments_nl bloque
     '''
 
 def p_vars(p):
     '''
-    vars : tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionmatriz comments_nl RIGHTKEY comments_nl SEMICOLON np_anadir_variable comments_nl
-        | tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_anadir_variable comments_nl
-        | tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionarreglo comments_nl RIGHTKEY comments_nl SEMICOLON np_asignar_arreglo comments_nl
-        | tipo comments_nl ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_asignar_arreglo comments_nl
-        | tipo comments_nl ID np_obtener_nombre_var comments_nl EQUALS comments_nl ctes comments_nl SEMICOLON np_asignar_fil_col comments_nl
-        | tipo comments_nl ID np_obtener_nombre_var comments_nl SEMICOLON np_asignar_fil_col comments_nl
+    vars : tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionmatriz RIGHTKEY comments_nl SEMICOLON np_anadir_variable comments_nl
+        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_anadir_variable comments_nl
+        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionarreglo RIGHTKEY comments_nl SEMICOLON np_asignar_arreglo comments_nl
+        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_asignar_arreglo comments_nl
+        | tipo ID np_obtener_nombre_var comments_nl EQUALS comments_nl ctes SEMICOLON np_asignar_fil_col comments_nl
+        | tipo ID np_obtener_nombre_var comments_nl SEMICOLON np_asignar_fil_col comments_nl
     '''
 
 def p_asignacionmatriz(p):
     '''
-    asignacionmatriz : LEFTKEY comments_nl asignacionarreglo comments_nl RIGHTKEY comments_nl COMMA comments_nl asignacionmatriz comments_nl
-                    | LEFTKEY comments_nl asignacionarreglo comments_nl RIGHTKEY comments_nl
+    asignacionmatriz : LEFTKEY comments_nl asignacionarreglo RIGHTKEY comments_nl COMMA comments_nl asignacionmatriz comments_nl
+                    | LEFTKEY comments_nl asignacionarreglo RIGHTKEY comments_nl
     '''
 
 def p_asignacionarreglo(p):
     '''
-    asignacionarreglo : ctes comments_nl COMMA comments_nl asignacionarreglo comments_nl
-                    | ctes comments_nl
+    asignacionarreglo : ctes COMMA comments_nl asignacionarreglo comments_nl
+                    | ctes
     '''
 
 def p_tipo(p):
@@ -630,59 +630,59 @@ def p_tipo(p):
 
 def p_durante(p):
     '''
-    durante : WHILE np_durante_quad1 comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS np_durante_quad2 comments_nl bloque np_durante_quad3 comments_nl
+    durante : WHILE np_durante_quad1 comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS np_durante_quad2 comments_nl bloque np_durante_quad3
     '''
 
 def p_condition(p):
     '''
-    condition : IF comments_nl LEFTPARENTHESIS comments_nl mega_exp np_condition_quad1 comments_nl RIGHTPARENTHESIS comments_nl bloque comments_nl np_condition_quad2 else np_condition_quad3
+    condition : IF comments_nl LEFTPARENTHESIS comments_nl mega_exp np_condition_quad1 RIGHTPARENTHESIS comments_nl bloque np_condition_quad2 else np_condition_quad3
     '''
 
 def p_else(p):
     '''
-    else : ELSE comments_nl bloque comments_nl
+    else : ELSE comments_nl bloque
         | empty
     '''
 
 def p_mega_exp(p):
     '''
-    mega_exp : expression_compare np_mega_exp_quad2 comments_nl mega_expaux comments_nl
+    mega_exp : expression_compare np_mega_exp_quad2 comments_nl mega_expaux
     '''
 
 def p_mega_expaux(p):
     '''
-    mega_expaux : OR np_mega_exp_quad1  mega_exp comments_nl
-                | AND np_mega_exp_quad1  mega_exp comments_nl
+    mega_expaux : OR np_mega_exp_quad1 mega_exp comments_nl
+                | AND np_mega_exp_quad1 mega_exp comments_nl
                 | empty
     '''
 
 def p_expression_compare(p):
     '''
-    expression_compare : exp comments_nl DIFFERENT np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2 comments_nl 
-                    | exp comments_nl GTEQ np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2 comments_nl
-                    | exp comments_nl LTEQ np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2 comments_nl 
-                    | exp comments_nl EQUIVALENTE np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2 comments_nl
-                    | exp comments_nl GT np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2 comments_nl
-                    | exp comments_nl LT np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2 comments_nl
-                    | exp comments_nl np_expression_compare_quad2
+    expression_compare : exp DIFFERENT np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2
+                    | exp GTEQ np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2
+                    | exp LTEQ np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2
+                    | exp EQUIVALENTE np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2
+                    | exp GT np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2
+                    | exp LT np_expression_compare_quad1 comments_nl exp np_expression_compare_quad2
+                    | exp np_expression_compare_quad2
     '''
 
 def p_exp(p):
     '''
-    exp : termino comments_nl np_expaux_quad4 expaux comments_nl
+    exp : termino np_expaux_quad4 expaux comments_nl
     '''
 
 
 def p_expaux(p):
     '''
-    expaux : PLUS np_expaux_quad3 comments_nl exp comments_nl
-            | MINUS np_expaux_quad3 comments_nl exp comments_nl
+    expaux : PLUS np_expaux_quad3 comments_nl exp
+            | MINUS np_expaux_quad3 comments_nl exp
             | empty 
     '''
 
 def p_termino(p):
     '''
-    termino : factor np_terminoaux_quad5 comments_nl terminoaux comments_nl
+    termino : factor np_terminoaux_quad5 terminoaux
     '''
 
 def p_terminoaux(p):
@@ -694,7 +694,7 @@ def p_terminoaux(p):
 
 def p_factor(p):
     '''
-    factor : vars_cte comments_nl
+    factor : vars_cte
     		| PLUS comments_nl vars_cte comments_nl
             | MINUS comments_nl vars_cte comments_nl
             | LEFTPARENTHESIS np_parentesis_quad1 comments_nl mega_exp comments_nl RIGHTPARENTHESIS np_parentesis_quad2 comments_nl
@@ -703,17 +703,17 @@ def p_factor(p):
 def p_func(p):
     '''
     func : FUNC comments_nl VOID np_obtener_tipo comments_nl restofuncion comments_nl
-        | FUNC comments_nl tipo comments_nl restofuncion comments_nl
+        | FUNC comments_nl tipo restofuncion comments_nl
     '''
 
 def p_restofuncion(p):
     '''
-    restofuncion : ID np_obtener_nombre_func comments_nl LEFTPARENTHESIS comments_nl argumentos comments_nl RIGHTPARENTHESIS comments_nl bloque comments_nl
+    restofuncion : ID np_obtener_nombre_func comments_nl LEFTPARENTHESIS comments_nl argumentos comments_nl RIGHTPARENTHESIS comments_nl bloque
     '''
 
 def p_argumentos(p):
     '''
-    argumentos : tipo comments_nl mismotipo comments_nl SEMICOLON comments_nl argumentos comments_nl
+    argumentos : tipo mismotipo comments_nl SEMICOLON comments_nl argumentos comments_nl
                 | empty
     '''
 
@@ -729,7 +729,7 @@ def p_mismotipo(p):
 
 def p_bloque(p):
     '''
-    bloque : LEFTKEY comments_nl estatuto comments_nl RIGHTKEY comments_nl
+    bloque : LEFTKEY comments_nl estatuto RIGHTKEY comments_nl
     '''
 
 def p_estatuto(p):
@@ -739,7 +739,7 @@ def p_estatuto(p):
 
 def p_declaracionvariables(p):
     '''
-    declaracionvariables : vars comments_nl declaracionvariables comments_nl
+    declaracionvariables : vars declaracionvariables comments_nl
                         | empty
     '''
 def p_aplicaciones(p):
@@ -750,7 +750,7 @@ def p_aplicaciones(p):
                 | llama_spec_func comments_nl aplicaciones comments_nl
                 | asignacion comments_nl aplicaciones comments_nl
                 | durante comments_nl aplicaciones comments_nl
-                | llama_func comments_nl aplicaciones comments_nl
+                | llama_func aplicaciones comments_nl
                 | returnx comments_nl aplicaciones comments_nl
                 | empty
     '''
@@ -758,76 +758,76 @@ def p_aplicaciones(p):
 def p_vars_cte(p):
     '''
     vars_cte : spec_func
-            | ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl
-            | ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl
-            | ID comments_nl LEFTPARENTHESIS comments_nl params comments_nl RIGHTPARENTHESIS comments_nl
+            | ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl
+            | ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl
+            | ID comments_nl LEFTPARENTHESIS comments_nl params RIGHTPARENTHESIS comments_nl
             | ID np_factor_quad1 comments_nl
-            | ctes comments_nl
+            | ctes
     '''
 
 def p_params(p):
     '''
-    params : paramsaux comments_nl
+    params : paramsaux
             | empty
     '''
 def p_paramsaux(p):
     '''
-    paramsaux : mega_exp comments_nl COMMA comments_nl paramsaux comments_nl
+    paramsaux : mega_exp COMMA comments_nl paramsaux comments_nl
                 | mega_exp
     '''
 
 def p_asignacion(p):
     '''
-    asignacion : ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp comments_nl SEMICOLON comments_nl
-               | ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp comments_nl SEMICOLON comments_nl
-               | ID np_asignacion_quad1 comments_nl EQUALS np_asignacion_quad2 comments_nl mega_exp comments_nl SEMICOLON np_asignacion_quad4 comments_nl
+    asignacion : ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp SEMICOLON comments_nl
+               | ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp SEMICOLON comments_nl
+               | ID np_asignacion_quad1 comments_nl EQUALS np_asignacion_quad2 comments_nl mega_exp SEMICOLON np_asignacion_quad4 comments_nl
     '''	
 
 def p_escritura(p):
     '''
-    escritura : PRINT np_print_quad1 comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_print_quad2 comments_nl
+    escritura : PRINT np_print_quad1 comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl SEMICOLON np_print_quad2 comments_nl
     '''
 
 def p_lectura(p):
     '''
-    lectura : READ np_read_quad1 comments_nl LEFTPARENTHESIS comments_nl ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_read_quad2 comments_nl
-            | READ np_read_quad1 comments_nl LEFTPARENTHESIS comments_nl ID comments_nl LEFTBRACKET comments_nl mega_exp comments_nl RIGHTBRACKET comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_read_quad2 comments_nl
+    lectura : READ np_read_quad1 comments_nl LEFTPARENTHESIS comments_nl ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_read_quad2 comments_nl
+            | READ np_read_quad1 comments_nl LEFTPARENTHESIS comments_nl ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_read_quad2 comments_nl
             | READ np_read_quad1 comments_nl LEFTPARENTHESIS comments_nl ID np_read_quad3 comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_read_quad2 comments_nl
     '''
 
 def p_llama_spec_func(p):
     '''
-    llama_spec_func : spec_func comments_nl SEMICOLON comments_nl
+    llama_spec_func : spec_func SEMICOLON comments_nl
     '''
 
 def p_spec_func(p):
     '''
-    spec_func : SQRT comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | POW comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | ABS comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | STDEV comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | MEAN comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | MEDIAN comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | MODE comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | FACTORIAL comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | SORT comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | SIN comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | COS comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | TRANSPOSE comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | EXPORTCSV comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | ARRANGE comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | GRAPH3D comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl 
-                | PIECHART comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
-                | HISTOGRAMCHART comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
-                | LINECHART comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
-                | BARCHART comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
-                | LINREG comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl COMMA comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
-                | NOT comments_nl LEFTPARENTHESIS comments_nl mega_exp comments_nl RIGHTPARENTHESIS comments_nl
+    spec_func : SQRT comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | POW comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | ABS comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | STDEV comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | MEAN comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | MEDIAN comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | MODE comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | FACTORIAL comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | SORT comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | SIN comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | COS comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | TRANSPOSE comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | EXPORTCSV comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | ARRANGE comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | GRAPH3D comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | PIECHART comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl
+                | HISTOGRAMCHART comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
+                | LINECHART comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
+                | BARCHART comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
+                | LINREG comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
+                | NOT comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl
     '''
 
 def p_returnx(p):
     '''
-    returnx : RETURNX comments_nl mega_exp comments_nl SEMICOLON comments_nl
+    returnx : RETURNX comments_nl mega_exp SEMICOLON comments_nl
     '''
 
 def p_ctes(p):
@@ -840,7 +840,7 @@ def p_ctes(p):
 
 def p_llama_func(p):
     '''
-    llama_func : ID comments_nl LEFTPARENTHESIS comments_nl params comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON comments_nl
+    llama_func : ID comments_nl LEFTPARENTHESIS comments_nl params RIGHTPARENTHESIS comments_nl SEMICOLON comments_nl
     '''
 
 def p_comments_nl(p):
