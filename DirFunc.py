@@ -4,7 +4,7 @@ import sys
 class DirFunc:
     class __DirFunc:
         def __init__(self,nombre,tipo):
-            self.val = { nombre : (tipo, {}) }
+            self.val = { nombre : (tipo, {}, 0) }
         def __str__(self):
             return repr(self)
     instance = None
@@ -26,7 +26,7 @@ class DirFunc:
             print('Function {} previously defined.'.format(nombre))
             sys.exit()
         else:
-            DirFunc.instance.val[nombre] = (tipo, {} )
+            DirFunc.instance.val[nombre] = (tipo, {}, 0 )
 
     def addVariable(self, nameFunc, variable, tipo, filas, columnas):
         """ Adjunta la variable a la funcion especificada 
@@ -43,5 +43,14 @@ class DirFunc:
         else:
             tableVars = self.val[nameFunc][1]  
             tableVars[variable] = (tipo, filas, columnas)
-            self.val[nameFunc] =  (self.val[nameFunc][0], tableVars)
+            self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, self.val[nameFunc][2])
+
+    def updateParams(self, nombre, numPar):
+        """
+        Actualiza la cantidad de parametros en la funcion
+        Args:
+         nombre: Nombre de la funcion a modificar
+         numPar: Cantidad de parametros de la funcion a modificar
+        """
+        DirFunc.instance.val[nombre] = (self.val[nombre][0], self.val[nombre][1], numPar)
         
