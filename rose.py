@@ -292,6 +292,9 @@ pilaSaltos = []
 # Pila que almacena los saltos a las funciones 
 pilaFunciones = []
 
+#Valor que almacen la cantidad de argumentos al llamar a un método.
+pilaArgumentos = []
+
 # Vector que almacena los Cuadruplos del programa
 arrCuad = []
 
@@ -300,6 +303,8 @@ iMemoryAdd = 0;
 
 # Valor que apunta al siguiente espacio temporal disponible
 iAvail = 1;
+
+
 
 # Valor que almacena el nombre del ID
 idName = ''
@@ -354,7 +359,8 @@ def aniadirParametros():
 def anadirFunc():
     global nombreFunc
     global tipoDato
-    dirFunc.addFunc(nombreFunc, tipoDato)
+    global arrCuad
+    dirFunc.addFunc(nombreFunc, tipoDato, len(arrCuad))
 #Regresa el temporal siguiente disponible
 def getAvail():
 	global iAvail
@@ -718,7 +724,7 @@ def p_func(p):
 def p_restofuncion(p):
     '''
     restofuncion : ID np_obtener_nombre_func comments_nl LEFTPARENTHESIS comments_nl argumentos comments_nl RIGHTPARENTHESIS np_agregar_parametros2 comments_nl bloque np_endproc
-    '''
+    '''	
 
 def p_argumentos(p):
     '''
@@ -769,7 +775,7 @@ def p_vars_cte(p):
     vars_cte : spec_func
             | ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl
             | ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl
-            | ID comments_nl LEFTPARENTHESIS comments_nl params RIGHTPARENTHESIS comments_nl
+            | ID np_crea_era comments_nl LEFTPARENTHESIS comments_nl params RIGHTPARENTHESIS np_genera_gosub comments_nl
             | ID np_factor_quad1 comments_nl
             | ctes
     '''
@@ -781,8 +787,8 @@ def p_params(p):
     '''
 def p_paramsaux(p):
     '''
-    paramsaux : mega_exp COMMA comments_nl paramsaux comments_nl
-                | mega_exp
+    paramsaux : mega_exp COMMA np_add_parametro comments_nl paramsaux comments_nl
+                | mega_exp np_add_parametro
     '''
 
 def p_asignacion(p):
@@ -861,7 +867,7 @@ def p_floatPostNeg(p):
 
 def p_llama_func(p):
     '''
-    llama_func : ID comments_nl LEFTPARENTHESIS comments_nl params RIGHTPARENTHESIS comments_nl SEMICOLON comments_nl
+    llama_func : ID np_crea_era2 comments_nl LEFTPARENTHESIS comments_nl params RIGHTPARENTHESIS np_genera_gosub2 comments_nl SEMICOLON comments_nl
     '''
 
 def p_comments_nl(p):
@@ -976,7 +982,7 @@ def p_np_main_func(p):
 
 def p_np_factor_quad1(p):
 	'''
-	np_factor_quad1 : empty
+	np_factor_quad1 : 
 	'''
 	tempIdName = str(p[-1])
 	addIdToStack(tempIdName)
@@ -1164,32 +1170,117 @@ def p_np_agregar_goto_main(p):
     '''
     np_agregar_goto_main : empty
     '''
-    global arrCuad
-    tupla=('GoTo','','','')
-    arrCuad.append(tupla)
-
+    addQuad('GoTo','','','')
+    
 def p_np_cuadruplo_retorno(p):
     '''
     np_cuadruplo_retorno : empty
     '''
-    global arrCuad
     operand=popOperando()
     tipo=popTipos()
     if(dirFunc.val[nombreFunc][0]==tipo):
-        tupla=('return','','',operand)
-        arrCuad.append(tupla)
+        addQuad('return','','',operand)
     else:
         print("In line {} expected return value: {}, instead {}.".format( lexer.lineno, dirFunc.val[nombreFunc][0], tipo))
         sys.exit()
-
 
 def p_np_endproc(p):
     '''
     np_endproc : empty
     '''
-    global arrCuad
-    tupla=('endproc','','','')
-    arrCuad.append(tupla)
+    addQuad('endproc','','','')
+    
+def p_np_crea_era(p):
+	'''
+	np_crea_era : empty
+	'''
+	global pilaArgumentos
+	global pilaFunciones
+	nameFunc = p[-1]
+	if nameFunc in dirFunc.val:
+		result = getAvail()
+		addOperandoToStack(result)
+		addTipoToStack(dirFunc.val[nameFunc][0])
+		pilaFunciones.append(nameFunc)
+		addQuad('era', nameFunc, '', '')
+		pilaArgumentos.append(0)
+	else:
+		print("In line {}, function {} not previously declared.".format( lexer.lineno, nameFunc))
+		sys.exit()
+
+def p_np_add_parametro(p):
+	'''
+	np_add_parametro : empty
+	'''
+	global pilaArgumentos
+	argumentoValor = popOperando()
+	tipoArgumento = popTipos()
+	nameFunc = pilaFunciones.pop()
+	iArgumentos = pilaArgumentos.pop() + 1
+	pilaArgumentos.append(iArgumentos)
+	paramName = 'param' + str(iArgumentos)
+	iArgumentosDeFunc = dirFunc.val[nameFunc][2]
+	listaDirFunc = list(dirFunc.val[nameFunc][1].values()) 
+	if iArgumentosDeFunc >= iArgumentos:
+		if listaDirFunc[iArgumentos-1][0] == tipoArgumento:
+			addQuad('parameter', argumentoValor, '', paramName)
+		else:
+			print("In line {}, argument {} type mismatch with function declaration.".format( lexer.lineno, nameFunc))
+			sys.exit()
+	else:
+		print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
+		sys.exit()
+	
+	pilaFunciones.append(nameFunc)
+	
+def p_np_genera_gosub(p):
+	'''
+	np_genera_gosub : empty
+	'''
+	global pilaArgumentos
+	global pilaFunciones
+	operando=popOperando()
+	iArgumentos = pilaArgumentos.pop()
+	nameFunc = pilaFunciones.pop()
+	print(iArgumentos)
+	if iArgumentos == dirFunc.val[nameFunc][2]:
+		addQuad('gosub', nameFunc, '', dirFunc.val[nameFunc][3])
+		addQuad('=',nameFunc,'',operando)
+		addOperandoToStack(operando)
+	else:
+		print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
+		sys.exit()
+
+def p_np_genera_gosub2(p):
+	'''
+	np_genera_gosub2 : empty
+	'''
+	global pilaArgumentos
+	global pilaFunciones
+	iArgumentos = pilaArgumentos.pop()
+	nameFunc = pilaFunciones.pop()
+	print(iArgumentos)
+	if iArgumentos == dirFunc.val[nameFunc][2]:
+		addQuad('gosub', nameFunc, '', dirFunc.val[nameFunc][3])
+	else:
+		print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
+		sys.exit()
+
+def p_np_crea_era2(p):
+	'''
+	np_crea_era2 : empty
+	'''
+	global pilaArgumentos
+	global pilaFunciones
+	nameFunc = p[-1]
+	if nameFunc in dirFunc.val:
+		pilaFunciones.append(nameFunc)
+		addQuad('era', nameFunc, '', '')
+		pilaArgumentos.append(0)
+	else:
+		print("In line {}, function {} not previously declared.".format( lexer.lineno, nameFunc))
+		sys.exit()
+
 
 parser = yacc.yacc() 
 

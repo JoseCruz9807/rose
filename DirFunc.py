@@ -4,7 +4,7 @@ import sys
 class DirFunc:
     class __DirFunc:
         def __init__(self,nombre,tipo):
-            self.val = { nombre : (tipo, {}, 0) }
+            self.val = { nombre : (tipo, {}, 0, 0) }
         def __str__(self):
             return repr(self)
     instance = None
@@ -16,17 +16,18 @@ class DirFunc:
     def __getattr__(self, table):
         return getattr(self.instance, table)
 
-    def addFunc(self, nombre, tipo):
+    def addFunc(self, nombre, tipo, quadCount):
         """ Adjunta la funcion especificada al Directorio de Funciones 
             Args:
              nombre : Nombre de la funcion a aniadir.
              tipo   : Tipo de dato que le pertenece a la funcion.
+             quadCount : Cantidad de cuádruplos generados hasta el momento.
         """
         if (nombre in DirFunc.instance.val):
             print('Function {} previously defined.'.format(nombre))
             sys.exit()
         else:
-            DirFunc.instance.val[nombre] = (tipo, {}, 0 )
+            DirFunc.instance.val[nombre] = (tipo, {}, 0, quadCount)
 
     def addVariable(self, nameFunc, variable, tipo, filas, columnas):
         """ Adjunta la variable a la funcion especificada 
@@ -43,7 +44,7 @@ class DirFunc:
         else:
             tableVars = self.val[nameFunc][1]  
             tableVars[variable] = (tipo, filas, columnas)
-            self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, self.val[nameFunc][2])
+            self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, self.val[nameFunc][2], self.val[nameFunc][3])
 
     def updateParams(self, nombre, numPar):
         """
@@ -52,5 +53,5 @@ class DirFunc:
          nombre: Nombre de la funcion a modificar
          numPar: Cantidad de parametros de la funcion a modificar
         """
-        DirFunc.instance.val[nombre] = (self.val[nombre][0], self.val[nombre][1], numPar)
+        DirFunc.instance.val[nombre] = (self.val[nombre][0], self.val[nombre][1], numPar, self.val[nombre][3])
         

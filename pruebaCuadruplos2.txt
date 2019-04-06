@@ -10,6 +10,7 @@ func int funcion1(int a; bool b;){
 main (){ 
 bool a;
 bool b;
+int iNum = 3;
 float z;
 string s;
 s="nasufnewd   lua"+"asdadwa";
@@ -26,4 +27,6 @@ while(a==b){
         z=-4-(-3.1);
     }
 }
+funcion1(1,a);
+funcion1(funcion1(1,a),a);
 }
