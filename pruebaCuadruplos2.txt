@@ -1,12 +1,19 @@
-program 
-test; 
+program test; 
+
+func int funcion1(int a; bool b;){
+    int c;
+    c=a+a;
+    b=false;
+    return a+2;
+}
 
 main (){ 
 bool a;
 bool b;
+int iNum = 3;
 float z;
 string s;
-s="nasufnewd   lua _ - 31312 ^? !"+"asdadwa";
+s="nasufnewd   lua"+"asdadwa";
 while(a==b){
     a= not(b);
     if(a AND b) {
@@ -20,4 +27,6 @@ while(a==b){
         z=-4-(-3.1);
     }
 }
+funcion1(1,a);
+funcion1(funcion1(1,a),a);
 }

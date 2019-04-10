@@ -1,4 +1,3 @@
-
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
@@ -218,8 +217,7 @@ def t_ID (t):
 
 ###Definicion regex de constantes tipo string###
 def t_CTES (t):
-    ##r'\"[a-zA-Z_ 0-9]+\"'
-    r'\".*\"'
+    r'\"[a-zA-Z_ 0-9]+\"'
     t.type = 'CTES'
     return t
 
@@ -270,6 +268,8 @@ tipoDato = 'void'
 iVarFilas = 0
 # Variable que almacena la cantidad de Columnas que tiene la variable especificada
 iVarColumnas = 0
+# Variable que almacena la cantidad de parametros de una funcion
+numeroParametros=0
 
 # Directorio donde se almacenan las funciones y sus variables
 dirFunc = DirFunc(nombreFunc,tipoDato)
@@ -289,6 +289,12 @@ pilaOperadores = []
 # Pila que almacena los saltos para los ifs
 pilaSaltos = []
 
+# Pila que almacena los saltos a las funciones 
+pilaFunciones = []
+
+#Valor que almacen la cantidad de argumentos al llamar a un método.
+pilaArgumentos = []
+
 # Vector que almacena los Cuadruplos del programa
 arrCuad = []
 
@@ -298,6 +304,8 @@ iMemoryAdd = 0;
 # Valor que apunta al siguiente espacio temporal disponible
 iAvail = 1;
 
+
+
 # Valor que almacena el nombre del ID
 idName = ''
 
@@ -305,7 +313,10 @@ idName = ''
 ############################
 ### FUNCIONES AUXILIARES ###
 ############################
-
+#Actualiza el primer goto
+def solveGoMain():
+    global arrCuad
+    arrCuad[0]=('GoTo', '', '' , len(arrCuad))
 #Retorna el siguiente espacio de memoria disponible
 def getMemAdd():
     global iMemoryAdd
@@ -339,11 +350,17 @@ def anadirVar():
     global iVarFilas
     global iVarColumnas
     dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas)
+#Guarda la cantidad de parametros en la funcion
+def aniadirParametros():
+    global nombreFunc
+    global numeroParametros
+    dirFunc.updateParams(nombreFunc, numeroParametros)
 #Guarda la funcion actual en el directorio de funciones
 def anadirFunc():
     global nombreFunc
     global tipoDato
-    dirFunc.addFunc(nombreFunc, tipoDato)
+    global arrCuad
+    dirFunc.addFunc(nombreFunc, tipoDato, len(arrCuad))
 #Regresa el temporal siguiente disponible
 def getAvail():
 	global iAvail
@@ -576,7 +593,7 @@ def operacionesEnPilasBrincos(tipoFunc):
 #################
 def p_rose(p):
     '''
-    rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars roseauxfunc main
+    rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON np_agregar_goto_main comments_nl roseauxvars roseauxfunc main
     '''
     print(dirFunc.val)
     print(arrCuad)
@@ -700,14 +717,14 @@ def p_factor(p):
 
 def p_func(p):
     '''
-    func : FUNC comments_nl VOID np_obtener_tipo comments_nl restofuncion comments_nl
-        | FUNC comments_nl tipo restofuncion comments_nl
+    func : FUNC comments_nl np_inicializar_parametros VOID np_obtener_tipo comments_nl restofuncion comments_nl
+        | FUNC comments_nl np_inicializar_parametros tipo restofuncion comments_nl
     '''
 
 def p_restofuncion(p):
     '''
-    restofuncion : ID np_obtener_nombre_func comments_nl LEFTPARENTHESIS comments_nl argumentos comments_nl RIGHTPARENTHESIS comments_nl bloque
-    '''
+    restofuncion : ID np_obtener_nombre_func comments_nl LEFTPARENTHESIS comments_nl argumentos comments_nl RIGHTPARENTHESIS np_agregar_parametros2 comments_nl bloque np_endproc
+    '''	
 
 def p_argumentos(p):
     '''
@@ -717,12 +734,12 @@ def p_argumentos(p):
 
 def p_mismotipo(p):
     '''
-    mismotipo : ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl COMMA np_anadir_variable comments_nl mismotipo comments_nl
-                | ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl COMMA np_asignar_arreglo comments_nl mismotipo comments_nl
-                | ID np_obtener_nombre_var comments_nl COMMA np_asignar_fil_col comments_nl mismotipo comments_nl
-                | ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl np_anadir_variable
-                | ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl np_asignar_arreglo
-                | ID np_obtener_nombre_var comments_nl np_asignar_fil_col
+    mismotipo : ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl COMMA np_anadir_variable comments_nl mismotipo comments_nl
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl COMMA np_asignar_arreglo comments_nl mismotipo comments_nl
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl COMMA np_asignar_fil_col comments_nl mismotipo comments_nl
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl np_anadir_variable
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl np_asignar_arreglo
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl np_asignar_fil_col
     '''
 
 def p_bloque(p):
@@ -749,7 +766,7 @@ def p_aplicaciones(p):
                 | asignacion comments_nl aplicaciones comments_nl
                 | durante comments_nl aplicaciones comments_nl
                 | llama_func aplicaciones comments_nl
-                | returnx comments_nl aplicaciones comments_nl
+                | returnx np_cuadruplo_retorno comments_nl aplicaciones comments_nl
                 | empty
     '''
 
@@ -758,7 +775,7 @@ def p_vars_cte(p):
     vars_cte : spec_func
             | ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl
             | ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl
-            | ID comments_nl LEFTPARENTHESIS comments_nl params RIGHTPARENTHESIS comments_nl
+            | ID np_crea_era comments_nl LEFTPARENTHESIS comments_nl params RIGHTPARENTHESIS np_genera_gosub comments_nl
             | ID np_factor_quad1 comments_nl
             | ctes
     '''
@@ -770,8 +787,8 @@ def p_params(p):
     '''
 def p_paramsaux(p):
     '''
-    paramsaux : mega_exp COMMA comments_nl paramsaux comments_nl
-                | mega_exp
+    paramsaux : mega_exp COMMA np_add_parametro comments_nl paramsaux comments_nl
+                | mega_exp np_add_parametro
     '''
 
 def p_asignacion(p):
@@ -850,7 +867,7 @@ def p_floatPostNeg(p):
 
 def p_llama_func(p):
     '''
-    llama_func : ID comments_nl LEFTPARENTHESIS comments_nl params RIGHTPARENTHESIS comments_nl SEMICOLON comments_nl
+    llama_func : ID np_crea_era2 comments_nl LEFTPARENTHESIS comments_nl params RIGHTPARENTHESIS np_genera_gosub2 comments_nl SEMICOLON comments_nl
     '''
 
 def p_comments_nl(p):
@@ -898,6 +915,26 @@ def p_np_obtener_nombre_var(p):
     varName = str(p[-1])
     setNombreVar(varName)
 
+def p_np_agregar_parametros(p):
+    '''
+    np_agregar_parametros : empty
+    '''
+    global numeroParametros
+    numeroParametros+=1
+
+def p_np_inicializar_parametros(p):
+    '''
+    np_inicializar_parametros : empty
+    '''
+    global numeroParametros
+    numeroParametros=0
+
+def p_np_agregar_parametros2(p):
+    '''
+    np_agregar_parametros2 : empty
+    '''
+    aniadirParametros()
+
 def p_np_obtener_filas(p):
     '''
     np_obtener_filas : empty
@@ -941,10 +978,11 @@ def p_np_main_func(p):
     setNombreFunc(funName)
     setTipoDato('void')
     anadirFunc()
+    solveGoMain()
 
 def p_np_factor_quad1(p):
 	'''
-	np_factor_quad1 : empty
+	np_factor_quad1 : 
 	'''
 	tempIdName = str(p[-1])
 	addIdToStack(tempIdName)
@@ -1127,6 +1165,122 @@ def p_np_condition_quad3(p):
 	np_condition_quad3 : empty
 	'''
 	operacionesEnPilasBrincos(6)
+
+def p_np_agregar_goto_main(p):
+    '''
+    np_agregar_goto_main : empty
+    '''
+    addQuad('GoTo','','','')
+    
+def p_np_cuadruplo_retorno(p):
+    '''
+    np_cuadruplo_retorno : empty
+    '''
+    operand=popOperando()
+    tipo=popTipos()
+    if(dirFunc.val[nombreFunc][0]==tipo):
+        addQuad('return','','',operand)
+    else:
+        print("In line {} expected return value: {}, instead {}.".format( lexer.lineno, dirFunc.val[nombreFunc][0], tipo))
+        sys.exit()
+
+def p_np_endproc(p):
+    '''
+    np_endproc : empty
+    '''
+    addQuad('endproc','','','')
+    
+def p_np_crea_era(p):
+	'''
+	np_crea_era : empty
+	'''
+	global pilaArgumentos
+	global pilaFunciones
+	nameFunc = p[-1]
+	if nameFunc in dirFunc.val:
+		result = getAvail()
+		addOperandoToStack(result)
+		addTipoToStack(dirFunc.val[nameFunc][0])
+		pilaFunciones.append(nameFunc)
+		addQuad('era', nameFunc, '', '')
+		pilaArgumentos.append(0)
+	else:
+		print("In line {}, function {} not previously declared.".format( lexer.lineno, nameFunc))
+		sys.exit()
+
+def p_np_add_parametro(p):
+	'''
+	np_add_parametro : empty
+	'''
+	global pilaArgumentos
+	argumentoValor = popOperando()
+	tipoArgumento = popTipos()
+	nameFunc = pilaFunciones.pop()
+	iArgumentos = pilaArgumentos.pop() + 1
+	pilaArgumentos.append(iArgumentos)
+	paramName = 'param' + str(iArgumentos)
+	iArgumentosDeFunc = dirFunc.val[nameFunc][2]
+	listaDirFunc = list(dirFunc.val[nameFunc][1].values()) 
+	if iArgumentosDeFunc >= iArgumentos:
+		if listaDirFunc[iArgumentos-1][0] == tipoArgumento:
+			addQuad('parameter', argumentoValor, '', paramName)
+		else:
+			print("In line {}, argument {} type mismatch with function declaration.".format( lexer.lineno, nameFunc))
+			sys.exit()
+	else:
+		print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
+		sys.exit()
+	
+	pilaFunciones.append(nameFunc)
+	
+def p_np_genera_gosub(p):
+	'''
+	np_genera_gosub : empty
+	'''
+	global pilaArgumentos
+	global pilaFunciones
+	operando=popOperando()
+	iArgumentos = pilaArgumentos.pop()
+	nameFunc = pilaFunciones.pop()
+	print(iArgumentos)
+	if iArgumentos == dirFunc.val[nameFunc][2]:
+		addQuad('gosub', nameFunc, '', dirFunc.val[nameFunc][3])
+		addQuad('=',nameFunc,'',operando)
+		addOperandoToStack(operando)
+	else:
+		print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
+		sys.exit()
+
+def p_np_genera_gosub2(p):
+	'''
+	np_genera_gosub2 : empty
+	'''
+	global pilaArgumentos
+	global pilaFunciones
+	iArgumentos = pilaArgumentos.pop()
+	nameFunc = pilaFunciones.pop()
+	print(iArgumentos)
+	if iArgumentos == dirFunc.val[nameFunc][2]:
+		addQuad('gosub', nameFunc, '', dirFunc.val[nameFunc][3])
+	else:
+		print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
+		sys.exit()
+
+def p_np_crea_era2(p):
+	'''
+	np_crea_era2 : empty
+	'''
+	global pilaArgumentos
+	global pilaFunciones
+	nameFunc = p[-1]
+	if nameFunc in dirFunc.val:
+		pilaFunciones.append(nameFunc)
+		addQuad('era', nameFunc, '', '')
+		pilaArgumentos.append(0)
+	else:
+		print("In line {}, function {} not previously declared.".format( lexer.lineno, nameFunc))
+		sys.exit()
+
 
 parser = yacc.yacc() 
 
