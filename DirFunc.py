@@ -29,7 +29,7 @@ class DirFunc:
         else:
             DirFunc.instance.val[nombre] = (tipo, {}, 0, quadCount)
 
-    def addVariable(self, nameFunc, variable, tipo, filas, columnas):
+    def addVariable(self, nameFunc, variable, tipo, filas, columnas, posMemory):
         """ Adjunta la variable a la funcion especificada 
             Args:
              nameFunc   : Nombre de la funcion a la que se le aniadiran las variables.
@@ -43,8 +43,8 @@ class DirFunc:
             sys.exit()
         else:
             tableVars = self.val[nameFunc][1]  
-            tableVars[variable] = (tipo, filas, columnas)
-            self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, self.val[nameFunc][2], self.val[nameFunc][3])
+            tableVars[variable] = (tipo, filas, columnas, posMemory)
+            self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, self.val[nameFunc][2], self.val[nameFunc][3], self.val[nameFunc][4])
 
     def updateParams(self, nombre, numPar):
         """
@@ -53,5 +53,5 @@ class DirFunc:
          nombre: Nombre de la funcion a modificar
          numPar: Cantidad de parametros de la funcion a modificar
         """
-        DirFunc.instance.val[nombre] = (self.val[nombre][0], self.val[nombre][1], numPar, self.val[nombre][3])
+        DirFunc.instance.val[nombre] = (self.val[nombre][0], self.val[nombre][1], numPar, self.val[nombre][3], self.val[nombre][4])
         

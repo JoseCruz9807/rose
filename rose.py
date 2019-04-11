@@ -304,7 +304,80 @@ iMemoryAdd = 0;
 # Valor que apunta al siguiente espacio temporal disponible
 iAvail = 1;
 
+# Valor que habilita la cantidad de espacios disponibles para cada tipo de dato
+espaciosDisponibles = 1000
 
+# Valor que apunta al primer lugar disponible de los int locales
+iIntLocales = espaciosDisponibles
+
+# Valor que apunta al primer lugar disponible de los float locales
+iFloatLocales = iIntLocales + espaciosDisponibles
+
+# Valor que apunta al primer lugar disponible de los bool locales
+iBoolLocales = iFloatLocales + espaciosDisponibles
+
+# Valor que apunta al primer lugar disponible de los strings locales
+iStringLocales = iBoolLocales + espaciosDisponibles
+
+# Valor que apunta al primer lugar disponible de los int locales
+iIntGlobales = iStringLocales + espaciosDisponibles
+
+# Valor que apunta al primer lugar disponible de los float locales
+iFloatGlobales = iIntGlobales + espaciosDisponibles
+
+# Valor que apunta al primer lugar disponible de los bool locales
+iBoolGlobales = iFloatGlobales + espaciosDisponibles
+
+# Valor que apunta al primer lugar disponible de los strings locales
+iStringGlobales = iBoolGlobales + espaciosDisponibles
+
+# Valor que apunta al primer lugar disponible de los int temporales
+iIntTemporales = iStringGlobales + espaciosDisponibles
+
+# Valor que apunta al primer lugar disponible de los float temporales
+iFloatTemporales = iIntTemporales + espaciosDisponibles
+
+# Valor que apunta al primer lugar disponible de los bool temporales
+iBoolTemporales = iFloatTemporales + espaciosDisponibles
+
+# Valor que apunta al primer lugar disponible de los strings temporales
+iStringTemporales = iBoolTemporales + espaciosDisponibles
+
+# Valor que apunta al siguiente lugar disponible de los int
+iIntConst = iStringTemporales + espaciosDisponibles
+
+# Valor que apunta al siguiente lugar disponible de los float
+iFloatConst = iIntConst + espaciosDisponibles
+
+# Valor que apunta al siguiente lugar disponible de los bool
+iBoolConst = iFloatConst + espaciosDisponibles
+
+# Valor que apunta al siguiente lugar disponible de los strings
+iStringConst = iBoolConst + espaciosDisponibles
+
+# Dictionary que almacena constantes int
+dictInt = {}
+
+# Dictionary que almacena constantes float
+dictFloat = {}
+
+# Dictionary que almacena constantes bool
+dictBool = {}
+
+# Dictionary que almacena constantes string
+dictString = {}
+
+# Contador de las variables temporales int
+iContadorIntTemp = iStringTemporales
+
+# Contador de las variables temporales float
+iContadorFloatTemp = iIntConst
+
+# Contador de las variables temporales bool
+iContadorBoolTemp = iFloatConst
+
+# Contador de las variables temporales string
+iContadorStringTemp = iBoolConst
 
 # Valor que almacena el nombre del ID
 idName = ''
@@ -362,11 +435,24 @@ def anadirFunc():
     global arrCuad
     dirFunc.addFunc(nombreFunc, tipoDato, len(arrCuad))
 #Regresa el temporal siguiente disponible
-def getAvail():
-	global iAvail
-	iAvail += 1
-	strAvail = 'temp' + str(iAvail-1)
-	return strAvail
+def getAvail(tipoDato):
+	global iContadorIntTemp
+    global iContadorFloatTemp
+    global iContadorBoolTemp
+    global iContadorStringTemp
+    if tipoDato == 'int':
+        avail = iContadorIntTemp
+        iContadorIntTemp+=1
+    if tipoDato == 'float':
+        avail = iContadorFloatTemp
+        iContadorFloatTemp+=1
+    if tipoDato == 'bool':
+        avail = iContadorBoolTemp
+        iContadorBoolTemp+=1
+    if tipoDato == 'string':
+        avail = iContadorStringTemp
+        iContadorStringTemp+=1
+	return avail
 #Guarda el cuadruplo especificado al arreglo de cuarduplos
 def addQuad(operador, operandoUno, operandoDos, valorGuardar):
 	global arrCuad
@@ -448,12 +534,14 @@ def popTipos():
 def arithmeticOperator():
     rightOperand = popOperando()
     rightType = popTipos()
+    checkIfTemporal(rightOperand)
     leftOperand = popOperando()
     leftType = popTipos()
+    checkIfTemporal(leftOperand)
     tempOperator = popOperadores()
     resultType = semantica.resultType(leftType, rightType, tempOperator)
     if resultType != 'error':
-        result = getAvail()
+        result = getAvail(resultType)
         addQuad(tempOperator, leftOperand, rightOperand, result)
         addOperandoToStack(result)
         addTipoToStack(resultType)
@@ -464,12 +552,13 @@ def arithmeticOperator():
 def assignOperator():
 	rightOperand = popOperando()
 	rightType = popTipos()
+    checkIfTemporal(rightOperand)
 	leftOperand = popOperando()
 	leftType = popTipos()
+    checkIfTemporal(leftOperand)
 	tempOperator = popOperadores()
 	resultType = semantica.resultType(leftType, rightType, tempOperator)
 	if resultType != 'error':
-		#result = getAvail()
 		addQuad(tempOperator, rightOperand, '', leftOperand)
 		##Regresar el temp al AVAIL
 	else:
@@ -481,7 +570,6 @@ def printFun():
     tempOperator = popOperadores()
     resultType = semantica.resultType(tempOperator, typeOperand, '')
     if resultType != 'error':
-        #result = getAvail()
         addQuad(tempOperator, printOperand, '', '')
 		##Regresar el temp al AVAIL
         popOperando()
@@ -587,6 +675,21 @@ def operacionesEnPilasBrincos(tipoFunc):
     func = switchFuncion(tipoFunc)
     func()
     
+#Se valida si se libera o no el espacio usado por el temporal
+def checkIfTemporal(memPos):
+    global iContadorIntTemp
+    global iContadorFloatTemp
+    global iContadorBoolTemp
+    global iContadorStringTemp
+    if (memPos >= iStringGlobales && memPos < iIntTemporales):
+        iContadorIntTemp -= 1
+    if (memPos >= iIntTemporales && memPos < iFloatTemporales):
+        iContadorFloatTemp -= 1
+    if (memPos >= iFloatTemporales && memPos < iBoolTemporales):
+        iContadorBoolTemp -= 1
+    if (memPos >= iBoolTemporales && memPos < iStringTemporales):
+        iContadorStringTemp -= 1
+
 
 #################
 ### GRAMATICA ###
@@ -595,8 +698,12 @@ def p_rose(p):
     '''
     rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON np_agregar_goto_main comments_nl roseauxvars roseauxfunc main
     '''
+    file = open("codeobj.rs","w+")
     print(dirFunc.val)
     print(arrCuad)
+    for cuad in arrCuad:
+    	file.write(str(cuad) + "\n")
+    file.close()
     print("Exito compilando")
 
 def p_roseauxvars(p):
@@ -1178,6 +1285,7 @@ def p_np_cuadruplo_retorno(p):
     '''
     operand=popOperando()
     tipo=popTipos()
+    checkIfTemporal(operand)
     if(dirFunc.val[nombreFunc][0]==tipo):
         addQuad('return','','',operand)
     else:
@@ -1198,7 +1306,7 @@ def p_np_crea_era(p):
 	global pilaFunciones
 	nameFunc = p[-1]
 	if nameFunc in dirFunc.val:
-		result = getAvail()
+        result = getAvail(dirFunc.val[nameFunc][0])
 		addOperandoToStack(result)
 		addTipoToStack(dirFunc.val[nameFunc][0])
 		pilaFunciones.append(nameFunc)
@@ -1215,6 +1323,7 @@ def p_np_add_parametro(p):
 	global pilaArgumentos
 	argumentoValor = popOperando()
 	tipoArgumento = popTipos()
+    checkIfTemporal(argumentoValor)
 	nameFunc = pilaFunciones.pop()
 	iArgumentos = pilaArgumentos.pop() + 1
 	pilaArgumentos.append(iArgumentos)
@@ -1241,8 +1350,13 @@ def p_np_genera_gosub(p):
 	global pilaFunciones
 	operando=popOperando()
 	iArgumentos = pilaArgumentos.pop()
+    #################################################################
+    #    CHECAR ESTA PARE
+
+
+    #################################################################
+    #checkIfTemporal(operando)
 	nameFunc = pilaFunciones.pop()
-	print(iArgumentos)
 	if iArgumentos == dirFunc.val[nameFunc][2]:
 		addQuad('gosub', nameFunc, '', dirFunc.val[nameFunc][3])
 		addQuad('=',nameFunc,'',operando)
@@ -1259,7 +1373,6 @@ def p_np_genera_gosub2(p):
 	global pilaFunciones
 	iArgumentos = pilaArgumentos.pop()
 	nameFunc = pilaFunciones.pop()
-	print(iArgumentos)
 	if iArgumentos == dirFunc.val[nameFunc][2]:
 		addQuad('gosub', nameFunc, '', dirFunc.val[nameFunc][3])
 	else:
