@@ -80,7 +80,8 @@ class CuboSemantico:
 		('read',	'string',	''	)	:	'string',
 		('read',	'bool',		''	)	:	'bool',
 		('read',	'int',		''	)	:	'int',
-		('read',	'float',	''	)	:	'float',	
+		('read',	'float',	''	)	:	'float',
+		('not',		'bool',		''	)	:	'bool'
 		}
 
 	def resultType(self, op1, op2, operator):

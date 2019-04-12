@@ -361,23 +361,29 @@ dictInt = {}
 # Dictionary que almacena constantes float
 dictFloat = {}
 
-# Dictionary que almacena constantes bool
-dictBool = {}
-
 # Dictionary que almacena constantes string
 dictString = {}
 
 # Contador de las variables temporales int
-iContadorIntTemp = iStringTemporales
+iContadorIntTemp = iStringGlobales
 
 # Contador de las variables temporales float
-iContadorFloatTemp = iIntConst
+iContadorFloatTemp = iIntTemporales
 
 # Contador de las variables temporales bool
-iContadorBoolTemp = iFloatConst
+iContadorBoolTemp = iFloatTemporales
 
 # Contador de las variables temporales string
-iContadorStringTemp = iBoolConst
+iContadorStringTemp = iBoolTemporales
+
+# Lista que almacena los valores actuales de las variables locales
+memoriaLocalCantidad = [0, iIntLocales, iFloatLocales, iBoolLocales]
+
+# Lista que almacena los valores actuales de las variables globales
+memoriaGlobalCantidad = [iStringLocales, iIntGlobales, iFloatGlobales, iBoolGlobales]
+
+# Lista que almacena los valores actuales de las constantes
+memoriaConstantesCantidad = [iStringTemporales, iIntConst, iFloatConst, iBoolConst]
 
 # Valor que almacena el nombre del ID
 idName = ''
@@ -415,6 +421,65 @@ def setIVarFilas(numFil):
 def setIVarColumnas(numCol):
     global iVarColumnas
     iVarColumnas = numCol
+#Regresa y actualiza el valor de la memoria local correspondiente
+def getMemPosVars(dataType):
+    global memoriaLocalCantidad
+    memPos = -1
+    if dataType == 'int':
+        if memoriaLocalCantidad[0] < iIntLocales:
+            memPos = memoriaLocalCantidad[0]
+            memoriaLocalCantidad[0] += 1
+        else:
+            memoryOverflow('int local')
+    if dataType == 'float':
+        if memoriaLocalCantidad[1] < iFloatLocales:
+            memPos = memoriaLocalCantidad[1]
+            memoriaLocalCantidad[1] += 1
+        else:
+            memoryOverflow('float local')
+    if dataType == 'bool':
+        if memoriaLocalCantidad[2] < iBoolLocales:
+            memPos = memoriaLocalCantidad[2]
+            memoriaLocalCantidad[2] += 1
+        else:
+            memoryOverflow('bool local')
+    if dataType == 'string':
+        if memoriaLocalCantidad[3] < iStringLocales:
+            memPos = memoriaLocalCantidad[3]
+            memoriaLocalCantidad[3] += 1
+        else:
+            memoryOverflow('string local')
+    return memPos
+
+#Regresa y actualiza el valor de la memoria local correspondiente
+def getMemPosGlobals(dataType):
+    global memoriaGlobalCantidad
+    memPos = -1
+    if dataType == 'int':
+        if memoriaGlobalCantidad[0] < iIntGlobales:
+            memPos = memoriaGlobalCantidad[0]
+            memoriaGlobalCantidad[0] += 1
+        else:
+            memoryOverflow('int global')
+    if dataType == 'float':
+        if memoriaGlobalCantidad[1] < iFloatGlobales:
+            memPos = memoriaGlobalCantidad[1]
+            memoriaGlobalCantidad[1] += 1
+        else:
+            memoryOverflow('float global')
+    if dataType == 'bool':
+        if memoriaGlobalCantidad[2] < iBoolGlobales:
+            memPos = memoriaGlobalCantidad[2]
+            memoriaGlobalCantidad[2] += 1
+        else:
+            memoryOverflow('bool global')
+    if dataType == 'string':
+        if memoriaGlobalCantidad[3] < iStringGlobales:
+            memPos = memoriaGlobalCantidad[3]
+            memoriaGlobalCantidad[3] += 1
+        else:
+            memoryOverflow('string global')
+    return memPos
 #Guarda la variable actual en el directorio de variables de la funcion especificada
 def anadirVar():
     global nombreFunc
@@ -422,7 +487,11 @@ def anadirVar():
     global tipoDato
     global iVarFilas
     global iVarColumnas
-    dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas)
+    if nombreFunc == 'globals':
+        posMemoria = getMemPosGlobals(tipoDato)
+    else:
+        posMemoria = getMemPosVars(tipoDato)
+    dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas, posMemoria)
 #Guarda la cantidad de parametros en la funcion
 def aniadirParametros():
     global nombreFunc
@@ -434,25 +503,42 @@ def anadirFunc():
     global tipoDato
     global arrCuad
     dirFunc.addFunc(nombreFunc, tipoDato, len(arrCuad))
+#Funcion que imprime el error al alcanzar el limite de memoria
+def memoryOverflow(description):
+    print("In line {}, {} has reached its memory limit.".format(lexer.lineno, description))
+    sys.exit()
 #Regresa el temporal siguiente disponible
 def getAvail(tipoDato):
-	global iContadorIntTemp
+    global iContadorIntTemp
     global iContadorFloatTemp
     global iContadorBoolTemp
     global iContadorStringTemp
+    avail = -1
     if tipoDato == 'int':
-        avail = iContadorIntTemp
-        iContadorIntTemp+=1
+        if iContadorIntTemp < iIntTemporales:
+            avail = iContadorIntTemp
+            iContadorIntTemp = iContadorIntTemp + 1
+        else:
+            memoryOverflow('int temporal')
     if tipoDato == 'float':
-        avail = iContadorFloatTemp
-        iContadorFloatTemp+=1
+        if iContadorFloatTemp < iFloatTemporales:
+            avail = iContadorFloatTemp
+            iContadorFloatTemp+=1
+        else:
+            memoryOverflow('float temporal')
     if tipoDato == 'bool':
-        avail = iContadorBoolTemp
-        iContadorBoolTemp+=1
+        if iContadorBoolTemp < iBoolTemporales:
+            avail = iContadorBoolTemp
+            iContadorBoolTemp+=1
+        else:
+            memoryOverflow('bool temporal')
     if tipoDato == 'string':
-        avail = iContadorStringTemp
-        iContadorStringTemp+=1
-	return avail
+        if iContadorStringTemp < iStringTemporales:
+            avail = iContadorStringTemp
+            iContadorStringTemp+=1
+        else:
+            memoryOverflow('string temporal')
+    return avail
 #Guarda el cuadruplo especificado al arreglo de cuarduplos
 def addQuad(operador, operandoUno, operandoDos, valorGuardar):
 	global arrCuad
@@ -461,35 +547,66 @@ def addQuad(operador, operandoUno, operandoDos, valorGuardar):
 	return getMemAdd()
 #Agrega el id especificado a la pila de operandos y a su tipo a la pila de tipos
 def addIdToStack(nameId):
-	global idName
-	global nombreFunc
-	global pilaOperando
-	global pilaTipos
-	idName = nameId
-	if (idName in dirFunc.val[nombreFunc][1] or idName in dirFunc.val['globals'][1]):
-		try:
-			tipoTemp = dirFunc.val[nombreFunc][1][idName][0]      #Se da prioridad a buscar la variable en la funcion
-		except:
-			tipoTemp = dirFunc.val['globals'][1][idName][0]       #Si no, se busca de manera global
-		addOperandoToStack(idName)
-		addTipoToStack(tipoTemp)
-	else:
-		print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
-		sys.exit()
+    global idName
+    global nombreFunc
+    global pilaOperando
+    global pilaTipos
+    idName = nameId
+    if (idName in dirFunc.val[nombreFunc][1] or idName in dirFunc.val['globals'][1]):
+        try:
+            tipoTemp = dirFunc.val[nombreFunc][1][idName][0]      #Se da prioridad a buscar la variable en la funciones
+            idName = dirFunc.val[nombreFunc][1][idName][3]
+        except:
+            tipoTemp = dirFunc.val['globals'][1][idName][0]       #Si no, se busca de manera global
+            idName = dirFunc.val['globals'][1][idName][3]
+        addOperandoToStack(idName)
+        addTipoToStack(tipoTemp)
+    else:
+        print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
+        sys.exit()
 #Agrega el operando a la pila de operandos y su tipo a la pila de tipos 
 def addValueToStack(value):
-	if type(value) == int:
-		addOperandoToStack(value)
-		addTipoToStack('int')
-	if type(value) == float:
-		addOperandoToStack(value)
-		addTipoToStack('float')
-	if type(value) == str:
-		addOperandoToStack(value)
-		if (value == 'true' or value == 'false'):
-			addTipoToStack('bool')
-		else:
-			addTipoToStack('string')
+    global dictInt
+    global dictFloat
+    global dictString
+    global memoriaConstantesCantidad
+    if type(value) == int:
+        if value not in dictInt:
+            if memoriaConstantesCantidad[0] < iIntConst:
+                dictInt[value]=memoriaConstantesCantidad[0]
+                memoriaConstantesCantidad[0] += 1
+                addQuad('addConstInt', value, '', dictInt[value])
+            else:
+                memoryOverflow('int const') 
+        addOperandoToStack(dictInt[value])
+        addTipoToStack('int')
+    if type(value) == float:
+        if value not in dictFloat:
+            if memoriaConstantesCantidad[1] < iFloatConst:
+                dictFloat[value]=memoriaConstantesCantidad[1]
+                memoriaConstantesCantidad[1] += 1
+                addQuad('addConstFloat', value, '', dictFloat[value])
+            else:
+                memoryOverflow('float const')  
+        addOperandoToStack(dictFloat[value])
+        addTipoToStack('float')
+    if type(value) == str:
+        if (value == 'true' or value == 'false'):
+            if(value=='true'):
+                addOperandoToStack(iFloatConst+1)
+            else:
+                addOperandoToStack(iFloatConst)
+            addTipoToStack('bool')
+        else:
+            if value not in dictString:
+                if memoriaConstantesCantidad[2] < iStringConst:
+                    dictString[value]=memoriaConstantesCantidad[2]
+                    memoriaConstantesCantidad[2] += 1
+                    addQuad('addConstString', value, '', dictString[value])
+                else:
+                    memoryOverflow('string const') 
+            addOperandoToStack(dictString[value])
+            addTipoToStack('string')
 #Agrega el operador a la pila de operadores
 def addOperadorToStack(operator):
 	global pilaOperadores
@@ -550,23 +667,24 @@ def arithmeticOperator():
         typeMismatch()
 #Se hace la creacion del cuadruplo para la operacion de asignacion
 def assignOperator():
-	rightOperand = popOperando()
-	rightType = popTipos()
+    rightOperand = popOperando()
+    rightType = popTipos()
     checkIfTemporal(rightOperand)
-	leftOperand = popOperando()
-	leftType = popTipos()
+    leftOperand = popOperando()
+    leftType = popTipos()
     checkIfTemporal(leftOperand)
-	tempOperator = popOperadores()
-	resultType = semantica.resultType(leftType, rightType, tempOperator)
-	if resultType != 'error':
-		addQuad(tempOperator, rightOperand, '', leftOperand)
+    tempOperator = popOperadores()
+    resultType = semantica.resultType(leftType, rightType, tempOperator)
+    if resultType != 'error':
+        addQuad(tempOperator, rightOperand, '', leftOperand)
 		##Regresar el temp al AVAIL
-	else:
-		typeMismatch()
+    else:
+        typeMismatch()
 #Creacion del cuadruplo de print
 def printFun():
     printOperand=popOperando()
     typeOperand=popTipos()
+    checkIfTemporal(printOperand)
     tempOperator = popOperadores()
     resultType = semantica.resultType(tempOperator, typeOperand, '')
     if resultType != 'error':
@@ -579,6 +697,7 @@ def printFun():
 def readFunc():
     readOperand=popOperando()
     typeOperand=popTipos()
+    checkIfTemporal(readOperand)
     tempOperator = popOperadores()
     resultType = semantica.resultType(tempOperator, typeOperand, '')
     if resultType != 'error':
@@ -588,7 +707,21 @@ def readFunc():
         ##Regresar el temp al AVAIL
     else:
         typeMismatch()
-
+#Función que genera el cuádruplo para la funcíon not()
+def notFunc():
+    notOperand = popOperando()
+    typeOperand = popTipos()
+    tempOperator = popOperadores()
+    resultType = semantica.resultType(tempOperator, typeOperand, '')
+    if resultType != 'error':
+        result = getAvail(typeOperand)
+        addQuad(tempOperator, notOperand, '', result)
+        addOperandoToStack(result)
+        addTipoToStack(resultType)
+        ##Regresar el temp al AVAIL
+    else:
+        typeMismatch()
+#Funcion que imprime el error de type missmatch
 def typeMismatch():
 	print("In line {}, type mismatch".format(lexer.lineno))
 	sys.exit()
@@ -604,14 +737,15 @@ def durante1():
     addSaltoToStack(len(arrCuad))
 
 def durante2():
-	global arrCuad
-	bResultado = popTipos()
-	if bResultado == 'bool':
-		operand = popOperando()
-		addQuad('GoToF', operand, '', '')
-		addSaltoToStack(len(arrCuad)-1)
-	else:
-		typeMismatch()
+    global arrCuad
+    bResultado = popTipos()
+    if bResultado == 'bool':
+        operand = popOperando()
+        checkIfTemporal(operand)
+        addQuad('GoToF', operand, '', '')
+        addSaltoToStack(len(arrCuad)-1)
+    else:
+        typeMismatch()
 
 def durante3():
     global arrCuad
@@ -622,13 +756,14 @@ def durante3():
     arrCuad[falso]=tupla
 
 def condicion1():
-	bResultado = popTipos()
-	if bResultado == 'bool':
-		valor = popOperando()
-		addQuad('GoToF', valor, '', '')
-		addSaltoToStack(len(arrCuad)-1)
-	else:
-		typeMismatch()
+    bResultado = popTipos()
+    if bResultado == 'bool':
+        valor = popOperando()
+        checkIfTemporal(valor)
+        addQuad('GoToF', valor, '', '')
+        addSaltoToStack(len(arrCuad)-1)
+    else:
+        typeMismatch()
 
 def condicion2():
     global arrCuad
@@ -651,7 +786,8 @@ def switchOperator(arg):
 		2: assignOperator,
         3: readFunc,
         4: printFun,
-        5: delParentesis
+        5: delParentesis,
+        6: notFunc
 	}
 	return switcher.get(arg)
 #Determina el tipo de operador con el que se trabajara la operacion
@@ -659,7 +795,7 @@ def operacionesEnPilasId(operators, tipoFunc):
 	if (getTopOperator() in operators):
 		func = switchOperator(tipoFunc)
 		func()
-
+#Determina que tipo de funcion es la que se debe de ejecutar
 def switchFuncion(arg):
     switcher = {
         1: durante1,
@@ -670,7 +806,7 @@ def switchFuncion(arg):
         6: condicion3
     }
     return switcher.get(arg)
-
+#Manda ejecutar la funcion correspondiente en los brincos
 def operacionesEnPilasBrincos(tipoFunc):
     func = switchFuncion(tipoFunc)
     func()
@@ -681,13 +817,13 @@ def checkIfTemporal(memPos):
     global iContadorFloatTemp
     global iContadorBoolTemp
     global iContadorStringTemp
-    if (memPos >= iStringGlobales && memPos < iIntTemporales):
+    if (memPos >= iStringGlobales and memPos < iIntTemporales):
         iContadorIntTemp -= 1
-    if (memPos >= iIntTemporales && memPos < iFloatTemporales):
+    if (memPos >= iIntTemporales and memPos < iFloatTemporales):
         iContadorFloatTemp -= 1
-    if (memPos >= iFloatTemporales && memPos < iBoolTemporales):
+    if (memPos >= iFloatTemporales and memPos < iBoolTemporales):
         iContadorBoolTemp -= 1
-    if (memPos >= iBoolTemporales && memPos < iStringTemporales):
+    if (memPos >= iBoolTemporales and memPos < iStringTemporales):
         iContadorStringTemp -= 1
 
 
@@ -719,7 +855,7 @@ def p_roseauxfunc(p):
     '''
 def p_main(p):
     '''
-    main : MAIN np_main_func comments_nl LEFTPARENTHESIS comments_nl RIGHTPARENTHESIS comments_nl bloque
+    main : MAIN np_main_func comments_nl LEFTPARENTHESIS comments_nl RIGHTPARENTHESIS comments_nl bloque np_end
     '''
 
 def p_vars(p):
@@ -944,7 +1080,7 @@ def p_spec_func(p):
                 | LINECHART comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
                 | BARCHART comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
                 | LINREG comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
-                | NOT comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl
+                | NOT np_not_quad1 comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS np_not_quad2 comments_nl
     '''
 
 def p_returnx(p):
@@ -1096,7 +1232,7 @@ def p_np_factor_quad1(p):
 
 def p_np_asignacion_quad1(p):
 	'''
-	np_asignacion_quad1 : empty
+	np_asignacion_quad1 : 
 	'''
 	tempIdName = str(p[-1])
 	addIdToStack(tempIdName)
@@ -1222,6 +1358,21 @@ def p_np_read_quad3(p):
     tempIdName = str(p[-1])
     addIdToStack(tempIdName)
 
+def p_np_not_quad1(p):
+    '''
+    np_not_quad1 : 
+    '''
+    temporal = p[-1]
+    addOperadorToStack(temporal)
+
+def p_np_not_quad2(p):
+    '''
+    np_not_quad2 : 
+    '''
+    tuplaOperadores = ('not')
+    operacionesEnPilasId(tuplaOperadores,6)
+
+
 def p_np_parentesis_quad1(p):
     '''
     np_parentesis_quad1 : empty
@@ -1296,74 +1447,71 @@ def p_np_endproc(p):
     '''
     np_endproc : empty
     '''
+    global memoriaLocalCantidad
+    memoriaLocalCantidad = [0, iIntLocales, iFloatLocales, iBoolLocales]
     addQuad('endproc','','','')
+
     
 def p_np_crea_era(p):
-	'''
-	np_crea_era : empty
-	'''
-	global pilaArgumentos
-	global pilaFunciones
-	nameFunc = p[-1]
-	if nameFunc in dirFunc.val:
+    '''
+    np_crea_era : empty
+    '''
+    global pilaArgumentos
+    global pilaFunciones
+    nameFunc = p[-1]
+    if nameFunc in dirFunc.val:
         result = getAvail(dirFunc.val[nameFunc][0])
-		addOperandoToStack(result)
-		addTipoToStack(dirFunc.val[nameFunc][0])
-		pilaFunciones.append(nameFunc)
-		addQuad('era', nameFunc, '', '')
-		pilaArgumentos.append(0)
-	else:
-		print("In line {}, function {} not previously declared.".format( lexer.lineno, nameFunc))
-		sys.exit()
+        addOperandoToStack(result)
+        addTipoToStack(dirFunc.val[nameFunc][0])
+        pilaFunciones.append(nameFunc)
+        addQuad('era', nameFunc, '', '')
+        pilaArgumentos.append(0)
+    else:
+        print("In line {}, function {} not previously declared.".format( lexer.lineno, nameFunc))
+        sys.exit()
 
 def p_np_add_parametro(p):
-	'''
-	np_add_parametro : empty
-	'''
-	global pilaArgumentos
-	argumentoValor = popOperando()
-	tipoArgumento = popTipos()
+    '''
+    np_add_parametro : empty
+    '''
+    global pilaArgumentos
+    argumentoValor = popOperando()
+    tipoArgumento = popTipos()
     checkIfTemporal(argumentoValor)
-	nameFunc = pilaFunciones.pop()
-	iArgumentos = pilaArgumentos.pop() + 1
-	pilaArgumentos.append(iArgumentos)
-	paramName = 'param' + str(iArgumentos)
-	iArgumentosDeFunc = dirFunc.val[nameFunc][2]
-	listaDirFunc = list(dirFunc.val[nameFunc][1].values()) 
-	if iArgumentosDeFunc >= iArgumentos:
-		if listaDirFunc[iArgumentos-1][0] == tipoArgumento:
-			addQuad('parameter', argumentoValor, '', paramName)
-		else:
-			print("In line {}, argument {} type mismatch with function declaration.".format( lexer.lineno, nameFunc))
-			sys.exit()
-	else:
-		print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
-		sys.exit()
-	
-	pilaFunciones.append(nameFunc)
+    nameFunc = pilaFunciones.pop()
+    iArgumentos = pilaArgumentos.pop() + 1
+    pilaArgumentos.append(iArgumentos)
+    paramName = 'param' + str(iArgumentos)
+    iArgumentosDeFunc = dirFunc.val[nameFunc][2]
+    listaDirFunc = list(dirFunc.val[nameFunc][1].values()) 
+    if iArgumentosDeFunc >= iArgumentos:
+        if listaDirFunc[iArgumentos-1][0] == tipoArgumento:
+            addQuad('parameter', argumentoValor, '', paramName)
+        else:
+            print("In line {}, argument {} type mismatch with function declaration.".format( lexer.lineno, nameFunc))
+            sys.exit()
+    else:
+        print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
+        sys.exit()
+    pilaFunciones.append(nameFunc)
 	
 def p_np_genera_gosub(p):
-	'''
-	np_genera_gosub : empty
-	'''
-	global pilaArgumentos
-	global pilaFunciones
-	operando=popOperando()
-	iArgumentos = pilaArgumentos.pop()
-    #################################################################
-    #    CHECAR ESTA PARE
-
-
-    #################################################################
-    #checkIfTemporal(operando)
-	nameFunc = pilaFunciones.pop()
-	if iArgumentos == dirFunc.val[nameFunc][2]:
-		addQuad('gosub', nameFunc, '', dirFunc.val[nameFunc][3])
-		addQuad('=',nameFunc,'',operando)
-		addOperandoToStack(operando)
-	else:
-		print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
-		sys.exit()
+    '''
+    np_genera_gosub : empty
+    '''
+    global pilaArgumentos
+    global pilaFunciones
+    operando=popOperando()
+    iArgumentos = pilaArgumentos.pop()
+    checkIfTemporal(operando)
+    nameFunc = pilaFunciones.pop()
+    if iArgumentos == dirFunc.val[nameFunc][2]:
+        addQuad('gosub', nameFunc, len(arrCuad)+1, dirFunc.val[nameFunc][3])
+        addQuad('=',nameFunc,'',operando)
+        addOperandoToStack(operando)
+    else:
+        print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
+        sys.exit()
 
 def p_np_genera_gosub2(p):
 	'''
@@ -1374,14 +1522,14 @@ def p_np_genera_gosub2(p):
 	iArgumentos = pilaArgumentos.pop()
 	nameFunc = pilaFunciones.pop()
 	if iArgumentos == dirFunc.val[nameFunc][2]:
-		addQuad('gosub', nameFunc, '', dirFunc.val[nameFunc][3])
+		addQuad('gosub', nameFunc, len(arrCuad)+1, dirFunc.val[nameFunc][3])
 	else:
 		print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
 		sys.exit()
 
 def p_np_crea_era2(p):
 	'''
-	np_crea_era2 : empty
+	np_crea_era2 : 
 	'''
 	global pilaArgumentos
 	global pilaFunciones
@@ -1393,6 +1541,12 @@ def p_np_crea_era2(p):
 	else:
 		print("In line {}, function {} not previously declared.".format( lexer.lineno, nameFunc))
 		sys.exit()
+
+def p_np_end(p):
+    '''
+    np_end : empty
+    '''
+    addQuad('end','','','')
 
 
 parser = yacc.yacc() 

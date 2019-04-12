@@ -37,6 +37,7 @@ class DirFunc:
              tipo       : Tipo de dato que le pertenece a 'variable'.
              filas      : Cantidad de filas en la variable.
              columnas   : Cantidad de columnas en la variable.
+             posMemory  : Indice que apunta a la posicion de memoria en la que se encuentra.
         """
         if (variable in self.val[nameFunc][1]):
             print('Variable {} previously defined.'.format(variable))
@@ -44,7 +45,7 @@ class DirFunc:
         else:
             tableVars = self.val[nameFunc][1]  
             tableVars[variable] = (tipo, filas, columnas, posMemory)
-            self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, self.val[nameFunc][2], self.val[nameFunc][3], self.val[nameFunc][4])
+            self.val[nameFunc] =  (self.val[nameFunc][0], tableVars, self.val[nameFunc][2], self.val[nameFunc][3])
 
     def updateParams(self, nombre, numPar):
         """
@@ -53,5 +54,5 @@ class DirFunc:
          nombre: Nombre de la funcion a modificar
          numPar: Cantidad de parametros de la funcion a modificar
         """
-        DirFunc.instance.val[nombre] = (self.val[nombre][0], self.val[nombre][1], numPar, self.val[nombre][3], self.val[nombre][4])
+        DirFunc.instance.val[nombre] = (self.val[nombre][0], self.val[nombre][1], numPar, self.val[nombre][3])
         
