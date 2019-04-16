@@ -1,8 +1,13 @@
 program test; 
 
+globals string arbol = "Hola";
+globals bool finca=true;
+
 func int funcion1(int a; bool b;){
     int c;
+    c = 1;
     c=a+a;
+    //c=c+false;
     b=false;
     return a+2;
 }

@@ -89,7 +89,7 @@ class CuboSemantico:
 		try:
 			tipo = self.semantica[op1,op2,operator]
 		except:
-			print("issue en el CuboSemantico")
+			#print("issue en el CuboSemantico")
 			tipo ='error'
 		return tipo
 			
