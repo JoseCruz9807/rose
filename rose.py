@@ -456,34 +456,36 @@ def getMemPosVars(dataType):
 def getMemPosGlobals(dataType):
     global memoriaGlobalCantidad
     memPos = -1
-    if dataType == getTopTipos():
-	    if dataType == 'int':
-	        if memoriaGlobalCantidad[0] < iIntGlobales:
-	            memPos = memoriaGlobalCantidad[0]
-	            memoriaGlobalCantidad[0] += 1
-	        else:
-	            memoryOverflow('int global')
-	    if dataType == 'float':
-	        if memoriaGlobalCantidad[1] < iFloatGlobales:
-	            memPos = memoriaGlobalCantidad[1]
-	            memoriaGlobalCantidad[1] += 1
-	        else:
-	            memoryOverflow('float global')
-	    if dataType == 'bool':
-	        if memoriaGlobalCantidad[2] < iBoolGlobales:
-	            memPos = memoriaGlobalCantidad[2]
-	            memoriaGlobalCantidad[2] += 1
-	        else:
-	            memoryOverflow('bool global')
-	    if dataType == 'string':
-	        if memoriaGlobalCantidad[3] < iStringGlobales:
-	            memPos = memoriaGlobalCantidad[3]
-	            memoriaGlobalCantidad[3] += 1
-	        else:
-	            memoryOverflow('string global')
+    ###if dataType == getTopTipos():
+    if dataType == 'int':
+        if memoriaGlobalCantidad[0] < iIntGlobales:
+	        memPos = memoriaGlobalCantidad[0]
+	        memoriaGlobalCantidad[0] += 1
+        else:
+            memoryOverflow('int global')
+    if dataType == 'float':
+        if memoriaGlobalCantidad[1] < iFloatGlobales:
+            memPos = memoriaGlobalCantidad[1]
+            memoriaGlobalCantidad[1] += 1
+        else:
+            memoryOverflow('float global')
+    if dataType == 'bool':
+	    if memoriaGlobalCantidad[2] < iBoolGlobales:
+	        memPos = memoriaGlobalCantidad[2]
+	        memoriaGlobalCantidad[2] += 1
+	    else:
+	        memoryOverflow('bool global')
+    if dataType == 'string':
+        if memoriaGlobalCantidad[3] < iStringGlobales:
+            memPos = memoriaGlobalCantidad[3]
+            memoriaGlobalCantidad[3] += 1
+        else:
+            memoryOverflow('string global')
+    """
     else:
     	print("In line {}, assignation error occured, a type {} was casted to a type {}.".format(lexer.lineno-1, getTopTipos(), dataType))
     	sys.exit()
+    """
     return memPos
 #Guarda la variable actual en el directorio de variables de la funcion especificada
 def anadirVar():
@@ -878,7 +880,7 @@ def p_vars(p):
         | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_anadir_variable comments_nl
         | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionarreglo RIGHTKEY comments_nl SEMICOLON np_asignar_arreglo comments_nl
         | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_asignar_arreglo comments_nl
-        | tipo ID np_obtener_nombre_var comments_nl EQUALS np_asignacion_quad2 comments_nl ctes SEMICOLON np_asignar_fil_col np_asignacion_quad4 comments_nl
+        | tipo ID np_obtener_nombre_var np_asignar_fil_col np_asignacion_inicial_quad1 comments_nl EQUALS np_asignacion_quad2 comments_nl ctes SEMICOLON np_asignacion_quad4 comments_nl 
         | tipo ID np_obtener_nombre_var comments_nl SEMICOLON np_asignar_fil_col comments_nl
     '''
 
@@ -1243,6 +1245,13 @@ def p_np_factor_quad1(p):
 	'''
 	tempIdName = str(p[-1])
 	addIdToStack(tempIdName)
+
+def p_np_asignacion_inicial_quad1(p):
+    '''
+    np_asignacion_inicial_quad1 : empty
+    '''
+    global nombreVar
+    addIdToStack(nombreVar)
 
 def p_np_asignacion_quad1(p):
 	'''
