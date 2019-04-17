@@ -1,3 +1,4 @@
+
 from Memoria import * 
 
 #Memoria virtual que almacena datos de manera global
