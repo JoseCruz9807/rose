@@ -396,7 +396,7 @@ idName = ''
 #Actualiza el primer goto
 def solveGoMain():
     global arrCuad
-    arrCuad[0]=('GoTo', '', '' , len(arrCuad))
+    arrCuad[popSalto()]=('GoTo', '', '' , len(arrCuad))
 #Retorna el siguiente espacio de memoria disponible
 def getMemAdd():
     global iMemoryAdd
@@ -707,7 +707,7 @@ def printFun():
     if resultType != 'error':
         addQuad(tempOperator, printOperand, '', '')
 		##Regresar el temp al AVAIL
-        popOperando()
+        #popOperando()
     else:
         typeMismatch()
 #Creacion del cuadruplo de print
@@ -848,7 +848,7 @@ def checkIfTemporal(memPos):
 #################
 def p_rose(p):
     '''
-    rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON np_agregar_goto_main comments_nl roseauxvars roseauxfunc main
+    rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars np_agregar_goto_main roseauxfunc main
     '''
     file = open("codeobj.rs","w+")
     print(dirFunc.val)
@@ -1453,6 +1453,7 @@ def p_np_agregar_goto_main(p):
     np_agregar_goto_main : empty
     '''
     addQuad('GoTo','','','')
+    addSaltoToStack(len(arrCuad)-1)
     
 def p_np_cuadruplo_retorno(p):
     '''
