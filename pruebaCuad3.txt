@@ -1,0 +1,39 @@
+program test; 
+
+globals string arbol = "Hola";
+globals bool finca=true;
+
+
+func void funcion1(){
+    int c = 2;
+    int a =2;
+    bool b;
+    c = 1;
+    c=a+a;
+    //c=c+false;
+    b=false;
+}
+
+main (){ 
+bool a = true;
+bool b = true;
+int iNum = 3;
+float z;
+string s;
+s="nasufnewd   lua"+"asdadwa";
+while(a==b){
+    //a= not(b);
+    if(a AND b) {
+    	a = false;
+    }
+    else
+    {
+    	b=a;
+    	b=b;
+    	a=a;
+        z=-4-(-3.1);
+    }
+}
+funcion1();
+funcion1();
+}
