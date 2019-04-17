@@ -705,7 +705,7 @@ def printFun():
     if resultType != 'error':
         addQuad(tempOperator, printOperand, '', '')
 		##Regresar el temp al AVAIL
-        popOperando()
+        #popOperando()
     else:
         typeMismatch()
 #Creacion del cuadruplo de print

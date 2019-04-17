@@ -42,6 +42,7 @@ class Memoria:
 			
 			print("Variable declared but not initialized.")
 			sys.exit()
+		print("El valor en la memAdd dada es: " + almacena)
 		return almacena
 	#Regresa la cantidad del diccionario del tipo especificado
 	def getSizeMem(self, tipo):
@@ -55,3 +56,9 @@ class Memoria:
 		if tipo == 'string':
 			size = len(self.memoria[3])
 		return size
+
+	def printMem(self):
+		print(self.memoria[0])
+		print(self.memoria[1])
+		print(self.memoria[2])
+		print(self.memoria[3])
