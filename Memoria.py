@@ -2,12 +2,13 @@
 import sys
 #Memoria
 class Memoria:
-	def __init__(self):
+	def __init__(self, nameMemory):
 	#Almacena la info en el orden de Int, float, bool, string
-		self.memoria = ({},{},{},{})
+		self.memoria = ({},{},{'14000': 'false', '14001':'true'},{})
+		self.name = nameMemory
 	#Añade valor a la tupla de memoria
 	def addValue(self, tipo, memAdd, value):
-		print("tipo: {}, memAdd: {}, value: {}".format(tipo, memAdd, value))
+		#print("addValue() memory: {}, tipo: {}, memAdd: {}, value: {}".format(self.name, tipo, memAdd, value))
 		if tipo == 'int':
 			dictInt = self.memoria[0]
 			dictInt[memAdd] = value
@@ -26,24 +27,18 @@ class Memoria:
 			self.memoria = (self.memoria[0], self.memoria[1], self.memoria[2], dictString)
 	#Busca el valor correspondiente al espacio de memoria solicitado
 	def getValue(self, tipo, memAdd):
+		#print("getValue() memoryName: {}, memAdd: {}".format(self.name, memAdd))
 		typeVal = -1
-		try: 
-			if tipo == 'int':
-				typeVal = 0
-			if tipo == 'float':
-				typeVal = 1
-			if tipo == 'bool':
-				typeVal = 2
-			if tipo == 'string':
-				typeVal = 3
-			almacena = self.memoria[typeVal][memAdd]
-		except: 
-			print(self.memoria[typeVal][memAdd])
-			
-			print("Variable declared but not initialized.")
-			sys.exit()
-		print("El valor en la memAdd dada es: " + almacena)
-		return almacena
+		if tipo == 'int':
+			typeVal = 0
+		if tipo == 'float':
+			typeVal = 1
+		if tipo == 'bool':
+			typeVal = 2
+		if tipo == 'string':
+			typeVal = 3
+		returnVal = self.memoria[typeVal][memAdd] 
+		return returnVal
 	#Regresa la cantidad del diccionario del tipo especificado
 	def getSizeMem(self, tipo):
 		#Falta hacer que esto jale

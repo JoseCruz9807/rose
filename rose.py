@@ -602,15 +602,15 @@ def addValueToStack(value):
 	if type(value) == str:
 		if (value == 'true' or value == 'false'):
 			if(value=='true'):
-				addOperandoToStack(iBoolConst+1)
+				addOperandoToStack(iFloatConst+1)
 			else:
-				addOperandoToStack(iBoolConst)
+				addOperandoToStack(iFloatConst)
 			addTipoToStack('bool')
 		else:
 			if value not in dictString:
-				if memoriaConstantesCantidad[2] < iStringConst:
-					dictString[value]=memoriaConstantesCantidad[2]
-					memoriaConstantesCantidad[2] += 1
+				if memoriaConstantesCantidad[3] < iStringConst:
+					dictString[value]=memoriaConstantesCantidad[3]
+					memoriaConstantesCantidad[3] += 1
 					addQuad('addConstString', value, '', dictString[value])
 				else:
 					memoryOverflow('string const') 

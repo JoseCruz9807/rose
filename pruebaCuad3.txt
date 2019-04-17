@@ -1,14 +1,37 @@
+
 program test; 
 
-//globals string arbol = "Hola";
-//globals bool finca=true;
+globals string arbol = "Hola";
+globals bool finca=true;
+
+
+func void funcion1(){
+    int c = 2;
+    c = 1;
+    //c=c+false;
+}
 
 main (){ 
-//bool a = true;
-//bool b = true;
+bool a = true;
+bool b = true;
 int iNum = 3;
-//float z;
-//string s;
-//s="nasufnewd   lua"+"asdadwa";
-print(iNum);
+float z;
+string s;
+s="nasufnewd   lua"+"asdadwa";
+while(a==b){
+    //a= not(b);
+    if(a AND b) {
+        a = b;
+        a = false;
+    }
+    else
+    {
+        b=a;
+        b=b;
+        a=a;
+        a=false;
+        z=-4-(-3.1);
+    }
+}
+funcion1();
 }
