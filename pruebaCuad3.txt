@@ -16,8 +16,11 @@ main (){
 bool a = true;
 bool b = true;
 int iNum = 3;
+
 float z;
 string s;
+finca = false;
+z = 3.1416/0;
 s="nasufnewd   lua"+"asdadwa";
 while(a==b){
     //a= not(b);
@@ -35,4 +38,5 @@ while(a==b){
     }
 }
 funcion1(3,true);
+print(finca);
 }

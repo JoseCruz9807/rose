@@ -1,5 +1,6 @@
 
 from Memoria import * 
+import re
 
 #Memoria virtual que almacena datos de manera global
 memGlobal = Memoria("Global")
@@ -114,9 +115,9 @@ def getData(currentMemory, tipoDeDato, memAdd):
 			sys.exit()
 	return returnVal 
 #Determina si la dirección proporcionada es de variables locales o no
-def esGlobal(memAddress1):
+def esGlobalOTemporal(memAddress1):
 	memAddress = int(memAddress1)
-	if memAddress >= iStringLocales and memAddress < iStringGlobales:
+	if memAddress >= iStringLocales and memAddress < iStringTemporales:
 		tempVal = True
 	else:
 		tempVal = False
@@ -152,7 +153,7 @@ def ejecutaCuadruplo():
 	if currentCuad[0] == '=':
 		tempTipo = checkTipo(currentCuad[3])
 		valueTemp = getData(memoria, tempTipo, currentCuad[1])
-		if esGlobal(currentCuad[3]):
+		if esGlobalOTemporal(currentCuad[3]):
 			memGlobal.addValue(tempTipo, currentCuad[3], valueTemp)
 		else:
 			memoria.addValue(tempTipo, currentCuad[3], valueTemp)
@@ -206,8 +207,9 @@ def ejecutaCuadruplo():
 		resultado = operadorUno * operadorDos
 		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 	if currentCuad[0] == '/':
+		pattern = re.compile("[0|0\.0+]")
 		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
-		if operadorDos == 0:
+		if re.search(pattern, operadorDos):
 			print("Division by 0")
 			sys.exit()
 		
@@ -234,7 +236,10 @@ def ejecutaCuadruplo():
 			resultado = 'true'
 		else:
 			resultado = 'false'
-		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 	if currentCuad[0] == 'AND':
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
@@ -242,7 +247,10 @@ def ejecutaCuadruplo():
 			resultado = 'true'
 		else:
 			resultado = 'false'
-		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 	if currentCuad[0] == 'OR':
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]),int(currentCuad[1]))
 		operadorDos = getData(memoria, checkTipo(currentCuad[2]),int(currentCuad[2]))
@@ -250,7 +258,10 @@ def ejecutaCuadruplo():
 			resultado = 'true'
 		else:
 			resultado = 'false'
-		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 
 	#Llamadas a funciones definidas por el usuario
 	if currentCuad[0] == 'era':
@@ -285,6 +296,7 @@ def ejecutaCuadruplo():
 
 	if currentCuad[0] == 'end':
 		print("Se terminó la ejecución del programa.")
+		#memGlobal.printMem()
 		entrada = input()
 		sys.exit()
 

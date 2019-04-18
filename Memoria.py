@@ -41,7 +41,6 @@ class Memoria:
 		return returnVal
 	#Regresa la cantidad del diccionario del tipo especificado
 	def getSizeMem(self, tipo):
-		#Falta hacer que esto jale
 		if tipo == 'int':
 			size = len(self.memoria[0])
 		if tipo == 'float':
@@ -53,6 +52,7 @@ class Memoria:
 		return size
 
 	def printMem(self):
+		print("nombre de memoria: " + self.name)
 		print(self.memoria[0])
 		print(self.memoria[1])
 		print(self.memoria[2])
