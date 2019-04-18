@@ -246,32 +246,20 @@ for cuad in compiledFile:
 	try:
 		temp[0] = int(float(tupla[0]))
 	except:
-		#print(type(tupla[0]))
-		#print("no se pudo hacer el cast de la cosa {}".format(tupla[0]))
 		pass
 	try:
 		temp[1] = int(float(tupla[1]))
 	except:
-		#print(type(tupla[1]))
-		#print("no se pudo hacer el cast de la cosa {}".format(tupla[1]))
 		pass
 	try:
 		temp[2] = int(float(tupla[2]))
 	except:
-		#print(type(tupla[2]))
-		#print("no se pudo hacer el cast de la cosa {}".format(tupla[2]))
 		pass
 	try:
 		temp[3] = int(float(tupla[3]))
 	except:
-		#print(type(tupla[3]))
-		#print("no se pudo hacer el cast de la cosa {}".format(tupla[3]))
 		pass
-	#print(temp)
 	tupla = (tupla[0], tupla[1], tupla[2], tupla[3])
 	cuadruplos.append(tupla)
 
-
-
 ejecutaCuadruplo()
-
