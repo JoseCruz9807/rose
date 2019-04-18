@@ -5,6 +5,9 @@ import re
 #Memoria virtual que almacena datos de manera global
 memGlobal = Memoria("Global")
 
+#Desfase entre los goto debido a las constantes usadas
+desfase=0
+
 #Memoria virtual de la función main()
 memMain = Memoria("Main")
 
@@ -91,6 +94,11 @@ def checkTipo(iMemAdd1):
 		tipo = 'string'
 	return tipo
 
+
+#Actualiza el valor del desfase en los cuadruplos
+def setDesfase(des):
+	global desfase
+	desfase=int(des)
 #Regresa el cuadruplo de la posición solicitada
 def setCuadruplo(iPosicion):
 	global iEjecutando
@@ -136,12 +144,12 @@ def ejecutaCuadruplo():
 	nextCuad = -1
 	#Brincos
 	if currentCuad[0] == 'GoTo':
-		nextCuad = int(currentCuad[3])
+		nextCuad = int(currentCuad[3])+ desfase
 	if currentCuad[0] == 'GoToF':
 		memAddress = currentCuad[1]
 		tipo = checkTipo(memAddress)
 		if getData(memoria, tipo, memAddress) == 'false':
-			nextCuad = int(currentCuad[3])
+			nextCuad = int(currentCuad[3])+desfase
 	if currentCuad[0] == 'addConstString':
 		memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],currentCuad[1])
 	if currentCuad[0] == 'addConstInt':
@@ -208,6 +216,7 @@ def ejecutaCuadruplo():
 		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 	if currentCuad[0] == '/':
 		pattern = re.compile("[0|0\.0+]")
+		tempTipoDos = checkTipo(currentCuad[2])
 		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
 		if re.search(pattern, operadorDos):
 			print("Division by 0")
@@ -286,10 +295,10 @@ def ejecutaCuadruplo():
 			memoria.addValue(tipoTemp, localAdd, paramValue)
 	if currentCuad[0] == 'endproc':
 		bEndProc = True
-		nextCuad = int(iLlamadaAFuncion)
+		nextCuad = int(iLlamadaAFuncion) + desfase
 	if currentCuad[0] == 'gosub':
 		iLlamadaAFuncion = currentCuad[2]
-		nextCuad = int(currentCuad[3])
+		nextCuad = int(currentCuad[3]) + desfase
 
 	if currentCuad[0] == 'return':
 		pass
@@ -299,6 +308,9 @@ def ejecutaCuadruplo():
 		#memGlobal.printMem()
 		entrada = input()
 		sys.exit()
+
+	if currentCuad[0]=='offset':
+		setDesfase(currentCuad[1])
 
 	#Funciones Especiales
 	if currentCuad[0] == 'print':

@@ -299,6 +299,9 @@ pilaArgumentos = []
 # Vector que almacena los Cuadruplos del programa
 arrCuad = []
 
+#Vector que almacena los cuadruplos de constantes
+arrCuadTemp=[]
+
 # Valor que apunta al siguiente espacio de memoria disponible
 iMemoryAdd = 0;
 
@@ -388,6 +391,9 @@ memoriaConstantesCantidad = [iStringTemporales, iIntConst, iFloatConst, iBoolCon
 
 # Valor que almacena el nombre del ID
 idName = ''
+
+#Almacena la cantidad de constantes hasta el momento
+contadorConstantes = 0
 
 
 ############################
@@ -554,6 +560,10 @@ def addQuad(operador, operandoUno, operandoDos, valorGuardar):
 	tupla = (operador, operandoUno, operandoDos, valorGuardar)
 	arrCuad.append(tupla)
 	return getMemAdd()
+def addQuadInicio(operador, operandoUno, operandoDos, valorGuardar):
+    global arrCuadTemp
+    tupla = (operador, operandoUno, operandoDos, valorGuardar)
+    arrCuadTemp.append(tupla)
 #Agrega el id especificado a la pila de operandos y a su tipo a la pila de tipos
 def addIdToStack(nameId):
     global idName
@@ -575,47 +585,51 @@ def addIdToStack(nameId):
         sys.exit()
 #Agrega el operando a la pila de operandos y su tipo a la pila de tipos 
 def addValueToStack(value):
-	global dictInt
-	global dictFloat
-	global dictString
-	global memoriaConstantesCantidad
-	if type(value) == int:
-		if value not in dictInt:
-			if memoriaConstantesCantidad[0] < iIntConst:
-				dictInt[value]=memoriaConstantesCantidad[0]
-				memoriaConstantesCantidad[0] += 1
-				addQuad('addConstInt', value, '', dictInt[value])
-			else:
-				memoryOverflow('int const') 
-		addOperandoToStack(dictInt[value])
-		addTipoToStack('int')
-	if type(value) == float:
-		if value not in dictFloat:
-			if memoriaConstantesCantidad[1] < iFloatConst:
-				dictFloat[value]=memoriaConstantesCantidad[1]
-				memoriaConstantesCantidad[1] += 1
-				addQuad('addConstFloat', value, '', dictFloat[value])
-			else:
-				memoryOverflow('float const')  
-		addOperandoToStack(dictFloat[value])
-		addTipoToStack('float')
-	if type(value) == str:
-		if (value == 'true' or value == 'false'):
-			if(value=='true'):
-				addOperandoToStack(iFloatConst+1)
-			else:
-				addOperandoToStack(iFloatConst)
-			addTipoToStack('bool')
-		else:
-			if value not in dictString:
-				if memoriaConstantesCantidad[3] < iStringConst:
-					dictString[value]=memoriaConstantesCantidad[3]
-					memoriaConstantesCantidad[3] += 1
-					addQuad('addConstString', value, '', dictString[value])
-				else:
-					memoryOverflow('string const') 
-			addOperandoToStack(dictString[value])
-			addTipoToStack('string')
+    global dictInt
+    global dictFloat
+    global dictString
+    global memoriaConstantesCantidad
+    global contadorConstantes
+    if type(value) == int:
+        if value not in dictInt:
+            if memoriaConstantesCantidad[0] < iIntConst:
+                dictInt[value]=memoriaConstantesCantidad[0]
+                memoriaConstantesCantidad[0] += 1
+                addQuadInicio('addConstInt', value, '', dictInt[value])
+                contadorConstantes += 1
+            else:
+                memoryOverflow('int const') 
+        addOperandoToStack(dictInt[value])
+        addTipoToStack('int')
+    if type(value) == float:
+        if value not in dictFloat:
+            if memoriaConstantesCantidad[1] < iFloatConst:
+                dictFloat[value]=memoriaConstantesCantidad[1]
+                memoriaConstantesCantidad[1] += 1
+                addQuadInicio('addConstFloat', value, '', dictFloat[value])
+                contadorConstantes += 1
+            else:
+                memoryOverflow('float const')  
+        addOperandoToStack(dictFloat[value])
+        addTipoToStack('float')
+    if type(value) == str:
+        if (value == 'true' or value == 'false'):
+            if(value=='true'):
+                addOperandoToStack(iFloatConst+1)
+            else:
+                addOperandoToStack(iFloatConst)
+            addTipoToStack('bool')
+        else:
+            if value not in dictString:
+                if memoriaConstantesCantidad[3] < iStringConst:
+                    dictString[value]=memoriaConstantesCantidad[3]
+                    memoriaConstantesCantidad[3] += 1
+                    addQuadInicio('addConstString', value, '', dictString[value])
+                    contadorConstantes += 1
+                else:
+                    memoryOverflow('string const') 
+            addOperandoToStack(dictString[value])
+            addTipoToStack('string')
 #Agrega el operador a la pila de operadores
 def addOperadorToStack(operator):
 	global pilaOperadores
@@ -1571,7 +1585,14 @@ def p_np_end(p):
     '''
     np_end : empty
     '''
+    global arrCuad
+    global arrCuadTemp
+    lengthConst=len(arrCuadTemp)+1
+    offset=('offset', lengthConst, '','')
+    arrCuadTemp.insert(0,offset)
     addQuad('end','','','')
+    arrCuadTemp.extend(arrCuad)
+    arrCuad=arrCuadTemp
 
 
 parser = yacc.yacc() 

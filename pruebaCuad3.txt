@@ -20,7 +20,7 @@ int iNum = 3;
 float z;
 string s;
 finca = false;
-z = 3.1416/0;
+z = 3.1416/1;
 s="nasufnewd   lua"+"asdadwa";
 while(a==b){
     //a= not(b);
