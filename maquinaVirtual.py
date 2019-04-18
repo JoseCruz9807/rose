@@ -114,7 +114,8 @@ def getData(currentMemory, tipoDeDato, memAdd):
 			sys.exit()
 	return returnVal 
 #Determina si la dirección proporcionada es de variables locales o no
-def esGlobal(memAddress):
+def esGlobal(memAddress1):
+	memAddress = int(memAddress1)
 	if memAddress >= iStringLocales and memAddress < iStringGlobales:
 		tempVal = True
 	else:
