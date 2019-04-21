@@ -105,12 +105,15 @@ def getData(currentMemory, tipoDeDato, memAdd):
 	returnVal = 0
 	try:
 		returnVal = currentMemory.getValue(tipoDeDato,memAdd)
-		#currentMemory.printMem()
+		
 	except:
 		try:
 			returnVal = memGlobal.getValue(tipoDeDato,memAdd)
-			#memGlobal.printMem()
+			
 		except:
+			print(memAdd)
+			currentMemory.printMem()
+			memGlobal.printMem()
 			print("Variable declared but not initialized.")
 			sys.exit()
 	return returnVal 
@@ -214,6 +217,7 @@ def ejecutaCuadruplo():
 			sys.exit()
 		
 		tempTipoUno = checkTipo(currentCuad[1])
+		tempTipoDos = checkTipo(currentCuad[2])
 		operadorUno = getData(memoria, tempTipoUno,currentCuad[1])
 		if tempTipoUno == 'int':
 			operadorUno = int(operadorUno)
@@ -296,7 +300,7 @@ def ejecutaCuadruplo():
 
 	if currentCuad[0] == 'end':
 		print("Se terminó la ejecución del programa.")
-		#memGlobal.printMem()
+		memGlobal.printMem()
 		entrada = input()
 		sys.exit()
 
