@@ -14,14 +14,20 @@ memMain = Memoria("Main")
 #Pila de memorias
 memoryStack = [memMain]
 
+#Pila de memorias temporal
+tempMemoryStack = []
+
 #Lista que almacena los valores de los cuadruplos generados
 cuadruplos = []
 
 #Contador que apunta al cuadruplo que se va a ejecutar
 iEjecutando = 0
 
+#Variable donde se almacenan los valores de retorno de las funciones 
+returnValue=0
+
 #Variable que almacena la posición en la que estaba la ejecución de los cuadruplos antes de hacer el llamado a una función.
-iLlamadaAFuncion = 0
+iLlamadaAFuncion = []
 
 # Se sincronizan los datos con los del compilador Rose
 # Valor que habilita la cantidad de espacios disponibles para cada tipo de dato
@@ -83,7 +89,7 @@ compiledFile = open("codeobj.rs","r")
 def checkTipo(iMemAdd1):
 	tipo = 'none'
 	iMemAdd = int(iMemAdd1)
-	#print(iMemAdd)
+	#print(iMemAdd1)
 	if (iMemAdd >= 0 and iMemAdd < iIntLocales) or (iMemAdd >= iStringLocales and iMemAdd < iIntGlobales) or (iMemAdd >= iStringGlobales and iMemAdd < iIntTemporales) or (iMemAdd >= iStringTemporales and iMemAdd < iIntConst):
 		tipo = 'int'
 	if (iMemAdd >= iIntLocales and iMemAdd < iFloatLocales) or (iMemAdd >= iIntGlobales and iMemAdd < iFloatGlobales) or (iMemAdd >= iIntTemporales and iMemAdd < iFloatTemporales) or (iMemAdd >= iIntConst and iMemAdd < iFloatConst):
@@ -137,6 +143,8 @@ def ejecutaCuadruplo():
 	global memoryStack
 	global memoria
 	global iLlamadaAFuncion
+	global tempMemoryStack
+	global returnValue
 	
 	bEndProc = False
 	memoria = memoryStack.pop()
@@ -160,7 +168,12 @@ def ejecutaCuadruplo():
 	#Operadores
 	if currentCuad[0] == '=':
 		tempTipo = checkTipo(currentCuad[3])
-		valueTemp = getData(memoria, tempTipo, currentCuad[1])
+		valueTemp=0
+		try:
+			int(currentCuad[1])
+			valueTemp = getData(memoria, tempTipo, currentCuad[1])
+		except:
+			valueTemp = returnValue
 		if esGlobalOTemporal(currentCuad[3]):
 			memGlobal.addValue(tempTipo, currentCuad[3], valueTemp)
 		else:
@@ -273,6 +286,7 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 
 	#Llamadas a funciones definidas por el usuario
+	"""
 	if currentCuad[0] == 'era':
 		memAux = Memoria(currentCuad[1])
 		memoryStack.append(memAux)
@@ -299,9 +313,44 @@ def ejecutaCuadruplo():
 	if currentCuad[0] == 'gosub':
 		iLlamadaAFuncion = currentCuad[2]
 		nextCuad = int(currentCuad[3]) + desfase
-
+	"""
+	if currentCuad[0] == 'era':
+		memAux = Memoria(currentCuad[1])
+		tempMemoryStack.append(memAux)
+	if currentCuad[0] == 'parameter':
+		if True:#len(memoryStack) > 0:
+			memoriaFuncionSiguiente = memoria#memoryStack.pop()
+			paramValue = getData(memoriaFuncionSiguiente, checkTipo(currentCuad[1]), currentCuad[1])
+			#memoryStack.append(memoriaFuncionSiguiente)
+			tipoTemp = checkTipo(currentCuad[1])
+			baseAddress = 0
+			if tipoTemp == 'int':
+				baseAddress = 0
+			if tipoTemp == 'float':
+				baseAddress = iIntLocales
+			if tipoTemp == 'bool':
+				baseAddress = iFloatLocales
+			if tipoTemp == 'string':
+				baseAddress = iBoolLocales
+			memoriaTemp=tempMemoryStack.pop()
+			localAdd = baseAddress + memoriaTemp.getSizeMem(tipoTemp)
+			memoriaTemp.addValue(tipoTemp, str(localAdd), paramValue)
+			tempMemoryStack.append(memoriaTemp)
+	if currentCuad[0] == 'endproc':
+		#bEndProc = True
+		memoria=memoryStack.pop()
+		nextCuad = int(iLlamadaAFuncion.pop()) + desfase
+	if currentCuad[0] == 'gosub':
+		memoriaTemp=tempMemoryStack.pop()
+		memoryStack.append(memoria)
+		memoria=memoriaTemp
+		iLlamadaAFuncion.append(int(currentCuad[2]))
+		nextCuad = int(currentCuad[3]) + desfase
+	
 	if currentCuad[0] == 'return':
-		pass
+		#memoriaFuncionPrevia = memoryStack.pop()
+		returnValue = getData(memoria, checkTipo(currentCuad[3]), currentCuad[3])
+
 
 	if currentCuad[0] == 'end':
 		print("Se terminó la ejecución del programa.")
@@ -317,6 +366,7 @@ def ejecutaCuadruplo():
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		print(operadorUno)
 
+	
 	if bEndProc == False:
 		memoryStack.append(memoria)
 
