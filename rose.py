@@ -389,6 +389,9 @@ memoriaGlobalCantidad = [iStringLocales, iIntGlobales, iFloatGlobales, iBoolGlob
 # Lista que almacena los valores actuales de las constantes
 memoriaConstantesCantidad = [iStringTemporales, iIntConst, iFloatConst, iBoolConst]
 
+# Valor que almacena el valor de R para guardar arreglos
+iR = 1
+
 # Valor que almacena el nombre del ID
 idName = ''
 
@@ -487,11 +490,6 @@ def getMemPosGlobals(dataType):
             memoriaGlobalCantidad[3] += 1
         else:
             memoryOverflow('string global')
-    """
-    else:
-    	print("In line {}, assignation error occured, a type {} was casted to a type {}.".format(lexer.lineno-1, getTopTipos(), dataType))
-    	sys.exit()
-    """
     return memPos
 #Guarda la variable actual en el directorio de variables de la funcion especificada
 def anadirVar():
@@ -507,6 +505,46 @@ def anadirVar():
     addOperandoToStack(posMemoria)
     addTipoToStack(tipoDato)
     dirFunc.addVariable(nombreFunc, nombreVar, tipoDato, iVarFilas, iVarColumnas, posMemoria)
+#Modifica el apuntador de memoria con base al tipo de dato que es el arreglo y la cantidad especificada
+def actualizaApuntadorMemoria(dataType, cantidadValores):
+    global memoriaGlobalCantidad
+    global memoriaLocalCantidad
+    if nombreFunc == 'globals':
+        if dataType == 'int':
+            memoriaGlobalCantidad[0] += cantidadValores
+            if memoriaGlobalCantidad[0] > iIntGlobales:
+                memoryOverflow('int global')
+        if dataType == 'float':
+            memoriaGlobalCantidad[1] += cantidadValores
+            if memoriaGlobalCantidad[1] > iFloatGlobales:
+                memoryOverflow('float global')
+        if dataType == 'bool':
+            memoriaGlobalCantidad[2] += cantidadValores
+            if memoriaGlobalCantidad[2] > iBoolGlobales:
+                memoryOverflow('bool global')
+        if dataType == 'string':
+            memoriaGlobalCantidad[3] += cantidadValores
+            if memoriaGlobalCantidad[3] > iStringGlobales:
+                memoryOverflow('string global')
+    else:
+        if dataType == 'int':
+            memoriaLocalCantidad[0] += cantidadValores
+            if memoriaLocalCantidad[0] > iIntLocales:
+                memoryOverflow('int local')
+        if dataType == 'float':
+            memoriaLocalCantidad[1] += cantidadValores
+            if memoriaLocalCantidad[1] > iFloatLocales:
+                memoryOverflow('float local')
+        if dataType == 'bool':
+            memoriaLocalCantidad[2] += cantidadValores
+            if memoriaLocalCantidad[2] > iBoolLocales:
+                memoryOverflow('bool local')
+        if dataType == 'string':
+            memoriaLocalCantidad[3] += cantidadValores
+            if memoriaLocalCantidad[3] > iStringLocales:
+                memoryOverflow('string local')
+
+
 #Guarda la cantidad de parametros en la funcion
 def aniadirParametros():
     global nombreFunc
@@ -891,12 +929,12 @@ def p_main(p):
 def p_vars(p):
     '''
     vars : tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionmatriz RIGHTKEY comments_nl SEMICOLON np_anadir_variable comments_nl
-        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_anadir_variable comments_nl
+        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_anadir_variable np_calcular_k_matrix comments_nl
         | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionarreglo RIGHTKEY comments_nl SEMICOLON np_asignar_arreglo comments_nl
-        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_asignar_arreglo comments_nl
+        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_asignar_arreglo np_calcular_k_arreglo comments_nl
         | tipo ID np_obtener_nombre_var np_asignar_fil_col np_asignacion_inicial_quad1 comments_nl EQUALS np_asignacion_quad2 comments_nl ctes SEMICOLON np_asignacion_quad4 comments_nl 
         | tipo ID np_obtener_nombre_var comments_nl SEMICOLON np_asignar_fil_col comments_nl
-    '''
+    '''	
 
 def p_asignacionmatriz(p):
     '''
@@ -1007,8 +1045,8 @@ def p_argumentos(p):
 
 def p_mismotipo(p):
     '''
-    mismotipo : ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl COMMA np_anadir_variable comments_nl mismotipo comments_nl
-                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl COMMA np_asignar_arreglo comments_nl mismotipo comments_nl
+    mismotipo : ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl COMMA np_anadir_variable np_calcular_k_matrix comments_nl mismotipo comments_nl
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl COMMA np_asignar_arreglo np_calcular_k_arreglo comments_nl mismotipo comments_nl
                 | ID np_obtener_nombre_var np_agregar_parametros comments_nl COMMA np_asignar_fil_col comments_nl mismotipo comments_nl
                 | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl np_anadir_variable
                 | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl np_asignar_arreglo
@@ -1039,7 +1077,7 @@ def p_aplicaciones(p):
                 | asignacion comments_nl aplicaciones comments_nl
                 | durante comments_nl aplicaciones comments_nl
                 | llama_func aplicaciones comments_nl
-                | returnx np_cuadruplo_retorno comments_nl aplicaciones comments_nl
+                | returnx np_cuadruplo_retorno np_endproc comments_nl aplicaciones comments_nl 
                 | empty
     '''
 
@@ -1212,15 +1250,28 @@ def p_np_obtener_filas(p):
     '''
     np_obtener_filas : empty
     '''
+    global iR
     numFilas = int(p[-1])
-    setIVarFilas(numFilas)
+    if numFilas > 0:
+        iR = (numFilas) * iR
+        setIVarFilas(numFilas)
+    else:
+        print("In line {}, negative index.".format(lexer.lineno))
+        sys.exit()
 
 def p_np_obtener_columnas(p):
     '''
     np_obtener_columnas : empty
     '''
+    global iR
     numCol = int(p[-1])
-    setIVarColumnas(numCol)
+    if numCol > 0:
+        iR = (numCol) * iR
+        setIVarColumnas(numCol)
+    else:
+        print("In line {}, negative index.".format(lexer.lineno))
+        sys.exit()
+
 
 def p_np_anadir_variable(p):
 	'''
@@ -1594,6 +1645,31 @@ def p_np_end(p):
     arrCuadTemp.extend(arrCuad)
     arrCuad=arrCuadTemp
 
+def p_np_calcular_k_arreglo(p):
+    '''
+    np_calcular_k_arreglo : 
+    '''
+    global dirFunc
+    global nombreVar
+    global nombreFunc
+    global iR
+    mDim = iR-1
+    iR=1
+    typeTemp = dirFunc.getVarType(nombreFunc, nombreVar)
+    actualizaApuntadorMemoria(typeTemp, mDim)
+    
+def p_np_calcular_k_matrix(p):
+    '''
+    np_calcular_k_matrix : 
+    '''
+    global dirFunc
+    global nombreVar
+    global iR
+    global nombreFunc
+    mDim = iR-1
+    iR=1
+    typeTemp = dirFunc.getVarType(nombreFunc, nombreVar)
+    actualizaApuntadorMemoria(typeTemp, mDim)
 
 parser = yacc.yacc() 
 
