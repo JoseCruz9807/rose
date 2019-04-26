@@ -392,12 +392,20 @@ memoriaConstantesCantidad = [iStringTemporales, iIntConst, iFloatConst, iBoolCon
 # Valor que almacena el valor de R para guardar arreglos
 iR = 1
 
+# Valor que almacen la dirección base del arreglo
+dirBase = -1
+
+# Valor que almacena la cantidad de columnas declaradas que han sido proporcionadas
+iColumnasDeclaradas = 0
+
+# Valor que almacena la cantidad de filas declaradas que han sido proporcionadas
+iFilasDeclaradas = 0
+
 # Valor que almacena el nombre del ID
 idName = ''
 
 #Almacena la cantidad de constantes hasta el momento
 contadorConstantes = 0
-
 
 ############################
 ### FUNCIONES AUXILIARES ###
@@ -628,6 +636,9 @@ def addValueToStack(value):
     global dictString
     global memoriaConstantesCantidad
     global contadorConstantes
+    #print(value)
+    #print(type(value))
+    #print(tipoDato)
     if type(value) == int:
         if value not in dictInt:
             if memoriaConstantesCantidad[0] < iIntConst:
@@ -848,6 +859,24 @@ def condicion3():
     tupla = (arrCuad[end][0], arrCuad[end][1], arrCuad[end][2], len(arrCuad))
     arrCuad[end] = tupla
 
+#Genera el cuádruplo para la asignación de los arreglos
+def assignArray():
+	global dirBase
+	global iColumnasDeclaradas
+	global iFilasDeclaradas
+	rightOperand = popOperando()
+	rightType = popTipos()
+	checkIfTemporal(rightOperand)
+	leftOperand = dirBase + (iVarFilas*iFilasDeclaradas + iColumnasDeclaradas)
+	leftType = popTipos()
+	tempOperator = popOperadores()
+	resultType = semantica.resultType(leftType, rightType, tempOperator)
+	if resultType != 'error':
+		addQuad(tempOperator, rightOperand, '', leftOperand)
+		##Regresar el temp al AVAIL
+	else:
+		typeMismatch()
+
 #Regresa la funcion que se debe usar en base a los operadores dados
 def switchOperator(arg):
 	switcher = {
@@ -856,7 +885,8 @@ def switchOperator(arg):
         3: readFunc,
         4: printFun,
         5: delParentesis,
-        6: notFunc
+        6: notFunc,
+        7: assignArray
 	}
 	return switcher.get(arg)
 #Determina el tipo de operador con el que se trabajara la operacion
@@ -928,24 +958,24 @@ def p_main(p):
 
 def p_vars(p):
     '''
-    vars : tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionmatriz RIGHTKEY comments_nl SEMICOLON np_anadir_variable comments_nl
-        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_anadir_variable np_calcular_k_matrix comments_nl
-        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl EQUALS comments_nl LEFTKEY comments_nl asignacionarreglo RIGHTKEY comments_nl SEMICOLON np_asignar_arreglo comments_nl
-        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_asignar_arreglo np_calcular_k_arreglo comments_nl
+    vars : tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl np_anadir_variable EQUALS np_asignacion_arreglo_quad1 comments_nl LEFTKEY comments_nl asignacionmatriz RIGHTKEY np_asignacion_matrix_quad2 comments_nl SEMICOLON np_calcular_k_matrix comments_nl
+        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_anadir_variable np_calcular_k_matrix comments_nl
+        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl np_asignar_arreglo EQUALS np_asignacion_arreglo_quad1 comments_nl LEFTKEY comments_nl asignacionarreglo RIGHTKEY comments_nl SEMICOLON np_asignacion_arreglo_quad4 np_calcular_k_arreglo comments_nl
+        | tipo ID np_obtener_nombre_var comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl SEMICOLON np_asignar_arreglo np_calcular_k_arreglo comments_nl
         | tipo ID np_obtener_nombre_var np_asignar_fil_col np_asignacion_inicial_quad1 comments_nl EQUALS np_asignacion_quad2 comments_nl ctes SEMICOLON np_asignacion_quad4 comments_nl 
         | tipo ID np_obtener_nombre_var comments_nl SEMICOLON np_asignar_fil_col comments_nl
     '''	
 
 def p_asignacionmatriz(p):
     '''
-    asignacionmatriz : LEFTKEY comments_nl asignacionarreglo RIGHTKEY comments_nl COMMA comments_nl asignacionmatriz comments_nl
+    asignacionmatriz : LEFTKEY comments_nl asignacionarreglo RIGHTKEY np_asignacion_matrix_quad1 comments_nl COMMA comments_nl asignacionmatriz comments_nl
                     | LEFTKEY comments_nl asignacionarreglo RIGHTKEY comments_nl
     '''
 
 def p_asignacionarreglo(p):
     '''
-    asignacionarreglo : ctes COMMA comments_nl asignacionarreglo comments_nl
-                    | ctes
+    asignacionarreglo : ctes np_asignacion_arreglo_quad2 COMMA np_asignacion_arreglo_quad3 comments_nl asignacionarreglo comments_nl
+                    | ctes np_asignacion_arreglo_quad2
     '''
 
 def p_tipo(p):
@@ -1045,11 +1075,11 @@ def p_argumentos(p):
 
 def p_mismotipo(p):
     '''
-    mismotipo : ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl COMMA np_anadir_variable np_calcular_k_matrix comments_nl mismotipo comments_nl
-                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl COMMA np_asignar_arreglo np_calcular_k_arreglo comments_nl mismotipo comments_nl
+    mismotipo : ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl COMMA np_anadir_variable np_calcular_k_matrix comments_nl mismotipo comments_nl
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl COMMA np_asignar_arreglo np_calcular_k_arreglo comments_nl mismotipo comments_nl
                 | ID np_obtener_nombre_var np_agregar_parametros comments_nl COMMA np_asignar_fil_col comments_nl mismotipo comments_nl
-                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl np_anadir_variable
-                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl np_asignar_arreglo
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl np_anadir_variable
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl np_asignar_arreglo
                 | ID np_obtener_nombre_var np_agregar_parametros comments_nl np_asignar_fil_col
     '''
 
@@ -1104,8 +1134,8 @@ def p_paramsaux(p):
 
 def p_asignacion(p):
     '''
-    asignacion : ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp SEMICOLON comments_nl
-               | ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl EQUALS comments_nl mega_exp SEMICOLON comments_nl
+    asignacion : ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl EQUALS np_asignacion_quad2 comments_nl mega_exp SEMICOLON comments_nl
+               | ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl EQUALS np_asignacion_quad2 comments_nl mega_exp SEMICOLON comments_nl
                | ID np_asignacion_quad1 comments_nl EQUALS np_asignacion_quad2 comments_nl mega_exp SEMICOLON np_asignacion_quad4 comments_nl
     '''	
 
@@ -1256,7 +1286,7 @@ def p_np_obtener_filas(p):
         iR = (numFilas) * iR
         setIVarFilas(numFilas)
     else:
-        print("In line {}, negative index.".format(lexer.lineno))
+        print("In line {}, invalid index.".format(lexer.lineno))
         sys.exit()
 
 def p_np_obtener_columnas(p):
@@ -1291,7 +1321,7 @@ def p_np_asignar_arreglo(p):
 	'''
 	np_asignar_arreglo : empty
 	'''
-	setIVarColumnas(0)
+	setIVarFilas(0)
 	anadirVar()
 
 def p_np_main_func(p):
@@ -1670,6 +1700,81 @@ def p_np_calcular_k_matrix(p):
     iR=1
     typeTemp = dirFunc.getVarType(nombreFunc, nombreVar)
     actualizaApuntadorMemoria(typeTemp, mDim)
+
+def p_np_asignacion_arreglo_quad1(p):
+	'''
+	np_asignacion_arreglo_quad1 : 
+	'''
+	global dirBase
+	global nombreFunc
+	global nombreVar
+	dirBase = dirFunc.getVarMemPos(nombreFunc, nombreVar)
+	tempOperator = '='
+	addOperadorToStack(tempOperator)
+
+def p_np_asignacion_arreglo_quad2(p):
+	'''
+	np_asignacion_arreglo_quad2 : 
+	'''
+	tuplaOperadores = ('=')
+	operacionesEnPilasId(tuplaOperadores, 7)
+
+def p_np_asignacion_arreglo_quad3(p):
+	'''
+	np_asignacion_arreglo_quad3 : empty
+	'''
+	global iVarColumnas
+	global iColumnasDeclaradas
+	global tipoDato
+	if iColumnasDeclaradas < iVarColumnas-1:
+		tempOperator = '='
+		addOperadorToStack(tempOperator)
+		iColumnasDeclaradas += 1
+		addTipoToStack(tipoDato)
+	else:
+		print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
+		sys.exit()	
+
+def p_np_asignacion_arreglo_quad4(p):
+	'''
+	np_asignacion_arreglo_quad4 :
+	'''	
+	global iColumnasDeclaradas
+	global iVarColumnas
+	if iColumnasDeclaradas != iVarColumnas-1:
+		print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
+		sys.exit()
+	else:
+		iColumnasDeclaradas = 0
+
+def p_np_asignacion_matrix_quad1(p):
+	'''
+	np_asignacion_matrix_quad1 : 
+	'''
+	global iFilasDeclaradas
+	global iColumnasDeclaradas
+	global iVarFilas
+	if iFilasDeclaradas < iVarFilas-1:
+		tempOperator = '='
+		addOperadorToStack(tempOperator)
+		iFilasDeclaradas += 1
+		iColumnasDeclaradas = 0
+		addTipoToStack(tipoDato)
+	else:
+		print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
+		sys.exit()
+
+def p_np_asignacion_matrix_quad2(p):
+	'''
+	np_asignacion_matrix_quad2 : 
+	'''
+	global iFilasDeclaradas
+	global iVarFilas
+	if iFilasDeclaradas != iVarFilas-1:
+		print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
+		sys.exit()
+	else:
+		iFilasDeclaradas = 0
 
 parser = yacc.yacc() 
 
