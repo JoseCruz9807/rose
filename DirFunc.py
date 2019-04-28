@@ -54,5 +54,44 @@ class DirFunc:
          nombre: Nombre de la funcion a modificar
          numPar: Cantidad de parametros de la funcion a modificar
         """
-        DirFunc.instance.val[nombre] = (self.val[nombre][0], self.val[nombre][1], numPar, self.val[nombre][3])
-        
+        self.val[nombre] = (self.val[nombre][0], self.val[nombre][1], numPar, self.val[nombre][3])
+
+    def getVarType(self, scope, nombre):
+        """
+        Regresa el tipo de la variable solicitada.
+        Args:
+         scope: Función donde se busca la variable deseada
+         nombre: Nombre de la variable que se desea saber el tipo 
+        """
+        tableVars = self.val[scope][1]
+        return tableVars[nombre][0]
+
+    def getVarMemPos(self, scope, nombre):
+        """
+        Regresa el tipo de la variable solicitada.
+        Args:
+         scope: Función donde se busca la variable deseada
+         nombre: Nombre de la variable que se desea saber el tipo 
+        """
+        tableVars = self.val[scope][1]
+        return tableVars[nombre][3]
+
+    def getFilasVar(self, scope, nombre):
+        """
+        Regresa el tipo de la variable solicitada.
+        Args:
+         scope: Función donde se busca la variable deseada
+         nombre: Nombre de la variable que se desea saber el tipo 
+        """
+        tableVars = self.val[scope][1]
+        return tableVars[nombre][1]
+
+    def getColumnasVar(self, scope, nombre):
+        """
+        Regresa el tipo de la variable solicitada.
+        Args:
+         scope: Función donde se busca la variable deseada
+         nombre: Nombre de la variable que se desea saber el tipo 
+        """
+        tableVars = self.val[scope][1]
+        return tableVars[nombre][2]
