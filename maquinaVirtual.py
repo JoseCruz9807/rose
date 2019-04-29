@@ -117,6 +117,7 @@ def setCuadruplo(iPosicion):
 def getData(currentMemory, tipoDeDato, memAdd):	
 	global memGlobal
 	returnVal = 0
+	memAdd=str(memAdd)
 	try:
 		returnVal = currentMemory.getValue(tipoDeDato,memAdd)
 		
@@ -125,9 +126,12 @@ def getData(currentMemory, tipoDeDato, memAdd):
 			returnVal = memGlobal.getValue(tipoDeDato,memAdd)
 			
 		except:
+			"""
 			print(memAdd)
+			print(tipoDeDato)
 			currentMemory.printMem()
 			memGlobal.printMem()
+			"""
 			print("Variable declared but not initialized.")
 			sys.exit()
 	return returnVal 
@@ -199,7 +203,10 @@ def ejecutaCuadruplo():
 		if tempTipoDos == 'float':
 			operadorDos = float(operadorDos)
 		resultado = operadorUno + operadorDos
-		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 	if currentCuad[0] == '-':
 		tempTipoUno = checkTipo(currentCuad[1])
 		tempTipoDos = checkTipo(currentCuad[2])
@@ -214,7 +221,10 @@ def ejecutaCuadruplo():
 		if tempTipoDos == 'float':
 			operadorDos = float(operadorDos)
 		resultado = operadorUno - operadorDos
-		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 	if currentCuad[0] == '*':
 		tempTipoUno = checkTipo(currentCuad[1])
 		tempTipoDos = checkTipo(currentCuad[2])
@@ -229,7 +239,10 @@ def ejecutaCuadruplo():
 		if tempTipoDos == 'float':
 			operadorDos = float(operadorDos)
 		resultado = operadorUno * operadorDos
-		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 	if currentCuad[0] == '/':
 		pattern = re.compile("[0|0\.0+]")
 		tempTipoDos = checkTipo(currentCuad[2])
@@ -251,7 +264,10 @@ def ejecutaCuadruplo():
 			operadorDos = float(operadorDos)
 		
 		resultado = operadorUno / operadorDos
-		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 
 	#Operadores logicos
 	###HAY QUE CHECAR TODAS LAS QUE REGRESAN UN BOOL
@@ -358,6 +374,7 @@ def ejecutaCuadruplo():
 
 	if currentCuad[0] == 'end':
 		print("Se terminó la ejecución del programa.")
+		memoria.printMem()
 		memGlobal.printMem()
 		entrada = input()
 		sys.exit()
@@ -370,7 +387,33 @@ def ejecutaCuadruplo():
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		print(operadorUno)
 
-	
+	#Procedimientos para arreglos y matrices
+	if currentCuad[0]=='ver':
+		valor=getData(memoria, checkTipo(currentCuad[3]),currentCuad[3])
+		limite=int(currentCuad[1])
+		if int(valor)<0 or int(valor)>=limite:
+			print("Out of bounds")
+			sys.exit()
+
+	if currentCuad[0]=='**':
+		valor=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		factor=int(currentCuad[2])
+		valueTemp=int(valor)*factor#getData(memoria,checkTipo(valor*factor), valor*factor)
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]), currentCuad[3], valueTemp)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], valueTemp)
+
+	if currentCuad[0]=='+*':
+		valor=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		factor=int(currentCuad[2])
+		valueTemp=int(valor)+factor#getData(memoria,checkTipo(valor+factor), valor+factor)
+		if esGlobalOTemporal(currentCuad[3]):
+			y=getData(memoria, checkTipo(currentCuad[2]), valueTemp)
+			memGlobal.addValue(checkTipo(currentCuad[3]), currentCuad[3], y)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], getData(memoria, checkTipo(currentCuad[2]), valueTemp))
+
 	if bEndProc == False:
 		memoryStack.append(memoria)
 
