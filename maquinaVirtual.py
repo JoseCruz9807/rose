@@ -141,7 +141,7 @@ def getData(currentMemory, tipoDeDato, memAdd):
 			"""
 			
 			if currentCuad[0] == '+*' or currentCuad[0] == '=*':
-				return dirMem 
+				return memAdd
 			
 			print("Variable declared but not initialized.")
 			sys.exit()
@@ -421,33 +421,22 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], valueTemp)
 
 	if currentCuad[0]=='+*':
-		print("Ando en +*")
 		valor=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		factor=int(currentCuad[2])
 		valueTemp=int(valor)+factor#getData(memoria,checkTipo(valor+factor), valor+factor)
-		dirMem = valueTemp
 		y=getData(memoria, checkTipo(currentCuad[2]), valueTemp)
-		print("y value: " + str(y))
 		if esGlobalOTemporal(currentCuad[3]):
 			memGlobal.addValue(checkTipo(currentCuad[3]), currentCuad[3], y)
 		else:
 			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], y)
 
 	if currentCuad[0]=='=*':
-		print("Ando en =*")
-		print("dirMem: " + str(dirMem))
-		direccionMemoria = str(getData(memoria,checkTipo(currentCuad[1]), dirMem))
+		direccionMemoria = str(getData(memoria,checkTipo(currentCuad[1]), getData(memoria, checkTipo(currentCuad[3]), currentCuad[3])))
 		valor=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
-		print("direccionMemoria: " + str(direccionMemoria))
-		print("valor: " + str(valor))
 		if esGlobalOTemporal(direccionMemoria):
 			memGlobal.addValue(checkTipo(currentCuad[3]), direccionMemoria, valor)
 		else:
 			memoria.addValue(checkTipo(currentCuad[3]), direccionMemoria, valor)
-
-
-
-
 
 
 	if bEndProc == False:

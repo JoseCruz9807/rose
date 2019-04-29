@@ -1965,15 +1965,11 @@ def p_np_solo_asignar_matrix_quad1(p):
 					print("In line {}, unexpected array call".format(lexer.lineno))
 					sys.exit()
 			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
-			tempColumnas = dirFunc.getColumnasVar(nombreFunc, idName)
-			tempDirBase = dirFunc.getVarMemPos(nombreFunc, idName)
-			print("tempColumnas: " + str(tempColumnas))
-			print("tempDirBase: " + str(tempDirBase))
-			print("iFilasLlamadas: " + str(iFilasLlamadas))
-			print("iColumnasLlamadas: " + str(iColumnasLlamadas))
-			
-			memTemp = tempDirBase + (tempColumnas*iFilasLlamadas + iColumnasLlamadas)
-			addOperandoToStack(memTemp)
+			temporalSiguiente=getAvail(tipoTemp)
+			addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente)
+			addQuad("+", temporalSiguiente, iFilasLlamadas, temporalSiguiente)
+			addQuad("+*", temporalSiguiente, dirFunc.getVarMemPos(nombreFunc,idName),temporalSiguiente)
+			addOperandoToStack(temporalSiguiente)
 		else:
 			tipoTemp = dirFunc.val['globals'][1][idName][0]       #Si no, se busca de manera global
 			if dirFunc.getFilasVar('globals',idName)==0:           #Verificar el llamado a filas
@@ -1985,17 +1981,17 @@ def p_np_solo_asignar_matrix_quad1(p):
 				if iColumnasLlamadas>=0:
 					print("In line {}, unexpected array call".format(lexer.lineno))
 					sys.exit()
-			addQuad('ver', dirFunc.getColumnasVar('globals', idName), dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
-			tempColumnas = dirFunc.getColumnasVar(nombreFunc, idName)
-			tempDirBase = dirFunc.getVarMemPos(nombreFunc, idName)
-			print("tempColumnas: " + str(tempColumnas))
-			print("tempDirBase: " + str(tempDirBase))
-			print("iFilasLlamadas: " + str(iFilasLlamadas))
-			print("iColumnasLlamadas: " + str(iColumnasLlamadas))
-			
-			memTemp = tempDirBase + (tempColumnas*iFilasLlamadas + iColumnasLlamadas)
-			addOperandoToStack(memTemp)
+			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
+			temporalSiguiente=getAvail(tipoTemp)
+			addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente)
+			addQuad("+", temporalSiguiente, iFilasLlamadas, temporalSiguiente)
+			addQuad("+*", temporalSiguiente, dirFunc.getVarMemPos(nombreFunc,idName),temporalSiguiente)
+			addOperandoToStack(temporalSiguiente)
 		addTipoToStack(tipoTemp)
+		checkIfTemporal(iColumnasLlamadas)
+		checkIfTemporal(iFilasLlamadas)
+		iFilasLlamadas=-1
+		iColumnasLlamadas=-1
 	else:
 		print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
 		sys.exit()
@@ -2022,14 +2018,6 @@ def p_np_solo_asignar_arreglo_quad1(p):
 					print("In line {}, unexpected array call".format(lexer.lineno))
 					sys.exit()
 			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
-			"""
-			tempColumnas = dirFunc.getColumnasVar(nombreFunc, idName)
-			tempDirBase = dirFunc.getVarMemPos(nombreFunc, idName)
-			print(tempDirBase)
-			if iFilasLlamadas = -1:
-				memTemp = tempDirBase + 
-			memTemp = tempDirBase + (tempColumnas*iFilasLlamadas + iColumnasLlamadas)
-            """
 			temporalSiguiente=getAvail(tipoTemp)
 			addQuad("+*", iColumnasLlamadas, dirFunc.getVarMemPos(nombreFunc, idName), temporalSiguiente)
 			addOperandoToStack(temporalSiguiente)
@@ -2043,14 +2031,10 @@ def p_np_solo_asignar_arreglo_quad1(p):
 				if iColumnasLlamadas>=0:
 					print("In line {}, unexpected array call".format(lexer.lineno))
 					sys.exit()
-			addQuad('ver', dirFunc.getColumnasVar('globals', idName),dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
-			tempColumnas = dirFunc.getColumnasVar(nombreFunc, idName)
-			tempDirBase = dirFunc.getVarMemPos(nombreFunc, idName)
-			print(tempDirBase)
-			#tempFilasLLamadas = dirFunc.getVarMemPos(nombreFunc, )
-			#############LE ASIGNAMOS EL MEMADD AL QUE CORRESPONDE (IFILASLLAMADAS E ICOLUMNASLLAMADAS), DE AHÍ QUE SALGAN NUMEROS MUY FEOS
-			memTemp = tempDirBase + (tempColumnas*iFilasLlamadas + iColumnasLlamadas)
-			addOperandoToStack(memTemp)
+			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
+			temporalSiguiente=getAvail(tipoTemp)
+			addQuad("+*", iColumnasLlamadas, dirFunc.getVarMemPos(nombreFunc, idName), temporalSiguiente)
+			addOperandoToStack(temporalSiguiente)
 		checkIfTemporal(iColumnasLlamadas)
 		iFilasLlamadas=-1
 		iColumnasLlamadas=-1
