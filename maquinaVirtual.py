@@ -81,6 +81,12 @@ iBoolConst = iFloatConst + espaciosDisponibles
 #16 Valor que apunta al siguiente lugar disponible de los strings
 iStringConst = iBoolConst + espaciosDisponibles
 
+#Valor que almacena el cuadruplo que se ejecuta actualmente
+currentCuad = ()
+
+#Valor que almacena la direccion de memoria del elemento del arreglo/matriz al que se le asignará un valor
+dirMem = -1
+
 #Archivo a leer
 compiledFile = open("codeobj.rs","r")
 
@@ -116,6 +122,7 @@ def setCuadruplo(iPosicion):
 #Regresa la información almacenada en la dirección proporcionada
 def getData(currentMemory, tipoDeDato, memAdd):	
 	global memGlobal
+	global currentCuad
 	returnVal = 0
 	memAdd=str(memAdd)
 	try:
@@ -132,6 +139,10 @@ def getData(currentMemory, tipoDeDato, memAdd):
 			currentMemory.printMem()
 			memGlobal.printMem()
 			"""
+			
+			if currentCuad[0] == '+*' or currentCuad[0] == '=*':
+				return dirMem 
+			
 			print("Variable declared but not initialized.")
 			sys.exit()
 	return returnVal 
@@ -152,6 +163,8 @@ def ejecutaCuadruplo():
 	global iLlamadaAFuncion
 	global tempMemoryStack
 	global returnValue
+	global currentCuad
+	global dirMem
 	
 	bEndProc = False
 	memoria = memoryStack.pop()
@@ -270,7 +283,6 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 
 	#Operadores logicos
-	###HAY QUE CHECAR TODAS LAS QUE REGRESAN UN BOOL
 	if currentCuad[0] == '==':
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
@@ -384,7 +396,11 @@ def ejecutaCuadruplo():
 
 	#Funciones Especiales
 	if currentCuad[0] == 'print':
-		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		if currentCuad[2] == 'arr':
+			tempMemoria = getData(memoria, checkTipo(currentCuad[1]), currentCuad[1])
+			operadorUno = getData(memoria, checkTipo(currentCuad[1]), tempMemoria)
+		else:
+			operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		print(operadorUno)
 
 	#Procedimientos para arreglos y matrices
@@ -405,14 +421,34 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], valueTemp)
 
 	if currentCuad[0]=='+*':
+		print("Ando en +*")
 		valor=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		factor=int(currentCuad[2])
 		valueTemp=int(valor)+factor#getData(memoria,checkTipo(valor+factor), valor+factor)
+		dirMem = valueTemp
+		y=getData(memoria, checkTipo(currentCuad[2]), valueTemp)
+		print("y value: " + str(y))
 		if esGlobalOTemporal(currentCuad[3]):
-			y=getData(memoria, checkTipo(currentCuad[2]), valueTemp)
 			memGlobal.addValue(checkTipo(currentCuad[3]), currentCuad[3], y)
 		else:
-			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], getData(memoria, checkTipo(currentCuad[2]), valueTemp))
+			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], y)
+
+	if currentCuad[0]=='=*':
+		print("Ando en =*")
+		print("dirMem: " + str(dirMem))
+		direccionMemoria = str(getData(memoria,checkTipo(currentCuad[1]), dirMem))
+		valor=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		print("direccionMemoria: " + str(direccionMemoria))
+		print("valor: " + str(valor))
+		if esGlobalOTemporal(direccionMemoria):
+			memGlobal.addValue(checkTipo(currentCuad[3]), direccionMemoria, valor)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]), direccionMemoria, valor)
+
+
+
+
+
 
 	if bEndProc == False:
 		memoryStack.append(memoria)

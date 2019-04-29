@@ -407,6 +407,9 @@ iColumnasLlamadas=-1
 #Valor que almacena la cantidad de filas en la matriz llamada
 iFilasLlamadas=-1
 
+#Booleano que determina si el valor a imprimir es unitario o arreglo/matriz
+isArrayOrMatrix = False
+
 #Guarda de manera temporal el valor de una matriz o de un arreglo, según corresponda
 tempIdArrMat=[]
 
@@ -756,32 +759,39 @@ def arithmeticOperator():
         typeMismatch()
 #Se hace la creacion del cuadruplo para la operacion de asignacion
 def assignOperator():
-    rightOperand = popOperando()
-    rightType = popTipos()
-    checkIfTemporal(rightOperand)
-    leftOperand = popOperando()
-    leftType = popTipos()
-    checkIfTemporal(leftOperand)
-    tempOperator = popOperadores()
-    resultType = semantica.resultType(leftType, rightType, tempOperator)
-    if resultType != 'error':
-        addQuad(tempOperator, rightOperand, '', leftOperand)
+	#BorraPrints
+	print(tempIdArrMat)
+	print(pilaOperadores)
+	print(pilaOperando)
+	rightOperand = popOperando()
+	rightType = popTipos()
+	checkIfTemporal(rightOperand)
+	leftOperand = popOperando()
+	leftType = popTipos()    
+	checkIfTemporal(leftOperand)
+	tempOperator = popOperadores()
+	resultType = semantica.resultType(leftType, rightType, tempOperator)
+	if resultType != 'error':
+		addQuad(tempOperator, rightOperand, '', leftOperand)
 		##Regresar el temp al AVAIL
-    else:
-        typeMismatch()
+	else:
+		typeMismatch()
 #Creacion del cuadruplo de print
 def printFun():
-    printOperand=popOperando()
-    typeOperand=popTipos()
-    checkIfTemporal(printOperand)
-    tempOperator = popOperadores()
-    resultType = semantica.resultType(tempOperator, typeOperand, '')
-    if resultType != 'error':
-        addQuad(tempOperator, printOperand, '', '')
-		##Regresar el temp al AVAIL
-        #popOperando()
-    else:
-        typeMismatch()
+	global isArrayOrMatrix
+	printOperand=popOperando()
+	typeOperand=popTipos()
+	checkIfTemporal(printOperand)
+	tempOperator = popOperadores()
+	resultType = semantica.resultType(tempOperator, typeOperand, '')
+	if resultType != 'error':
+		arrMat = ''
+		#if isArrayOrMatrix:
+		#	arrMat = 'arr'
+		addQuad(tempOperator, printOperand, arrMat, '')
+	else:
+		typeMismatch()
+	isArrayOrMatrix = False
 #Creacion del cuadruplo de print
 def readFunc():
     readOperand=popOperando()
@@ -876,7 +886,7 @@ def assignArray():
 	rightOperand = popOperando()
 	rightType = popTipos()
 	checkIfTemporal(rightOperand)
-	leftOperand = dirBase + (iVarColumnas*iFilasDeclaradas + iColumnasDeclaradas)#(iVarFilas*iFilasDeclaradas + iColumnasDeclaradas)
+	leftOperand = dirBase + (iVarColumnas*iFilasDeclaradas + iColumnasDeclaradas)
 	leftType = popTipos()
 	tempOperator = popOperadores()
 	resultType = semantica.resultType(leftType, rightType, tempOperator)
@@ -1143,8 +1153,8 @@ def p_paramsaux(p):
 
 def p_asignacion(p):
     '''
-    asignacion : ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl EQUALS np_asignacion_quad2 comments_nl mega_exp SEMICOLON comments_nl
-               | ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl EQUALS np_asignacion_quad2 comments_nl mega_exp SEMICOLON comments_nl
+    asignacion : ID np_factor_quad2 comments_nl LEFTBRACKET np_parentesis_quad1 comments_nl mega_exp np_valor_columnas RIGHTBRACKET np_parentesis_quad2 comments_nl LEFTBRACKET np_parentesis_quad1 comments_nl mega_exp np_valor_filas RIGHTBRACKET np_parentesis_quad2 np_solo_asignar_matrix_quad1 comments_nl EQUALS np_asignacion_de_arreglo_quad1 comments_nl mega_exp SEMICOLON np_asignacion_quad4 comments_nl
+               | ID np_factor_quad2 comments_nl LEFTBRACKET np_parentesis_quad1 comments_nl mega_exp np_valor_columnas RIGHTBRACKET np_parentesis_quad2 comments_nl EQUALS np_asignacion_de_arreglo_quad1 np_solo_asignar_arreglo_quad1 comments_nl mega_exp SEMICOLON np_asignacion_quad4 comments_nl
                | ID np_asignacion_quad1 comments_nl EQUALS np_asignacion_quad2 comments_nl mega_exp SEMICOLON np_asignacion_quad4 comments_nl
     '''	
 
@@ -1362,7 +1372,9 @@ def p_np_factor_quad2(p):
     '''
     np_factor_quad2 :
     '''
-    global tempIdArrMat 
+    global tempIdArrMat
+    global isArrayOrMatrix
+    isArrayOrMatrix = True
     tempIdArrMat.append(str(p[-1]))
 
 def p_np_factor_quad3(p):
@@ -1411,10 +1423,10 @@ def p_np_factor_quad3(p):
             addQuad("+*", temporalSiguiente, dirFunc.getVarMemPos('globals',idName),temporalSiguiente)
             addOperandoToStack(temporalSiguiente)
         addTipoToStack(tipoTemp)
-        iFilasLlamadas=-1
-        iColumnasLlamadas=-1
         checkIfTemporal(iColumnasLlamadas)
         checkIfTemporal(iFilasLlamadas)
+        iFilasLlamadas=-1
+        iColumnasLlamadas=-1
     else:
         print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
         sys.exit()
@@ -1428,6 +1440,7 @@ def p_np_factor_quad4(p):
     global nombreFunc
     global iColumnasLlamadas
     global iFilasLlamadas
+    global dirFunc
     idName = tempIdArrMat.pop()
     if (idName in dirFunc.val[nombreFunc][1] or idName in dirFunc.val['globals'][1]):
         if idName in dirFunc.val[nombreFunc][1]:
@@ -1459,9 +1472,10 @@ def p_np_factor_quad4(p):
             addQuad("+*", iColumnasLlamadas, dirFunc.getVarMemPos('globals', idName), temporalSiguiente)
             addOperandoToStack(temporalSiguiente)
         addTipoToStack(tipoTemp)
+        checkIfTemporal(iColumnasLlamadas)
         iFilasLlamadas=-1
         iColumnasLlamadas=-1
-        checkIfTemporal(iColumnasLlamadas)
+        
     else:
         print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
         sys.exit()
@@ -1556,7 +1570,7 @@ def p_np_asignacion_quad4(p):
 	'''
 	np_asignacion_quad4 : empty
 	'''
-	tuplaOperadores = ('=')
+	tuplaOperadores = ('=','=*')
 	operacionesEnPilasId(tuplaOperadores, 2)
 
 def p_np_terminoaux_quad5(p):
@@ -1927,6 +1941,127 @@ def p_np_asignacion_matrix_quad2(p):
 		sys.exit()
 	else:
 		iFilasDeclaradas = 0
+
+def p_np_solo_asignar_matrix_quad1(p):
+	'''
+	np_solo_asignar_matrix_quad1 : 
+	'''
+	global tempIdArrMat
+	global nombreFunc
+	global iColumnasLlamadas
+	global iFilasLlamadas
+	global dirFunc
+	idName = tempIdArrMat.pop()
+	if (idName in dirFunc.val[nombreFunc][1] or idName in dirFunc.val['globals'][1]):
+		if idName in dirFunc.val[nombreFunc][1]:
+			tipoTemp = dirFunc.val[nombreFunc][1][idName][0]      #Se da prioridad a buscar la variable en la funciones
+			if dirFunc.getFilasVar(nombreFunc,idName)==0:           #Verificar el llamado a filas
+				if iFilasLlamadas>=0:
+					print("In line {}, unexpected matrix call".format(lexer.lineno))
+					sys.exit()
+			addQuad('ver',dirFunc.getFilasVar(nombreFunc,idName), dirFunc.getVarMemPos(nombreFunc, idName), iFilasLlamadas)
+			if dirFunc.getColumnasVar(nombreFunc,idName)==0:            #Verificar el llamado a columas
+				if iColumnasLlamadas>=0:
+					print("In line {}, unexpected array call".format(lexer.lineno))
+					sys.exit()
+			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
+			tempColumnas = dirFunc.getColumnasVar(nombreFunc, idName)
+			tempDirBase = dirFunc.getVarMemPos(nombreFunc, idName)
+			print("tempColumnas: " + str(tempColumnas))
+			print("tempDirBase: " + str(tempDirBase))
+			print("iFilasLlamadas: " + str(iFilasLlamadas))
+			print("iColumnasLlamadas: " + str(iColumnasLlamadas))
+			
+			memTemp = tempDirBase + (tempColumnas*iFilasLlamadas + iColumnasLlamadas)
+			addOperandoToStack(memTemp)
+		else:
+			tipoTemp = dirFunc.val['globals'][1][idName][0]       #Si no, se busca de manera global
+			if dirFunc.getFilasVar('globals',idName)==0:           #Verificar el llamado a filas
+				if iFilasLlamadas>=0:
+					print("In line {}, unexpected matrix call".format(lexer.lineno))
+					sys.exit()
+			addQuad('ver',dirFunc.getFilasVar('globals',idName), dirFunc.getVarMemPos('globals', idName), iFilasLlamadas)
+			if dirFunc.getColumnasVar('globals',idName)==0:            #Verificar el llamado a columas
+				if iColumnasLlamadas>=0:
+					print("In line {}, unexpected array call".format(lexer.lineno))
+					sys.exit()
+			addQuad('ver', dirFunc.getColumnasVar('globals', idName), dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
+			tempColumnas = dirFunc.getColumnasVar(nombreFunc, idName)
+			tempDirBase = dirFunc.getVarMemPos(nombreFunc, idName)
+			print("tempColumnas: " + str(tempColumnas))
+			print("tempDirBase: " + str(tempDirBase))
+			print("iFilasLlamadas: " + str(iFilasLlamadas))
+			print("iColumnasLlamadas: " + str(iColumnasLlamadas))
+			
+			memTemp = tempDirBase + (tempColumnas*iFilasLlamadas + iColumnasLlamadas)
+			addOperandoToStack(memTemp)
+		addTipoToStack(tipoTemp)
+	else:
+		print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
+		sys.exit()
+
+def p_np_solo_asignar_arreglo_quad1(p):
+	'''
+	np_solo_asignar_arreglo_quad1 : 
+	'''
+	global tempIdArrMat
+	global nombreFunc
+	global iColumnasLlamadas
+	global iFilasLlamadas
+	global dirFunc
+	idName = tempIdArrMat.pop()
+	if (idName in dirFunc.val[nombreFunc][1] or idName in dirFunc.val['globals'][1]):
+		if idName in dirFunc.val[nombreFunc][1]:
+			tipoTemp = dirFunc.val[nombreFunc][1][idName][0]      #Se da prioridad a buscar la variable en la funciones
+			if dirFunc.getFilasVar(nombreFunc,idName)>0:           #Verificar el llamado a filas
+				if iFilasLlamadas<0:
+					print("In line {}, unexpected array call".format(lexer.lineno))
+					sys.exit()
+			if dirFunc.getColumnasVar(nombreFunc,idName)==0:            #Verificar el llamado a columas
+				if iColumnasLlamadas>=0:
+					print("In line {}, unexpected array call".format(lexer.lineno))
+					sys.exit()
+			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
+			"""
+			tempColumnas = dirFunc.getColumnasVar(nombreFunc, idName)
+			tempDirBase = dirFunc.getVarMemPos(nombreFunc, idName)
+			print(tempDirBase)
+			if iFilasLlamadas = -1:
+				memTemp = tempDirBase + 
+			memTemp = tempDirBase + (tempColumnas*iFilasLlamadas + iColumnasLlamadas)
+            """
+			temporalSiguiente=getAvail(tipoTemp)
+			addQuad("+*", iColumnasLlamadas, dirFunc.getVarMemPos(nombreFunc, idName), temporalSiguiente)
+			addOperandoToStack(temporalSiguiente)
+		else:
+			tipoTemp = dirFunc.val['globals'][1][idName][0]       #Si no, se busca de manera global
+			if dirFunc.getFilasVar('globals',idName)>0:           #Verificar el llamado a filas
+				if iFilasLlamadas<0:
+					print("In line {}, unexpected matrix call".format(lexer.lineno))
+					sys.exit()
+			if dirFunc.getColumnasVar('globals',idName)==0:            #Verificar el llamado a columas
+				if iColumnasLlamadas>=0:
+					print("In line {}, unexpected array call".format(lexer.lineno))
+					sys.exit()
+			addQuad('ver', dirFunc.getColumnasVar('globals', idName),dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
+			tempColumnas = dirFunc.getColumnasVar(nombreFunc, idName)
+			tempDirBase = dirFunc.getVarMemPos(nombreFunc, idName)
+			print(tempDirBase)
+			#tempFilasLLamadas = dirFunc.getVarMemPos(nombreFunc, )
+			#############LE ASIGNAMOS EL MEMADD AL QUE CORRESPONDE (IFILASLLAMADAS E ICOLUMNASLLAMADAS), DE AHÍ QUE SALGAN NUMEROS MUY FEOS
+			memTemp = tempDirBase + (tempColumnas*iFilasLlamadas + iColumnasLlamadas)
+			addOperandoToStack(memTemp)
+		checkIfTemporal(iColumnasLlamadas)
+		iFilasLlamadas=-1
+		iColumnasLlamadas=-1
+		addTipoToStack(tipoTemp)
+
+def p_np_asignacion_de_arreglo_quad1(p):
+	'''
+	np_asignacion_de_arreglo_quad1 : 
+	'''
+	addOperadorToStack('=*')
+
 
 parser = yacc.yacc() 
 

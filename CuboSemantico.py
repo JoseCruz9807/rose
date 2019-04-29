@@ -5,6 +5,7 @@ class CuboSemantico:
 		self.semantica = {
 		#op1		#op2		#operator	#result
 		('int',		'int',		'='		)	:'int'		,
+		('int',		'int',		'=*'	)	:'int'		,
 		('int',		'int',		'+'		)	:'int'		,
 		('int',		'int',		'-'		)	:'int'		,
 		('int',		'int',		'*'		)	:'int'		,
@@ -31,6 +32,7 @@ class CuboSemantico:
 		('int',		'float',	'!='	)	:'bool'		,
 
 		('float',	'int',		'='		)	:'float'		,
+		('float',	'int',		'=*'	)	:'float'		,
 		('float',	'int',		'+'		)	:'float'		,
 		('float',	'int',		'-'		)	:'float'		,
 		('float',	'int',		'*'		)	:'float'		,
@@ -62,9 +64,11 @@ class CuboSemantico:
 		('string',	'string',	'>'		)	:'bool'	,
 		('string',	'string',	'>='	)	:'bool'	,
 		('string',	'string',	'='		)	:'string'	,
+		('string',	'string',	'=*'	)	:'string'	,
 		('string',	'string',	'=='	)	:'bool'	,
 		
 		('bool',	'bool',		'='		)	:'bool'	,
+		('bool',	'bool',		'=*'	)	:'bool'	,
 		('bool',	'bool',		'!='	)	:'bool'	,
 		('bool',	'bool',		'AND'	)	:'bool'	,
 		('bool',	'bool',		'OR'	)	:'bool'	,
