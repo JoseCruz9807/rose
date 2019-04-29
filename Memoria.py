@@ -11,19 +11,19 @@ class Memoria:
 		#print("addValue() memory: {}, tipo: {}, memAdd: {}, value: {}".format(self.name, tipo, memAdd, value))
 		if tipo == 'int':
 			dictInt = self.memoria[0]
-			dictInt[memAdd] = value
+			dictInt[memAdd] = str(value)
 			self.memoria = (dictInt, self.memoria[1], self.memoria[2], self.memoria[3])
 		if tipo == 'float':
 			dictFloat = self.memoria[1]
-			dictFloat[memAdd] = value
+			dictFloat[memAdd] = str(value)
 			self.memoria = (self.memoria[0], dictFloat, self.memoria[2], self.memoria[3])
 		if tipo == 'bool':
 			dictBool = self.memoria[2]
-			dictBool[memAdd] = value
+			dictBool[memAdd] = str(value)
 			self.memoria = (self.memoria[0], self.memoria[1], dictBool, self.memoria[3])
 		if tipo == 'string':
 			dictString = self.memoria[3]
-			dictString[memAdd] = value
+			dictString[memAdd] = str(value)
 			self.memoria = (self.memoria[0], self.memoria[1], self.memoria[2], dictString)
 	#Busca el valor correspondiente al espacio de memoria solicitado
 	def getValue(self, tipo, memAdd):

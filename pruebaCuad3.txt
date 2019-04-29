@@ -1,44 +1,14 @@
 
 program test; 
 
-globals string arrString[2][2];
-globals string arbol = "Hola";
-globals bool finca=true;
+//globals string arrString[2][2];
+//globals string arbol = "Hola";
 
-
-func void funcion1(int a; bool b;){
-    int c = 2;
-    c = 1+a;
-    print(c);
-}
 
 main (){ 
 //int arrTest[2][2] = {{1,2},{3,4}};
-int arrTest[2][2] = {{1,3},{5,6}};
-
-bool a = true;
-bool b = true;
-int iNum = 3;
-float z;
-string s;
-finca = false;
-z = 3.1416/1;
-s="nasufnewd   lua"+"asdadwa";
-while(a==b){
-    //a= not(b);
-    if(a AND b) {
-        a = b;
-        a = false;
-    }
-    else
-    {
-        b=a;
-        b=b;
-        a=a;
-        a=false;
-        z=-4-(-3.1);
-    }
-}
-funcion1(3,true);
-print(finca);
+int iNum=3;
+int arrTest[2][3] = {{5,6},{7,8},{7,8}};
+iNum=2*arrTest[1][1*1];
+print(iNum);
 }
