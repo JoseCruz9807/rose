@@ -208,7 +208,6 @@ def ejecutaCuadruplo():
 		else:
 			memoria.addValue(tempTipo, currentCuad[3], valueTemp)
 	if currentCuad[0] == '+':
-		"""
 		
 		tempTipoUno = checkTipo(currentCuad[1])
 		tempTipoDos = checkTipo(currentCuad[2])
@@ -231,9 +230,8 @@ def ejecutaCuadruplo():
 		print(tempTipoDos)
 		print(operadorDos)
 		resultado = tempOperadorUno + tempOperadorDos
-		
-		Mi intento de solucionarlo, corre, y es aquí donde se nota que hay un error
 		"""
+		Mi intento de solucionarlo, corre, y es aquí donde se nota que hay un error
 		
 		tempTipoUno = checkTipo(currentCuad[1])
 		tempTipoDos = checkTipo(currentCuad[2])
@@ -261,6 +259,8 @@ def ejecutaCuadruplo():
 			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 		else:
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		"""
+		
 	if currentCuad[0] == '-':
 		tempTipoUno = checkTipo(currentCuad[1])
 		tempTipoDos = checkTipo(currentCuad[2])
@@ -499,9 +499,9 @@ def ejecutaCuadruplo():
 		valueTemp=int(valor)+factor#getData(memoria,checkTipo(valor+factor), valor+factor)
 		y=getData(memoria, checkTipo(currentCuad[2]), valueTemp)
 		if esGlobalOTemporal(currentCuad[3]):
-			memGlobal.addValue(checkTipo(currentCuad[3]), currentCuad[3], y)
+			memGlobal.addValue(checkTipo(currentCuad[2]), currentCuad[3], y)
 		else:
-			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], y)
+			memoria.addValue(checkTipo(currentCuad[2]), currentCuad[3], y)
 
 	if currentCuad[0]=='=*':
 		isMemAdd = True

@@ -1,8 +1,7 @@
 
 program test; 
 
-globals string arrString[2][2];
-//globals string arbol = "Hola";
+globals string arrString[2][2]={{"h","o"},{"l","a"}};
 
 
 main (){ 
@@ -22,7 +21,6 @@ main (){
 //arrTest[0][1] = iNum[1];
 //arrTest[1][0] = iNum[2];
 //arrTest[1][1] = iNum[3];
-
 //arrTest[0][1] = arrTest[0][0] + iNum[1] - arrTest[iNum[0]][1];
 //iNum=arrTest[0]+1;
 //iNum[0*3]=0;
@@ -44,5 +42,4 @@ print(arrString[1][1]);
 //	iI = iI +1;
 //	iJ = 0;
 //}
-
 }
