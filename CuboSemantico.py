@@ -59,10 +59,6 @@ class CuboSemantico:
 		('float',	'float',	'=='	)	:'bool'		,
 		
 		('string',	'string',	'+',	)	:'string'	,
-		('string',	'string',	'<'		)	:'bool'	,
-		('string',	'string',	'<='	)	:'bool'	,
-		('string',	'string',	'>'		)	:'bool'	,
-		('string',	'string',	'>='	)	:'bool'	,
 		('string',	'string',	'='		)	:'string'	,
 		('string',	'string',	'=*'	)	:'string'	,
 		('string',	'string',	'=='	)	:'bool'	,
