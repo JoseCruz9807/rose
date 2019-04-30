@@ -1,12 +1,30 @@
 
 program test; 
 
-globals string arrString[2][2]={{"h","o"},{"l","a"}};
-
-
+globals bool arrString[2];
 
 main (){ 
-string prueba;
-print(arrString[1][1]);
+int iI = 0;
+int iJ = 0;
+int iFilas = 2;
+int iColumnas = 2;
+while(iI < iFilas) {
+	while(iJ < iColumnas) {
+		arrString[iI]=false;
+		iJ=iJ+1;
+		}
+		iI=iI+1;
+		iJ=0;
+	}
 
+iI = 0;
+iJ = 0;
+while(iI < iFilas) {
+	while(iJ < iColumnas) {
+		print(arrString[iI]);
+		iJ=iJ+1;
+		}
+		iI=iI+1;
+		iJ=0;
+	}
 }

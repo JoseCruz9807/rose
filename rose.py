@@ -1941,58 +1941,64 @@ def p_np_asignacion_matrix_quad2(p):
 		iFilasDeclaradas = 0
 
 def p_np_solo_asignar_matrix_quad1(p):
-	'''
-	np_solo_asignar_matrix_quad1 : 
-	'''
-	global tempIdArrMat
-	global nombreFunc
-	global iColumnasLlamadas
-	global iFilasLlamadas
-	global dirFunc
-	idName = tempIdArrMat.pop()
-	if (idName in dirFunc.val[nombreFunc][1] or idName in dirFunc.val['globals'][1]):
-		if idName in dirFunc.val[nombreFunc][1]:
-			tipoTemp = dirFunc.val[nombreFunc][1][idName][0]      #Se da prioridad a buscar la variable en la funciones
-			if dirFunc.getFilasVar(nombreFunc,idName)==0:           #Verificar el llamado a filas
-				if iFilasLlamadas>=0:
-					print("In line {}, unexpected matrix call".format(lexer.lineno))
-					sys.exit()
-			addQuad('ver',dirFunc.getFilasVar(nombreFunc,idName), dirFunc.getVarMemPos(nombreFunc, idName), iFilasLlamadas)
-			if dirFunc.getColumnasVar(nombreFunc,idName)==0:            #Verificar el llamado a columas
-				if iColumnasLlamadas>=0:
-					print("In line {}, unexpected array call".format(lexer.lineno))
-					sys.exit()
-			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
-			temporalSiguiente=getAvail(tipoTemp)
-			addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente)
-			addQuad("+", temporalSiguiente, iFilasLlamadas, temporalSiguiente)
-			addQuad("+*", temporalSiguiente, dirFunc.getVarMemPos(nombreFunc,idName),temporalSiguiente)
-			addOperandoToStack(temporalSiguiente)
-		else:
-			tipoTemp = dirFunc.val['globals'][1][idName][0]       #Si no, se busca de manera global
-			if dirFunc.getFilasVar('globals',idName)==0:           #Verificar el llamado a filas
-				if iFilasLlamadas>=0:
-					print("In line {}, unexpected matrix call".format(lexer.lineno))
-					sys.exit()
-			addQuad('ver',dirFunc.getFilasVar('globals',idName), dirFunc.getVarMemPos('globals', idName), iFilasLlamadas)
-			if dirFunc.getColumnasVar('globals',idName)==0:            #Verificar el llamado a columas
-				if iColumnasLlamadas>=0:
-					print("In line {}, unexpected array call".format(lexer.lineno))
-					sys.exit()
-			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
-			temporalSiguiente=getAvail(tipoTemp)
-			addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente)
-			addQuad("+", temporalSiguiente, iFilasLlamadas, temporalSiguiente)
-			addQuad("+*", temporalSiguiente, dirFunc.getVarMemPos(nombreFunc,idName),temporalSiguiente)
-			addOperandoToStack(temporalSiguiente)
-		addTipoToStack(tipoTemp)
-		checkIfTemporal(iColumnasLlamadas)
-		checkIfTemporal(iFilasLlamadas)
-		iFilasLlamadas=-1
-		iColumnasLlamadas=-1
-	else:
-		print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
-		sys.exit()
+    '''
+    np_solo_asignar_matrix_quad1 : 
+    '''
+    global tempIdArrMat
+    global nombreFunc
+    global iColumnasLlamadas
+    global iFilasLlamadas
+    global dirFunc
+    idName = tempIdArrMat.pop()
+    if (idName in dirFunc.val[nombreFunc][1] or idName in dirFunc.val['globals'][1]):
+        if idName in dirFunc.val[nombreFunc][1]:
+            tipoTemp = dirFunc.val[nombreFunc][1][idName][0]      #Se da prioridad a buscar la variable en la funciones
+            if dirFunc.getFilasVar(nombreFunc,idName)==0:           #Verificar el llamado a filas
+                if iFilasLlamadas>=0:
+                    print("In line {}, unexpected matrix call".format(lexer.lineno))
+                    sys.exit()
+            addQuad('ver',dirFunc.getFilasVar(nombreFunc,idName), dirFunc.getVarMemPos(nombreFunc, idName), iFilasLlamadas)
+            if dirFunc.getColumnasVar(nombreFunc,idName)==0:            #Verificar el llamado a columas
+                if iColumnasLlamadas>=0:
+                    print("In line {}, unexpected array call".format(lexer.lineno))
+                    sys.exit()
+            addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
+            temporalSiguiente = getAvail('int')
+            temporalSiguiente2=getAvail('int')
+            
+            addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente2)
+            addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
+            addQuad("+**", temporalSiguiente2, dirFunc.getVarMemPos(nombreFunc,idName),temporalSiguiente)
+
+            addOperandoToStack(temporalSiguiente)
+        else:
+            tipoTemp = dirFunc.val['globals'][1][idName][0]       #Si no, se busca de manera global
+            if dirFunc.getFilasVar('globals',idName)==0:           #Verificar el llamado a filas
+                if iFilasLlamadas>=0:
+                    print("In line {}, unexpected matrix call".format(lexer.lineno))
+                    sys.exit()
+            addQuad('ver',dirFunc.getFilasVar('globals',idName), dirFunc.getVarMemPos('globals', idName), iFilasLlamadas)
+            if dirFunc.getColumnasVar('globals',idName)==0:            #Verificar el llamado a columas
+                if iColumnasLlamadas>=0:
+                    print("In line {}, unexpected array call".format(lexer.lineno))
+                    sys.exit()
+            addQuad('ver', dirFunc.getColumnasVar('globals', idName),dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
+            temporalSiguiente = getAvail('int')
+            temporalSiguiente2=getAvail('int')
+            
+            addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar('globals', idName), temporalSiguiente2)
+            addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
+            addQuad("+**", temporalSiguiente2, dirFunc.getVarMemPos('globals',idName),temporalSiguiente)
+
+            addOperandoToStack(temporalSiguiente)
+        addTipoToStack(tipoTemp)
+        checkIfTemporal(iColumnasLlamadas)
+        checkIfTemporal(iFilasLlamadas)
+        iFilasLlamadas=-1
+        iColumnasLlamadas=-1
+    else:
+        print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
+        sys.exit()
 
 def p_np_solo_asignar_arreglo_quad1(p):
 	'''
@@ -2016,8 +2022,8 @@ def p_np_solo_asignar_arreglo_quad1(p):
 					print("In line {}, unexpected array call".format(lexer.lineno))
 					sys.exit()
 			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
-			temporalSiguiente=getAvail(tipoTemp)
-			addQuad("+*", iColumnasLlamadas, dirFunc.getVarMemPos(nombreFunc, idName), temporalSiguiente)
+			temporalSiguiente=getAvail('int')
+			addQuad("+**", iColumnasLlamadas, dirFunc.getVarMemPos(nombreFunc, idName), temporalSiguiente)
 			addOperandoToStack(temporalSiguiente)
 		else:
 			tipoTemp = dirFunc.val['globals'][1][idName][0]       #Si no, se busca de manera global
@@ -2029,9 +2035,9 @@ def p_np_solo_asignar_arreglo_quad1(p):
 				if iColumnasLlamadas>=0:
 					print("In line {}, unexpected array call".format(lexer.lineno))
 					sys.exit()
-			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
-			temporalSiguiente=getAvail(tipoTemp)
-			addQuad("+*", iColumnasLlamadas, dirFunc.getVarMemPos(nombreFunc, idName), temporalSiguiente)
+			addQuad('ver', dirFunc.getColumnasVar('globals', idName),dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
+			temporalSiguiente=getAvail('int')
+			addQuad("+**", iColumnasLlamadas, dirFunc.getVarMemPos('globals', idName), temporalSiguiente)
 			addOperandoToStack(temporalSiguiente)
 		checkIfTemporal(iColumnasLlamadas)
 		iFilasLlamadas=-1

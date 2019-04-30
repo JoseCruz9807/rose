@@ -177,7 +177,6 @@ def ejecutaCuadruplo():
 	bEndProc = False
 	memoria = memoryStack.pop()
 	currentCuad = cuadruplos[iEjecutando]
-	print(currentCuad)
 	nextCuad = -1
 	#Brincos
 	if currentCuad[0] == 'GoTo':
@@ -225,39 +224,7 @@ def ejecutaCuadruplo():
 			tempOperadorUno = float(operadorUno)
 		if tempTipoDos == 'float':
 			tempOperadorDos = float(operadorDos)
-		print(tempTipoUno)
-		print(operadorUno)
-		print(tempTipoDos)
-		print(operadorDos)
 		resultado = tempOperadorUno + tempOperadorDos
-		
-		"""
-		Mi intento de solucionarlo, corre, y es aquí donde se nota que hay un error
-		
-		tempTipoUno = checkTipo(currentCuad[1])
-		tempTipoDos = checkTipo(currentCuad[2])
-		operadorUno = getData(memoria, tempTipoUno,currentCuad[1])
-		operadorDos = getData(memoria, tempTipoDos,currentCuad[2])
-		tempOperadorUno = operadorUno
-		tempOperadorDos = operadorDos
-
-		if tempTipoUno == 'string' and tempTipoDos == 'string':
-			tempOperadorUno = operadorUno[0:len(operadorUno)-1]
-			tempOperadorDos = operadorDos[1:len(operadorDos)]
-		if tempTipoUno == 'float' and tempTipoDos == 'float':
-			tempOperadorUno = float(operadorUno)
-			tempOperadorDos = float(operadorDos)
-		if tempTipoUno == 'int' and tempTipoDos == 'int':
-			tempOperadorUno = int(operadorUno)
-			tempOperadorDos = int(operadorDos)
-		
-		print(tempTipoUno)
-		print(operadorUno)
-		print(tempTipoDos)
-		print(operadorDos)
-		resultado = tempOperadorUno + tempOperadorDos
-		"""
-
 
 		if esGlobalOTemporal(currentCuad[3]):
 			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
@@ -497,8 +464,8 @@ def ejecutaCuadruplo():
 		isMemAdd = True
 		valorTupla=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		valor = valorTupla[0]
-		factor=int(currentCuad[2])
-		valueTemp=int(valor)+factor#getData(memoria,checkTipo(valor+factor), valor+factor)
+		dirBase=int(currentCuad[2])
+		valueTemp=int(valor)+dirBase#getData(memoria,checkTipo(valor+factor), valor+factor)
 		y=getData(memoria, checkTipo(currentCuad[2]), valueTemp)
 		if esGlobalOTemporal(currentCuad[3]):
 			memGlobal.addValue(checkTipo(currentCuad[2]), currentCuad[3], y)
@@ -507,14 +474,32 @@ def ejecutaCuadruplo():
 
 	if currentCuad[0]=='=*':
 		isMemAdd = True
-		direccionMemoriaTupla = str(getData(memoria,checkTipo(currentCuad[1]), getData(memoria, checkTipo(currentCuad[3]), currentCuad[3])))
-		direccionMemoria = direccionMemoriaTupla[0]
-		valor=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
-		if esGlobalOTemporal(direccionMemoria):
-			memGlobal.addValue(checkTipo(currentCuad[3]), direccionMemoria, valor)
+		posicionMemoria=getData(memoria,checkTipo(currentCuad[3]), currentCuad[3])
+		tempTipo = checkTipo(posicionMemoria)
+		valueTemp=0
+		try:
+			int(currentCuad[1])
+			valueTemp = getData(memoria, tempTipo, currentCuad[1])
+		except:
+			valueTemp = returnValue
+		if esGlobalOTemporal(posicionMemoria):
+			memGlobal.addValue(tempTipo, posicionMemoria, valueTemp)
 		else:
-			memoria.addValue(checkTipo(currentCuad[3]), direccionMemoria, valor)
+			memoria.addValue(tempTipo, posicionMemoria, valueTemp)
+		
 
+
+	if currentCuad[0]=='+**':
+		isMemAdd = True
+		valorTupla=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		valor = valorTupla[0]
+		dirBase=int(currentCuad[2])
+		valueTemp=int(valor)+dirBase#getData(memoria,checkTipo(valor+factor), valor+factor)
+		#y=getData(memoria, checkTipo(currentCuad[2]), valueTemp)
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]), currentCuad[3], valueTemp)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], valueTemp)
 
 	if bEndProc == False:
 		memoryStack.append(memoria)
