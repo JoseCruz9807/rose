@@ -759,10 +759,6 @@ def arithmeticOperator():
         typeMismatch()
 #Se hace la creacion del cuadruplo para la operacion de asignacion
 def assignOperator():
-	#BorraPrints
-	print(tempIdArrMat)
-	print(pilaOperadores)
-	print(pilaOperando)
 	rightOperand = popOperando()
 	rightType = popTipos()
 	checkIfTemporal(rightOperand)
@@ -785,9 +781,9 @@ def printFun():
 	tempOperator = popOperadores()
 	resultType = semantica.resultType(tempOperator, typeOperand, '')
 	if resultType != 'error':
-		arrMat = ''
+		#arrMat = ''
 		#if isArrayOrMatrix:
-		#	arrMat = 'arr'
+		arrMat = 'arr'
 		addQuad(tempOperator, printOperand, arrMat, '')
 	else:
 		typeMismatch()

@@ -50,7 +50,7 @@ class DirFunc:
     def updateParams(self, nombre, numPar):
         """
         Actualiza la cantidad de parametros en la funcion
-        Args:
+        Args:   
          nombre: Nombre de la funcion a modificar
          numPar: Cantidad de parametros de la funcion a modificar
         """
@@ -63,8 +63,13 @@ class DirFunc:
          scope: Función donde se busca la variable deseada
          nombre: Nombre de la variable que se desea saber el tipo 
         """
-        tableVars = self.val[scope][1]
-        return tableVars[nombre][0]
+        try:
+            tableVars = self.val[scope][1]
+            varType = tableVars[nombre][0]
+        except:
+            tableVars = self.val['globals'][1]
+            varType = tableVars[nombre][0]            
+        return varType
 
     def getVarMemPos(self, scope, nombre):
         """
@@ -73,8 +78,13 @@ class DirFunc:
          scope: Función donde se busca la variable deseada
          nombre: Nombre de la variable que se desea saber el tipo 
         """
-        tableVars = self.val[scope][1]
-        return tableVars[nombre][3]
+        try:
+            tableVars = self.val[scope][1]
+            numMemPos = tableVars[nombre][3]
+        except:
+            tableVars = self.val['globals'][1]
+            numMemPos = tableVars[nombre][3] 
+        return numMemPos
 
     def getFilasVar(self, scope, nombre):
         """
@@ -83,8 +93,13 @@ class DirFunc:
          scope: Función donde se busca la variable deseada
          nombre: Nombre de la variable que se desea saber el tipo 
         """
-        tableVars = self.val[scope][1]
-        return tableVars[nombre][1]
+        try:
+            tableVars = self.val[scope][1]
+            numFilas = tableVars[nombre][1]
+        except:
+            tableVars = self.val['globals'][1]
+            numFilas = tableVars[nombre][1]
+        return numFilas
 
     def getColumnasVar(self, scope, nombre):
         """
@@ -93,5 +108,10 @@ class DirFunc:
          scope: Función donde se busca la variable deseada
          nombre: Nombre de la variable que se desea saber el tipo 
         """
-        tableVars = self.val[scope][1]
-        return tableVars[nombre][2]
+        try:
+            tableVars = self.val[scope][1]
+            numColumnas = tableVars[nombre][2]
+        except:
+            tableVars = self.val['globals'][1]
+            numColumnas = tableVars[nombre][2]
+        return numColumnas

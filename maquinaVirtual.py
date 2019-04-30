@@ -87,6 +87,9 @@ currentCuad = ()
 #Valor que almacena la direccion de memoria del elemento del arreglo/matriz al que se le asignará un valor
 dirMem = -1
 
+#Valor que almacena si el parámetro que se recibe es un valor o una direccion de memoria
+isMemAdd = False
+
 #Archivo a leer
 compiledFile = open("codeobj.rs","r")
 
@@ -123,6 +126,8 @@ def setCuadruplo(iPosicion):
 def getData(currentMemory, tipoDeDato, memAdd):	
 	global memGlobal
 	global currentCuad
+	global isMemAdd
+	#print("isMedAdd: " + str(isMemAdd))
 	returnVal = 0
 	memAdd=str(memAdd)
 	try:
@@ -133,6 +138,9 @@ def getData(currentMemory, tipoDeDato, memAdd):
 			returnVal = memGlobal.getValue(tipoDeDato,memAdd)
 			
 		except:
+			if isMemAdd:
+				return (memAdd)
+			
 			"""
 			print(memAdd)
 			print(tipoDeDato)
@@ -140,9 +148,7 @@ def getData(currentMemory, tipoDeDato, memAdd):
 			memGlobal.printMem()
 			"""
 			
-			if currentCuad[0] == '+*' or currentCuad[0] == '=*':
-				return memAdd
-			
+
 			print("Variable declared but not initialized.")
 			sys.exit()
 	return returnVal 
@@ -165,10 +171,13 @@ def ejecutaCuadruplo():
 	global returnValue
 	global currentCuad
 	global dirMem
-	
+	global isMemAdd
+
+	isMemAdd = False
 	bEndProc = False
 	memoria = memoryStack.pop()
 	currentCuad = cuadruplos[iEjecutando]
+	print(currentCuad)
 	nextCuad = -1
 	#Brincos
 	if currentCuad[0] == 'GoTo':
@@ -204,18 +213,48 @@ def ejecutaCuadruplo():
 		operadorUno = getData(memoria, tempTipoUno,currentCuad[1])
 		operadorDos = getData(memoria, tempTipoDos,currentCuad[2])
 		if tempTipoUno == 'string':
-			operadorUno = operadorUno[0:len(operadorUno)-1]
+			tempOperadorUno = operadorUno[0:len(operadorUno)-1]
 		if tempTipoDos == 'string':
-			operadorDos = operadorDos[1:len(operadorDos)]
+			tempOperadorDos = operadorDos[1:len(operadorDos)]
 		if tempTipoUno == 'int':
-			operadorUno = int(operadorUno)
+			tempOperadorUno = int(operadorUno)
 		if tempTipoDos == 'int':
-			operadorDos = int(operadorDos)
+			tempOperadorDos = int(operadorDos)
 		if tempTipoUno == 'float':
-			operadorUno = float(operadorUno)
+			tempOperadorUno = float(operadorUno)
 		if tempTipoDos == 'float':
-			operadorDos = float(operadorDos)
-		resultado = operadorUno + operadorDos
+			tempOperadorDos = float(operadorDos)
+		print(tempTipoUno)
+		print(operadorUno)
+		print(tempTipoDos)
+		print(operadorDos)
+		resultado = tempOperadorUno + tempOperadorDos
+		
+		"""
+		Mi intento de solucionarlo, corre, y es aquí donde se nota que hay un error
+		tempTipoUno = checkTipo(currentCuad[1])
+		tempTipoDos = checkTipo(currentCuad[2])
+		operadorUno = getData(memoria, tempTipoUno,currentCuad[1])
+		operadorDos = getData(memoria, tempTipoDos,currentCuad[2])
+		tempOperadorUno = operadorUno
+		tempOperadorDos = operadorDos
+
+		if tempTipoUno == 'string' and tempTipoDos == 'string':
+			tempOperadorUno = operadorUno[0:len(operadorUno)-1]
+			tempOperadorDos = operadorDos[1:len(operadorDos)]
+		if tempTipoUno == 'float' and tempTipoDos == 'float':
+			tempOperadorUno = float(operadorUno)
+			tempOperadorDos = float(operadorDos)
+		if tempTipoUno == 'int' and tempTipoDos == 'int':
+			tempOperadorUno = int(operadorUno)
+			tempOperadorDos = int(operadorDos)
+		
+		print(tempTipoUno)
+		print(operadorUno)
+		print(tempTipoDos)
+		print(operadorDos)
+		resultado = tempOperadorUno + tempOperadorDos
+		"""
 		if esGlobalOTemporal(currentCuad[3]):
 			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 		else:
@@ -283,6 +322,52 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 
 	#Operadores logicos
+	if currentCuad[0] == '<':
+		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
+		if operadorUno < operadorDos:
+			resultado = 'true'
+		else:
+			resultado = 'false'
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+	if currentCuad[0] == '<=':
+		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
+		if operadorUno <= operadorDos:
+			resultado = 'true'
+		else:
+			resultado = 'false'
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+	
+	if currentCuad[0] == '>':
+		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
+		if operadorUno > operadorDos:
+			resultado = 'true'
+		else:
+			resultado = 'false'
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+	if currentCuad[0] == '=>':
+		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
+		if operadorUno > operadorDos:
+			resultado = 'true'
+		else:
+			resultado = 'false'
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+
 	if currentCuad[0] == '==':
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
@@ -294,6 +379,19 @@ def ejecutaCuadruplo():
 			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 		else:
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+	
+	if currentCuad[0] == '!=':
+		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
+		if operadorUno != operadorDos:
+			resultado = 'true'
+		else:
+			resultado = 'false'
+		if esGlobalOTemporal(currentCuad[3]):
+			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
+	
 	if currentCuad[0] == 'AND':
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
@@ -318,34 +416,6 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 
 	#Llamadas a funciones definidas por el usuario
-	"""
-	if currentCuad[0] == 'era':
-		memAux = Memoria(currentCuad[1])
-		memoryStack.append(memAux)
-	if currentCuad[0] == 'parameter':
-		if len(memoryStack) > 0:
-			memoriaFuncionPrevia = memoryStack.pop()
-			paramValue = getData(memoriaFuncionPrevia, checkTipo(currentCuad[1]), currentCuad[1])
-			memoryStack.append(memoriaFuncionPrevia)
-			tipoTemp = checkTipo(currentCuad[1])
-			baseAddress = 0
-			if tipoTemp == 'int':
-				baseAddress = 0
-			if tipoTemp == 'float':
-				baseAddress = iIntLocales
-			if tipoTemp == 'bool':
-				baseAddress = iFloatLocales
-			if tipoTemp == 'string':
-				baseAddress = iBoolLocales
-			localAdd = baseAddress + memoria.getSizeMem(tipoTemp)
-			memoria.addValue(tipoTemp, localAdd, paramValue)
-	if currentCuad[0] == 'endproc':
-		bEndProc = True
-		nextCuad = int(iLlamadaAFuncion) + desfase
-	if currentCuad[0] == 'gosub':
-		iLlamadaAFuncion = currentCuad[2]
-		nextCuad = int(currentCuad[3]) + desfase
-	"""
 	if currentCuad[0] == 'era':
 		memAux = Memoria(currentCuad[1])
 		tempMemoryStack.append(memAux)
@@ -396,15 +466,13 @@ def ejecutaCuadruplo():
 
 	#Funciones Especiales
 	if currentCuad[0] == 'print':
-		if currentCuad[2] == 'arr':
-			tempMemoria = getData(memoria, checkTipo(currentCuad[1]), currentCuad[1])
-			operadorUno = getData(memoria, checkTipo(currentCuad[1]), tempMemoria)
-		else:
-			operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
-		print(operadorUno)
+		operadorUno = getData(memoria, checkTipo(currentCuad[1]), currentCuad[1])
+		print('console>' + str(operadorUno))
 
 	#Procedimientos para arreglos y matrices
 	if currentCuad[0]=='ver':
+		isMemAdd = True
+		
 		valor=getData(memoria, checkTipo(currentCuad[3]),currentCuad[3])
 		limite=int(currentCuad[1])
 		if int(valor)<0 or int(valor)>=limite:
@@ -412,6 +480,7 @@ def ejecutaCuadruplo():
 			sys.exit()
 
 	if currentCuad[0]=='**':
+		isMemAdd = True
 		valor=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		factor=int(currentCuad[2])
 		valueTemp=int(valor)*factor#getData(memoria,checkTipo(valor*factor), valor*factor)
@@ -421,7 +490,9 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], valueTemp)
 
 	if currentCuad[0]=='+*':
-		valor=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		isMemAdd = True
+		valorTupla=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		valor = valorTupla[0]
 		factor=int(currentCuad[2])
 		valueTemp=int(valor)+factor#getData(memoria,checkTipo(valor+factor), valor+factor)
 		y=getData(memoria, checkTipo(currentCuad[2]), valueTemp)
@@ -431,7 +502,9 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], y)
 
 	if currentCuad[0]=='=*':
-		direccionMemoria = str(getData(memoria,checkTipo(currentCuad[1]), getData(memoria, checkTipo(currentCuad[3]), currentCuad[3])))
+		isMemAdd = True
+		direccionMemoriaTupla = str(getData(memoria,checkTipo(currentCuad[1]), getData(memoria, checkTipo(currentCuad[3]), currentCuad[3])))
+		direccionMemoria = direccionMemoriaTupla[0]
 		valor=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		if esGlobalOTemporal(direccionMemoria):
 			memGlobal.addValue(checkTipo(currentCuad[3]), direccionMemoria, valor)
