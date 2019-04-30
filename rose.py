@@ -1967,7 +1967,9 @@ def p_np_solo_asignar_matrix_quad1(p):
 			addQuad("+*", temporalSiguiente, dirFunc.getVarMemPos(nombreFunc,idName),temporalSiguiente)
 			addOperandoToStack(temporalSiguiente)
 		else:
-			tipoTemp = dirFunc.val['globals'][1][idName][0]       #Si no, se busca de manera global
+			tipoTemp = dirFunc.val['globals'][1][idName][0]      #Se da prioridad a buscar la variable en la funciones
+			
+			#tipoTemp = 'int'       #Si no, se busca de manera global
 			if dirFunc.getFilasVar('globals',idName)==0:           #Verificar el llamado a filas
 				if iFilasLlamadas>=0:
 					print("In line {}, unexpected matrix call".format(lexer.lineno))
@@ -1979,6 +1981,7 @@ def p_np_solo_asignar_matrix_quad1(p):
 					sys.exit()
 			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
 			temporalSiguiente=getAvail(tipoTemp)
+			#addQuad("=", temporalSiguiente, '', )
 			addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente)
 			addQuad("+", temporalSiguiente, iFilasLlamadas, temporalSiguiente)
 			addQuad("+*", temporalSiguiente, dirFunc.getVarMemPos(nombreFunc,idName),temporalSiguiente)
