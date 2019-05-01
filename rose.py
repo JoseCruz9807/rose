@@ -6,9 +6,7 @@ from DirFunc import *
 from CuboSemantico import *
 ###Declaracion de tokens
 tokens = [
-    'COLON',
     'SEMICOLON',
-    'PERIOD',
     'COMMA',
     'PLUS',
     'MINUS',
@@ -22,7 +20,6 @@ tokens = [
     'RIGHTBRACKET',
     'LEFTPARENTHESIS',
     'RIGHTPARENTHESIS',
-    'VAR',
     'CTEI',
     'CTEF',
     'CTES',
@@ -50,13 +47,9 @@ tokens = [
     'RETURNX',
     'MEDIAN',
     'LINREG',
-    'APPEND',
     'WHILE',
     'POW',
-    'GRAPH',
     'STDEV',
-    'MULTICOMOP',
-    'MULTICOMCL',
     'GTEQ',
     'LTEQ',
     'EQUIVALENTE',
@@ -70,9 +63,7 @@ tokens = [
     'SIN',
     'COS',
     'AND',
-    'TAN',
     'ABS',
-    'QUOTE',
     'NOT',
     'OR' ,
 	'LEFTKEY',
@@ -81,21 +72,15 @@ tokens = [
 	'COMENTARIO'
 ]
 
-#MultiCommentOpen
-t_MULTICOMOP= r'\/\*'
-#MultiCommentClose
-t_MULTICOMCL= r'\*\/'
 
 
-t_COLON= r'\:'
 t_SEMICOLON= r'\;'
-t_PERIOD= r'\.'
 t_COMMA= r'\,'
 t_PLUS= r'\+'
 t_MINUS= r'\-'
 t_DIVIDE= r'\/'
 t_MULTIPLY= r'\*'
-t_QUOTE= r'\"'
+
 
 t_DIFFERENT= r'\!\='
 t_GTEQ= r'\>\='
@@ -160,8 +145,6 @@ def t_ID (t):
         t.type='STDEV'
     elif t.value=='string':
         t.type='STRING'
-    elif t.value=='tan':
-        t.type='TAN'
     elif t.value=='transpose':
         t.type='TRANSPOSE'
     elif t.value=='true':
@@ -178,8 +161,6 @@ def t_ID (t):
         t.type='AND'
     elif t.value=='abs':
         t.type='ABS'
-    elif t.value=='graph':
-        t.type='GRAPH'
     elif t.value=='mean':
         t.type='MEAN'
     elif t.value=='median':
@@ -194,8 +175,6 @@ def t_ID (t):
         t.type='FUNC'
     elif t.value=='void':
         t.type='VOID'
-    elif t.value=='append':
-        t.type='APPEND'
     elif t.value=='main':
         t.type='MAIN'
     elif t.value=='exportCSV':
@@ -419,6 +398,12 @@ idName = ''
 #Almacena la cantidad de constantes hasta el momento
 contadorConstantes = 0
 
+#Revisa si se puede o no declarar variables al comienzo del bloque 
+declaracionVariables=True
+
+#Revisa si se hizo ya o no un return, también si es posible hacerlo
+habilitaReturn=False
+
 ############################
 ### FUNCIONES AUXILIARES ###
 ############################
@@ -580,6 +565,7 @@ def anadirFunc():
 def memoryOverflow(description):
     print("In line {}, {} has reached its memory limit.".format(lexer.lineno, description))
     sys.exit()
+    return
 #Regresa el temporal siguiente disponible
 def getAvail(tipoDato):
     global iContadorIntTemp
@@ -641,6 +627,7 @@ def addIdToStack(nameId):
     else:
         print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
         sys.exit()
+        return
 #Agrega el operando a la pila de operandos y su tipo a la pila de tipos 
 def addValueToStack(value):
     global dictInt
@@ -818,14 +805,16 @@ def notFunc():
         typeMismatch()
 #Funcion que imprime el error de type missmatch
 def typeMismatch():
-	print("In line {}, type mismatch".format(lexer.lineno))
-	sys.exit()
+    print("In line {}, type mismatch".format(lexer.lineno))
+    sys.exit()
+    return
 #Función que elimina el páréntesis que esté en el top de la pila
 def delParentesis():
     tempOperator = popOperadores()
     if  '('!= tempOperator and '['!=tempOperator:
         print("In line {}, unexpected token )".format(lexer.lineno))
         sys.exit()
+        return
 
 def durante1():
     global arrCuad
@@ -963,12 +952,12 @@ def p_roseauxvars(p):
 
 def p_roseauxfunc(p):
     '''
-    roseauxfunc : func roseauxfunc comments_nl
+    roseauxfunc : np_habilitar_variables func roseauxfunc comments_nl
                 | empty
     '''
 def p_main(p):
     '''
-    main : MAIN np_main_func comments_nl LEFTPARENTHESIS comments_nl RIGHTPARENTHESIS comments_nl bloque np_end
+    main : np_habilitar_variables MAIN np_main_func comments_nl LEFTPARENTHESIS comments_nl RIGHTPARENTHESIS comments_nl bloque np_end
     '''
 
 def p_vars(p):
@@ -1079,7 +1068,7 @@ def p_func(p):
 
 def p_restofuncion(p):
     '''
-    restofuncion : ID np_obtener_nombre_func comments_nl LEFTPARENTHESIS comments_nl argumentos comments_nl RIGHTPARENTHESIS np_agregar_parametros2 comments_nl bloque np_endproc
+    restofuncion : ID np_obtener_nombre_func comments_nl LEFTPARENTHESIS comments_nl argumentos comments_nl RIGHTPARENTHESIS np_agregar_parametros2 comments_nl bloque np_check_return2 np_endproc
     '''	
 
 def p_argumentos(p):
@@ -1105,12 +1094,12 @@ def p_bloque(p):
 
 def p_estatuto(p):
     '''
-    estatuto : declaracionvariables comments_nl aplicaciones comments_nl
+    estatuto : declaracionvariables np_flag_variables comments_nl aplicaciones comments_nl
     '''
 
 def p_declaracionvariables(p):
     '''
-    declaracionvariables : vars declaracionvariables comments_nl
+    declaracionvariables : np_verificar_variables vars declaracionvariables comments_nl
                         | empty
     '''
 def p_aplicaciones(p):
@@ -1122,7 +1111,7 @@ def p_aplicaciones(p):
                 | asignacion comments_nl aplicaciones comments_nl
                 | durante comments_nl aplicaciones comments_nl
                 | llama_func aplicaciones comments_nl
-                | returnx np_cuadruplo_retorno np_endproc comments_nl aplicaciones comments_nl 
+                | returnx np_check_return np_cuadruplo_retorno np_endproc comments_nl aplicaciones comments_nl 
                 | empty
     '''
 
@@ -1303,6 +1292,7 @@ def p_np_obtener_filas(p):
     else:
         print("In line {}, invalid index.".format(lexer.lineno))
         sys.exit()
+        return
 
 def p_np_obtener_columnas(p):
     '''
@@ -1316,6 +1306,7 @@ def p_np_obtener_columnas(p):
     else:
         print("In line {}, negative index.".format(lexer.lineno))
         sys.exit()
+        return
 
 
 def p_np_anadir_variable(p):
@@ -1358,10 +1349,12 @@ def p_np_factor_quad1(p):
         if dirFunc.getColumnasVar(nombreFunc,tempIdName)!=0:
             print("In line {}, expected [".format(lexer.lineno))
             sys.exit()
+            return
     elif tempIdName in dirFunc.val['globals'][1]:
         if dirFunc.getColumnasVar('globals',tempIdName)!=0:
             print("In line {}, expected [".format(lexer.lineno))
             sys.exit()
+            return
     addIdToStack(tempIdName)
 
 def p_np_factor_quad2(p):
@@ -1390,11 +1383,13 @@ def p_np_factor_quad3(p):
                 if iFilasLlamadas>=0:
                     print("In line {}, unexpected matrix call".format(lexer.lineno))
                     sys.exit()
+                    return
             addQuad('ver',dirFunc.getFilasVar(nombreFunc,idName), dirFunc.getVarMemPos(nombreFunc, idName), iFilasLlamadas)
             if dirFunc.getColumnasVar(nombreFunc,idName)==0:            #Verificar el llamado a columas
                 if iColumnasLlamadas>=0:
                     print("In line {}, unexpected array call".format(lexer.lineno))
                     sys.exit()
+                    return
             addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
             temporalSiguiente2=getAvail('int')
             temporalSiguiente=getAvail(tipoTemp)
@@ -1408,11 +1403,13 @@ def p_np_factor_quad3(p):
                 if iFilasLlamadas>=0:
                     print("In line {}, unexpected matrix call".format(lexer.lineno))
                     sys.exit()
+                    return
             addQuad('ver',dirFunc.getFilasVar('globals',idName), dirFunc.getVarMemPos('globals', idName), iFilasLlamadas)
             if dirFunc.getColumnasVar('globals',idName)==0:            #Verificar el llamado a columas
                 if iColumnasLlamadas>=0:
                     print("In line {}, unexpected array call".format(lexer.lineno))
                     sys.exit()
+                    return
             addQuad('ver', dirFunc.getColumnasVar('globals', idName), dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
             temporalSiguiente2=getAvail('int')
             temporalSiguiente=getAvail(tipoTemp)
@@ -1428,6 +1425,7 @@ def p_np_factor_quad3(p):
     else:
         print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
         sys.exit()
+        return
 
 
 def p_np_factor_quad4(p):
@@ -1447,10 +1445,12 @@ def p_np_factor_quad4(p):
                 if iFilasLlamadas<0:
                     print("In line {}, unexpected array call".format(lexer.lineno))
                     sys.exit()
+                    return
             if dirFunc.getColumnasVar(nombreFunc,idName)==0:            #Verificar el llamado a columas
                 if iColumnasLlamadas>=0:
                     print("In line {}, unexpected array call".format(lexer.lineno))
                     sys.exit()
+                    return
             addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
             temporalSiguiente=getAvail(tipoTemp)
             addQuad("+*", iColumnasLlamadas, dirFunc.getVarMemPos(nombreFunc, idName), temporalSiguiente)
@@ -1461,10 +1461,12 @@ def p_np_factor_quad4(p):
                 if iFilasLlamadas<0:
                     print("In line {}, unexpected matrix call".format(lexer.lineno))
                     sys.exit()
+                    return
             if dirFunc.getColumnasVar('globals',idName)==0:            #Verificar el llamado a columas
                 if iColumnasLlamadas>=0:
                     print("In line {}, unexpected array call".format(lexer.lineno))
                     sys.exit()
+                    return
             addQuad('ver', dirFunc.getColumnasVar('globals', idName),dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
             temporalSiguiente=getAvail(tipoTemp)
             addQuad("+*", iColumnasLlamadas, dirFunc.getVarMemPos('globals', idName), temporalSiguiente)
@@ -1477,6 +1479,7 @@ def p_np_factor_quad4(p):
     else:
         print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
         sys.exit()
+        return
 
 def p_np_valor_columnas(p):
     '''
@@ -1489,6 +1492,7 @@ def p_np_valor_columnas(p):
     if tipo!='int':
         print("In line {} expected int, instead {}.".format( lexer.lineno, tipo))
         sys.exit()
+        return
     else:
         iColumnasLlamadas=columnas
         iFilasLlamadas=-1
@@ -1726,6 +1730,7 @@ def p_np_cuadruplo_retorno(p):
     else:
         print("In line {} expected return value: {}, instead {}.".format( lexer.lineno, dirFunc.val[nombreFunc][0], tipo))
         sys.exit()
+        return
 
 def p_np_endproc(p):
     '''
@@ -1753,6 +1758,7 @@ def p_np_crea_era(p):
     else:
         print("In line {}, function {} not previously declared.".format( lexer.lineno, nameFunc))
         sys.exit()
+        return
 
 def p_np_add_parametro(p):
     '''
@@ -1774,9 +1780,11 @@ def p_np_add_parametro(p):
         else:
             print("In line {}, argument {} type mismatch with function declaration.".format( lexer.lineno, nameFunc))
             sys.exit()
+            return
     else:
         print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
         sys.exit()
+        return
     pilaFunciones.append(nameFunc)
 	
 def p_np_genera_gosub(p):
@@ -1796,35 +1804,38 @@ def p_np_genera_gosub(p):
     else:
         print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
         sys.exit()
+        return
 
 def p_np_genera_gosub2(p):
-	'''
-	np_genera_gosub2 : empty
-	'''
-	global pilaArgumentos
-	global pilaFunciones
-	iArgumentos = pilaArgumentos.pop()
-	nameFunc = pilaFunciones.pop()
-	if iArgumentos == dirFunc.val[nameFunc][2]:
-		addQuad('gosub', nameFunc, len(arrCuad)+1, dirFunc.val[nameFunc][3])
-	else:
-		print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
-		sys.exit()
+    '''
+    np_genera_gosub2 : empty
+    '''
+    global pilaArgumentos
+    global pilaFunciones
+    iArgumentos = pilaArgumentos.pop()
+    nameFunc = pilaFunciones.pop()
+    if iArgumentos == dirFunc.val[nameFunc][2]:
+        addQuad('gosub', nameFunc, len(arrCuad)+1, dirFunc.val[nameFunc][3])
+    else:
+        print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
+        sys.exit()
+        return
 
 def p_np_crea_era2(p):
-	'''
-	np_crea_era2 : 
-	'''
-	global pilaArgumentos
-	global pilaFunciones
-	nameFunc = p[-1]
-	if nameFunc in dirFunc.val:
-		pilaFunciones.append(nameFunc)
-		addQuad('era', nameFunc, '', '')
-		pilaArgumentos.append(0)
-	else:
-		print("In line {}, function {} not previously declared.".format( lexer.lineno, nameFunc))
-		sys.exit()
+    '''
+    np_crea_era2 : 
+    '''
+    global pilaArgumentos
+    global pilaFunciones
+    nameFunc = p[-1]
+    if nameFunc in dirFunc.val:
+        pilaFunciones.append(nameFunc)
+        addQuad('era', nameFunc, '', '')
+        pilaArgumentos.append(0)
+    else:
+        print("In line {}, function {} not previously declared.".format( lexer.lineno, nameFunc))
+        sys.exit()
+        return
 
 def p_np_end(p):
     '''
@@ -1884,61 +1895,65 @@ def p_np_asignacion_arreglo_quad2(p):
 	operacionesEnPilasId(tuplaOperadores, 7)
 
 def p_np_asignacion_arreglo_quad3(p):
-	'''
-	np_asignacion_arreglo_quad3 : empty
-	'''
-	global iVarColumnas
-	global iColumnasDeclaradas
-	global tipoDato
-	if iColumnasDeclaradas < iVarColumnas-1:
-		tempOperator = '='
-		addOperadorToStack(tempOperator)
-		iColumnasDeclaradas += 1
-		addTipoToStack(tipoDato)
-	else:
-		print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
-		sys.exit()	
+    '''
+    np_asignacion_arreglo_quad3 : empty
+    '''
+    global iVarColumnas
+    global iColumnasDeclaradas
+    global tipoDato
+    if iColumnasDeclaradas < iVarColumnas-1:
+        tempOperator = '='
+        addOperadorToStack(tempOperator)
+        iColumnasDeclaradas += 1
+        addTipoToStack(tipoDato)
+    else:
+        print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
+        sys.exit()	
+        return
 
 def p_np_asignacion_arreglo_quad4(p):
-	'''
-	np_asignacion_arreglo_quad4 :
-	'''	
-	global iColumnasDeclaradas
-	global iVarColumnas
-	if iColumnasDeclaradas != iVarColumnas-1:
-		print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
-		sys.exit()
-	else:
-		iColumnasDeclaradas = 0
+    '''
+    np_asignacion_arreglo_quad4 :
+    '''	
+    global iColumnasDeclaradas
+    global iVarColumnas
+    if iColumnasDeclaradas != iVarColumnas-1:
+        print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
+        sys.exit()
+        return
+    else:
+        iColumnasDeclaradas = 0
 
 def p_np_asignacion_matrix_quad1(p):
-	'''
-	np_asignacion_matrix_quad1 : 
-	'''
-	global iFilasDeclaradas
-	global iColumnasDeclaradas
-	global iVarFilas
-	if iFilasDeclaradas < iVarFilas-1:
-		tempOperator = '='
-		addOperadorToStack(tempOperator)
-		iFilasDeclaradas += 1
-		iColumnasDeclaradas = 0
-		addTipoToStack(tipoDato)
-	else:
-		print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
-		sys.exit()
+    '''
+    np_asignacion_matrix_quad1 : 
+    '''
+    global iFilasDeclaradas
+    global iColumnasDeclaradas
+    global iVarFilas
+    if iFilasDeclaradas < iVarFilas-1:
+        tempOperator = '='
+        addOperadorToStack(tempOperator)
+        iFilasDeclaradas += 1
+        iColumnasDeclaradas = 0
+        addTipoToStack(tipoDato)
+    else:
+        print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
+        sys.exit()
+        return
 
 def p_np_asignacion_matrix_quad2(p):
-	'''
-	np_asignacion_matrix_quad2 : 
-	'''
-	global iFilasDeclaradas
-	global iVarFilas
-	if iFilasDeclaradas != iVarFilas-1:
-		print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
-		sys.exit()
-	else:
-		iFilasDeclaradas = 0
+    '''
+    np_asignacion_matrix_quad2 : 
+    '''
+    global iFilasDeclaradas
+    global iVarFilas
+    if iFilasDeclaradas != iVarFilas-1:
+        print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
+        sys.exit()
+        return
+    else:
+        iFilasDeclaradas = 0
 
 def p_np_solo_asignar_matrix_quad1(p):
     '''
@@ -1957,11 +1972,13 @@ def p_np_solo_asignar_matrix_quad1(p):
                 if iFilasLlamadas>=0:
                     print("In line {}, unexpected matrix call".format(lexer.lineno))
                     sys.exit()
+                    return
             addQuad('ver',dirFunc.getFilasVar(nombreFunc,idName), dirFunc.getVarMemPos(nombreFunc, idName), iFilasLlamadas)
             if dirFunc.getColumnasVar(nombreFunc,idName)==0:            #Verificar el llamado a columas
                 if iColumnasLlamadas>=0:
                     print("In line {}, unexpected array call".format(lexer.lineno))
                     sys.exit()
+                    return
             addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
             temporalSiguiente = getAvail('int')
             temporalSiguiente2=getAvail('int')
@@ -1977,11 +1994,13 @@ def p_np_solo_asignar_matrix_quad1(p):
                 if iFilasLlamadas>=0:
                     print("In line {}, unexpected matrix call".format(lexer.lineno))
                     sys.exit()
+                    return
             addQuad('ver',dirFunc.getFilasVar('globals',idName), dirFunc.getVarMemPos('globals', idName), iFilasLlamadas)
             if dirFunc.getColumnasVar('globals',idName)==0:            #Verificar el llamado a columas
                 if iColumnasLlamadas>=0:
                     print("In line {}, unexpected array call".format(lexer.lineno))
                     sys.exit()
+                    return
             addQuad('ver', dirFunc.getColumnasVar('globals', idName),dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
             temporalSiguiente = getAvail('int')
             temporalSiguiente2=getAvail('int')
@@ -1999,56 +2018,108 @@ def p_np_solo_asignar_matrix_quad1(p):
     else:
         print("In line {}, variable {} not declared.".format( lexer.lineno, idName))
         sys.exit()
+        return
 
 def p_np_solo_asignar_arreglo_quad1(p):
-	'''
-	np_solo_asignar_arreglo_quad1 : 
-	'''
-	global tempIdArrMat
-	global nombreFunc
-	global iColumnasLlamadas
-	global iFilasLlamadas
-	global dirFunc
-	idName = tempIdArrMat.pop()
-	if (idName in dirFunc.val[nombreFunc][1] or idName in dirFunc.val['globals'][1]):
-		if idName in dirFunc.val[nombreFunc][1]:
-			tipoTemp = dirFunc.val[nombreFunc][1][idName][0]      #Se da prioridad a buscar la variable en la funciones
-			if dirFunc.getFilasVar(nombreFunc,idName)>0:           #Verificar el llamado a filas
-				if iFilasLlamadas<0:
-					print("In line {}, unexpected array call".format(lexer.lineno))
-					sys.exit()
-			if dirFunc.getColumnasVar(nombreFunc,idName)==0:            #Verificar el llamado a columas
-				if iColumnasLlamadas>=0:
-					print("In line {}, unexpected array call".format(lexer.lineno))
-					sys.exit()
-			addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
-			temporalSiguiente=getAvail('int')
-			addQuad("+**", iColumnasLlamadas, dirFunc.getVarMemPos(nombreFunc, idName), temporalSiguiente)
-			addOperandoToStack(temporalSiguiente)
-		else:
-			tipoTemp = dirFunc.val['globals'][1][idName][0]       #Si no, se busca de manera global
-			if dirFunc.getFilasVar('globals',idName)>0:           #Verificar el llamado a filas
-				if iFilasLlamadas<0:
-					print("In line {}, unexpected matrix call".format(lexer.lineno))
-					sys.exit()
-			if dirFunc.getColumnasVar('globals',idName)==0:            #Verificar el llamado a columas
-				if iColumnasLlamadas>=0:
-					print("In line {}, unexpected array call".format(lexer.lineno))
-					sys.exit()
-			addQuad('ver', dirFunc.getColumnasVar('globals', idName),dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
-			temporalSiguiente=getAvail('int')
-			addQuad("+**", iColumnasLlamadas, dirFunc.getVarMemPos('globals', idName), temporalSiguiente)
-			addOperandoToStack(temporalSiguiente)
-		checkIfTemporal(iColumnasLlamadas)
-		iFilasLlamadas=-1
-		iColumnasLlamadas=-1
-		addTipoToStack(tipoTemp)
+    '''
+    np_solo_asignar_arreglo_quad1 : 
+    '''
+    global tempIdArrMat
+    global nombreFunc
+    global iColumnasLlamadas
+    global iFilasLlamadas
+    global dirFunc
+    idName = tempIdArrMat.pop()
+    if (idName in dirFunc.val[nombreFunc][1] or idName in dirFunc.val['globals'][1]):
+        if idName in dirFunc.val[nombreFunc][1]:
+            tipoTemp = dirFunc.val[nombreFunc][1][idName][0]      #Se da prioridad a buscar la variable en la funciones
+            if dirFunc.getFilasVar(nombreFunc,idName)>0:           #Verificar el llamado a filas
+                if iFilasLlamadas<0:
+                    print("In line {}, unexpected array call".format(lexer.lineno))
+                    sys.exit()
+                    return
+            if dirFunc.getColumnasVar(nombreFunc,idName)==0:            #Verificar el llamado a columas
+                if iColumnasLlamadas>=0:
+                    print("In line {}, unexpected array call".format(lexer.lineno))
+                    sys.exit()
+                    return
+            addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
+            temporalSiguiente=getAvail('int')
+            addQuad("+**", iColumnasLlamadas, dirFunc.getVarMemPos(nombreFunc, idName), temporalSiguiente)
+            addOperandoToStack(temporalSiguiente)
+        else:
+            tipoTemp = dirFunc.val['globals'][1][idName][0]       #Si no, se busca de manera global
+            if dirFunc.getFilasVar('globals',idName)>0:           #Verificar el llamado a filas
+                if iFilasLlamadas<0:
+                    print("In line {}, unexpected matrix call".format(lexer.lineno))
+                    sys.exit()
+                    return
+            if dirFunc.getColumnasVar('globals',idName)==0:            #Verificar el llamado a columas
+                if iColumnasLlamadas>=0:
+                    print("In line {}, unexpected array call".format(lexer.lineno))
+                    sys.exit()
+                    return
+            addQuad('ver', dirFunc.getColumnasVar('globals', idName),dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
+            temporalSiguiente=getAvail('int')
+            addQuad("+**", iColumnasLlamadas, dirFunc.getVarMemPos('globals', idName), temporalSiguiente)
+            addOperandoToStack(temporalSiguiente)
+        checkIfTemporal(iColumnasLlamadas)
+        iFilasLlamadas=-1
+        iColumnasLlamadas=-1
+        addTipoToStack(tipoTemp)
 
 def p_np_asignacion_de_arreglo_quad1(p):
 	'''
 	np_asignacion_de_arreglo_quad1 : 
 	'''
 	addOperadorToStack('=*')
+
+def p_np_flag_variables(p):
+    '''
+    np_flag_variables :
+    '''
+    global declaracionVariables
+    declaracionVariables=False
+
+def p_np_habilitar_variables(p):
+    '''
+    np_habilitar_variables : 
+    '''
+    global declaracionVariables
+    declaracionVariables=True
+
+def p_np_verificar_variables(p):
+    '''
+    np_verificar_variables :
+    '''
+    global declaracionVariables
+    if not declaracionVariables:
+        print("In line {}, unexpected variable declaration.".format(lexer.lineno))
+        sys.exit()
+        return
+
+def p_np_check_return(p):
+    '''
+    np_check_return :
+    '''
+    global nombreFunc
+    global habilitaReturn
+    if dirFunc.getFuncType(nombreFunc)=='void':
+        print("In line {}, unexpected return in void function.".format(lexer.lineno))
+        sys.exit()
+        return
+    else:
+        habilitaReturn=True
+
+def p_np_check_return2(p):
+    '''
+    np_check_return2 :
+    '''
+    if dirFunc.getFuncType(nombreFunc)!='void':
+        if not habilitaReturn:
+            print("In line {}, return statment missing.".format(lexer.lineno))
+            sys.exit()
+            return
 
 
 parser = yacc.yacc() 

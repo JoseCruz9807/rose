@@ -174,7 +174,7 @@ def ejecutaCuadruplo():
 	global isMemAdd
 
 	isMemAdd = False
-	bEndProc = False
+	#bEndProc = False
 	memoria = memoryStack.pop()
 	currentCuad = cuadruplos[iEjecutando]
 	nextCuad = -1
@@ -501,8 +501,8 @@ def ejecutaCuadruplo():
 		else:
 			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], valueTemp)
 
-	if bEndProc == False:
-		memoryStack.append(memoria)
+	#if bEndProc == False:
+	memoryStack.append(memoria)
 
 	setCuadruplo(nextCuad)
 	ejecutaCuadruplo()
