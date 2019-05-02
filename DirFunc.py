@@ -115,3 +115,11 @@ class DirFunc:
             tableVars = self.val['globals'][1]
             numColumnas = tableVars[nombre][2]
         return numColumnas
+
+    def getFuncType (self, scope):
+        """
+        Regresa el tipo de la funcion solicitada.
+        Args:
+         scope: Función que se busca
+        """
+        return self.val[scope][0]
