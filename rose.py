@@ -221,6 +221,8 @@ def t_tabulador(t):
 def t_error(t):
     print("Caracteres no reconocidos " + str(t.type))
     t.lexer.skip(1)
+    sys.exit()
+    return
 
 ###Eliminacion de espacios en blanco###
 t_ignore = r' '
@@ -577,24 +579,28 @@ def getAvail(tipoDato):
         if iContadorIntTemp < iIntTemporales:
             avail = iContadorIntTemp
             iContadorIntTemp = iContadorIntTemp + 1
+            print("el tipo de dato es int" + str(avail))
         else:
             memoryOverflow('int temporal')
     if tipoDato == 'float':
         if iContadorFloatTemp < iFloatTemporales:
             avail = iContadorFloatTemp
             iContadorFloatTemp+=1
+            print("el tipo de dato es float"+ str(avail))
         else:
             memoryOverflow('float temporal')
     if tipoDato == 'bool':
         if iContadorBoolTemp < iBoolTemporales:
             avail = iContadorBoolTemp
             iContadorBoolTemp+=1
+            print("el tipo de dato es bool"+ str(avail))
         else:
             memoryOverflow('bool temporal')
     if tipoDato == 'string':
         if iContadorStringTemp < iStringTemporales:
             avail = iContadorStringTemp
             iContadorStringTemp+=1
+            print("el tipo de dato es string"+ str(avail))
         else:
             memoryOverflow('string temporal')
     return avail
@@ -692,8 +698,9 @@ def getTopOperator():
     return pilaOperadores[lastIndex]
 #Agrega el operador a la pila de operadores
 def addOperandoToStack(operando):
-	global pilaOperando
-	pilaOperando.append(operando)
+    global pilaOperando
+    print("No linea que se hizo add al operandoStack: {}".format(lexer.lineno))
+    pilaOperando.append(operando)
 #Agrega el nuevo salto a la pila
 def addSaltoToStack(salto):
     global pilaSaltos
@@ -1236,6 +1243,8 @@ def p_empty(p):
 
 def p_error(p):
     print ("Syntax error in line " + str(lexer.lineno))
+    sys.exit()
+    return
 
 
 def p_np_obtener_tipo(p):
@@ -1749,7 +1758,10 @@ def p_np_crea_era(p):
     global pilaFunciones
     nameFunc = p[-1]
     if nameFunc in dirFunc.val:
-        result = getAvail(dirFunc.val[nameFunc][0])
+        valueFunc = dirFunc.val[nameFunc][0]
+        print(valueFunc)
+        result = getAvail(valueFunc)
+        print("np_crea_era: " + str(result))
         addOperandoToStack(result)
         addTipoToStack(dirFunc.val[nameFunc][0])
         pilaFunciones.append(nameFunc)
@@ -1795,7 +1807,7 @@ def p_np_genera_gosub(p):
     global pilaFunciones
     operando=popOperando()
     iArgumentos = pilaArgumentos.pop()
-    checkIfTemporal(operando)
+    #checkIfTemporal(operando)
     nameFunc = pilaFunciones.pop()
     if iArgumentos == dirFunc.val[nameFunc][2]:
         addQuad('gosub', nameFunc, len(arrCuad)+1, dirFunc.val[nameFunc][3])
@@ -2126,7 +2138,8 @@ parser = yacc.yacc()
 
 #Cambiar el nombre del archivo de entrada para probar el codigo
 #name='pruebaRose.txt'
-name='pruebaCuad3.txt'
+#name='pruebaCuad3.txt'
+name='fibonacci.txt'
 
 with open(name, 'r') as myfile:
     s=myfile.read()
