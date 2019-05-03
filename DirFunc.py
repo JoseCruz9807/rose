@@ -71,6 +71,28 @@ class DirFunc:
             varType = tableVars[nombre][0]            
         return varType
 
+    def getVarName(self, scope, memAdd):
+        """
+        Regresa el nombre de la variable solicitada.
+        Args:
+         scope: Función donde se busca la variable deseada
+         memAdd: Posición de memoria que tiene la variable 
+        """
+        nameVar = 'none'
+        tableVars = self.val[scope][1]
+        for var in tableVars:
+            if tableVars[var][3] == memAdd:
+                nameVarTemp = var
+        try:
+            nameVar = nameVarTemp
+        except:
+            tableVars = self.val['globals'][1]
+            for var in tableVars:
+                if tableVars[var][3] == memAdd:
+                    nameVar = var
+        return nameVar
+
+
     def getVarMemPos(self, scope, nombre):
         """
         Regresa el tipo de la variable solicitada.

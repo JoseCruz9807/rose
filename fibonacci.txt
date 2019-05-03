@@ -10,9 +10,9 @@ func int fib(int iNum;) {
 main() {
    int x;
    int i=0;
-   //print("Enter the number of terms of series ");
-   x = 5;
+   print("Enter the number of terms of series ");
+   read(x);
    
-   print(fib(10));
+   print(fib(x));
 
 }

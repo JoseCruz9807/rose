@@ -81,6 +81,13 @@ class CuboSemantico:
 		('read',	'bool',		''	)	:	'bool',
 		('read',	'int',		''	)	:	'int',
 		('read',	'float',	''	)	:	'float',
+		
+		('read*',	'string',	''	)	:	'string',
+		('read*',	'bool',		''	)	:	'bool',
+		('read*',	'int',		''	)	:	'int',
+		('read*',	'float',	''	)	:	'float',
+		
+
 		('not',		'bool',		''	)	:	'bool'
 		}
 
@@ -89,7 +96,6 @@ class CuboSemantico:
 		try:
 			tipo = self.semantica[op1,op2,operator]
 		except:
-			#print("issue en el CuboSemantico")
 			tipo ='error'
 		return tipo
 			

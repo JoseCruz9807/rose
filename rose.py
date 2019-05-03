@@ -231,7 +231,7 @@ lexer = lex.lex()
 
 ###Lectura de tokens para pruebas###
 """
-lexer.input('program test; globals int arbol = 3; main (){ int arbol; arbol = arbol-3; if(arbol>6){print(arbol);}else{ print(arbol);};}')
+lexer.input('program test; globals bool arrString[2]; func string funcion(string strUno;){ string variable = "HOLA CRAYOLA"; read(arrString[0]); print(strUno); return variable; } main (){ funcion("Porfa jala"); }')
 
 while True:
     tok = lexer.token()
@@ -1158,12 +1158,19 @@ def p_escritura(p):
     escritura : PRINT np_print_quad1 comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl SEMICOLON np_print_quad2 comments_nl
     '''
 
-def p_lectura(p):
+def p_lectura1(p):
     '''
-    lectura : READ np_read_quad1 comments_nl LEFTPARENTHESIS comments_nl ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_read_quad2 comments_nl
-            | READ np_read_quad1 comments_nl LEFTPARENTHESIS comments_nl ID comments_nl LEFTBRACKET comments_nl mega_exp RIGHTBRACKET comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_read_quad2 comments_nl
-            | READ np_read_quad1 comments_nl LEFTPARENTHESIS comments_nl ID np_read_quad3 comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_read_quad2 comments_nl
+    lectura : READ np_read_quad1 comments_nl LEFTPARENTHESIS comments_nl ID np_read_quad3 lectura2 comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_read_quad2 comments_nl
     '''
+
+def p_lectura2(p):
+	'''
+	lectura2 : LEFTBRACKET np_parentesis_quad1 np_read_arr_quad2 comments_nl mega_exp np_valor_columnas RIGHTBRACKET np_parentesis_quad2 comments_nl LEFTBRACKET np_parentesis_quad1 comments_nl mega_exp np_valor_filas RIGHTBRACKET np_parentesis_quad2 np_solo_asignar_matrix_quad1 comments_nl 
+			| LEFTBRACKET np_parentesis_quad1 np_read_arr_quad2 comments_nl mega_exp np_valor_columnas RIGHTBRACKET np_parentesis_quad2 np_solo_asignar_arreglo_quad1 comments_nl
+			| empty
+	'''
+
+
 
 def p_llama_spec_func(p):
     '''
@@ -1247,11 +1254,14 @@ def p_empty(p):
 
 def p_error(p):
     print ("Syntax error in line " + str(lexer.lineno))
+    tok = lexer.token()
+    print("lo que truena es el: " + str(tok))
     sys.exit()
     return
 
 
 def p_np_obtener_tipo(p):
+
     '''
     np_obtener_tipo : empty
     '''
@@ -1637,6 +1647,23 @@ def p_np_print_quad2(p):
     tuplaOperadores=('print')
     operacionesEnPilasId(tuplaOperadores,4)
 
+
+def p_np_read_arr_quad2(p):
+	'''
+	np_read_arr_quad2 : 
+	'''
+	global tempIdArrMat
+	global isArrayOrMatrix
+	global nombreFunc
+	global pilaTipos
+	isArrayOrMatrix = True
+	popOperadores()
+	addOperadorToStack('read*')
+	memAdd = popOperando()
+	nombreDeVar = dirFunc.getVarName(nombreFunc,memAdd)
+	tempIdArrMat.append(nombreDeVar)
+	
+
 def p_np_read_quad1(p):
     '''
     np_read_quad1 : empty
@@ -1648,7 +1675,7 @@ def p_np_read_quad2(p):
     '''
     np_read_quad2 : empty
     '''
-    tuplaOperadores=('read')
+    tuplaOperadores=('read','read*')
     operacionesEnPilasId(tuplaOperadores,3)
 
 def p_np_read_quad3(p):
@@ -1675,14 +1702,14 @@ def p_np_not_quad2(p):
 
 def p_np_parentesis_quad1(p):
     '''
-    np_parentesis_quad1 : empty
+    np_parentesis_quad1 : 
     '''
     tempOperator = str(p[-1])
     addOperadorToStack(tempOperator)
 
 def p_np_parentesis_quad2(p):
     '''
-    np_parentesis_quad2 : empty
+    np_parentesis_quad2 : 
     '''
     tuplaOperadores=('(','[')
     operacionesEnPilasId(tuplaOperadores,5)

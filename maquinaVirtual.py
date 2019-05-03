@@ -444,7 +444,83 @@ def ejecutaCuadruplo():
 	if currentCuad[0] == 'print':
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]), currentCuad[1])
 		print('console>' + str(operadorUno))
+	
+	if currentCuad[0] == 'read':
+		valueTemp = ''
+		typeTemp = ''
+		valueTemp = input()
+		memAddTemp = currentCuad[3]
 
+		try:
+			int(valueTemp)
+			typeTemp = 'int'
+		except:
+			try: 
+				float(valueTemp)
+				typeTemp='float'
+			except:
+				str(valueTemp)
+				if valueTemp == 'true' or valueTemp == 'false':
+					typeTemp = 'bool'
+				else:
+					typeTemp = 'string'
+
+		if typeTemp == checkTipo(memAddTemp):
+			if esGlobalOTemporal(memAddTemp):
+				memGlobal.addValue(checkTipo(memAddTemp), memAddTemp, valueTemp)
+			else:
+				memoria.addValue(checkTipo(memAddTemp), memAddTemp, valueTemp)
+		else:
+			print("Wrong input, expected {} received {} instead.".format(checkTipo(memAddTemp), typeTemp))
+			sys.exit()
+			return
+
+
+
+	if currentCuad[0] == 'read*':
+		isMemAdd = True
+		valueLectura = ''
+		typeTemp = ''
+		valueLectura = input()
+		posicionMemoria=getData(memoria,checkTipo(currentCuad[3]), currentCuad[3])
+		tempTipo = checkTipo(posicionMemoria)
+		valueTemp = 0
+		try:
+			int(currentCuad[1])
+			valueTemp = getData(memoria, tempTipo, currentCuad[1])
+		except:
+			valueTemp = returnValues.pop()
+		
+
+		if esGlobalOTemporal(posicionMemoria):
+			memGlobal.addValue(tempTipo, posicionMemoria, valueTemp)
+		else:
+			memoria.addValue(tempTipo, posicionMemoria, valueTemp)
+
+		try:
+			int(valueLectura)
+			typeTemp = 'int'
+		except:
+			try: 
+				float(valueLectura)
+				typeTemp='float'
+			except:
+				str(valueLectura)
+				if valueTemp == 'true' or valueTemp == 'false':
+					typeTemp = 'bool'
+				else:
+					typeTemp = 'string'
+
+		if typeTemp == tempTipo:
+			if esGlobalOTemporal(posicionMemoria):
+				memGlobal.addValue(tempTipo, posicionMemoria, valueLectura)
+			else:
+				memoria.addValue(tempTipo, posicionMemoria, valueLectura)
+		else:
+			print("Wrong input, expected {} received {} instead.".format(checkTipo(posicionMemoria), typeTemp))
+			sys.exit()
+			return
+	
 	#Procedimientos para arreglos y matrices
 	if currentCuad[0]=='ver':
 		isMemAdd = True

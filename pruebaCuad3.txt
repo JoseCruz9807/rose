@@ -1,31 +1,20 @@
 
 program test; 
 
-globals bool arrString[2];
-
-func string funcion1(string strUno;){
-	string variable = "HOLA CRAYOLA";
-	if(strUno == "Pofa Jala") {
-			strUno="lol";
-	}
-	else
-	{
-			strUno = strUno;
-	}
-	print(strUno);
-	return variable;
-}
+globals string arrString[2];
 
 
 func string funcion(string strUno;){
 	string variable = "HOLA CRAYOLA";
-	print(strUno);
-	funcion1(variable);
+	//string arrString[2][2];	
+	read(arrString[0]);
+	print(arrString[0]);
 	return variable;
 }
 
 
 main (){ 
 funcion("Porfa jala");
+print(arrString[0]);
 }
 
