@@ -3,38 +3,29 @@ program test;
 
 globals bool arrString[2];
 
-func string funcion(){
+func string funcion1(string strUno;){
 	string variable = "HOLA CRAYOLA";
-	return 2+4;
-	return 2;
+	if(strUno == "Pofa Jala") {
+			strUno="lol";
+	}
+	else
+	{
+			strUno = strUno;
+	}
+	print(strUno);
+	return variable;
 }
 
+
+func string funcion(string strUno;){
+	string variable = "HOLA CRAYOLA";
+	print(strUno);
+	funcion1(variable);
+	return variable;
+}
+
+
 main (){ 
-int iI = 0;
-int iJ = 0;
-int iFilas = 2;
-int iColumnas = 2;
-while(iI < iFilas) {
-	while(iJ < iColumnas) {
-		
-		arrString[iI]=false;
-		iJ=iJ+1;
-		}
-		iI=iI+1;
-		iJ=0;
-	}
-
-
-iI = 0;
-iJ = 0;
-while(iI < iFilas) {
-	while(iJ < iColumnas) {
-		print(arrString[iI]);
-		iJ=iJ+1;
-		}
-		iI=iI+1;
-		iJ=0;
-	}
-
+funcion("Porfa jala");
 }
 

@@ -1,24 +1,18 @@
 program test; 
-func int fib(int x;) {
-   if((x==1) OR (x==0)) {
-   	  print("x es 1 o 0");
-      return(x);
-   }else {
-   	  print("x es mayor a 1");
-      return(fib(x-1)+fib(x-2));
+
+func int fib(int iNum;) {
+   if(iNum <= 1) {
+      return iNum;
    }
+   return (fib(iNum-1)) + (fib(iNum-2));
 }
+
 main() {
    int x;
    int i=0;
-   print("Enter the number of terms of series ");
+   //print("Enter the number of terms of series ");
    x = 5;
-   print("Fibonnaci Series ");
    
-   while(i < x) {
-   	  print("Valor de i ");
-   	  print(i);
-      print(fib(i));
-      i = i +1;
-   }
+   print(fib(10));
+
 }

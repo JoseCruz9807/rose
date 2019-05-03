@@ -406,6 +406,9 @@ declaracionVariables=True
 #Revisa si se hizo ya o no un return, también si es posible hacerlo
 habilitaReturn=False
 
+#Variable de control para saber si se está realizando o no un return
+returnInProcess = False
+
 ############################
 ### FUNCIONES AUXILIARES ###
 ############################
@@ -579,28 +582,24 @@ def getAvail(tipoDato):
         if iContadorIntTemp < iIntTemporales:
             avail = iContadorIntTemp
             iContadorIntTemp = iContadorIntTemp + 1
-            print("el tipo de dato es int" + str(avail))
         else:
             memoryOverflow('int temporal')
     if tipoDato == 'float':
         if iContadorFloatTemp < iFloatTemporales:
             avail = iContadorFloatTemp
             iContadorFloatTemp+=1
-            print("el tipo de dato es float"+ str(avail))
         else:
             memoryOverflow('float temporal')
     if tipoDato == 'bool':
         if iContadorBoolTemp < iBoolTemporales:
             avail = iContadorBoolTemp
             iContadorBoolTemp+=1
-            print("el tipo de dato es bool"+ str(avail))
         else:
             memoryOverflow('bool temporal')
     if tipoDato == 'string':
         if iContadorStringTemp < iStringTemporales:
             avail = iContadorStringTemp
             iContadorStringTemp+=1
-            print("el tipo de dato es string"+ str(avail))
         else:
             memoryOverflow('string temporal')
     return avail
@@ -699,7 +698,6 @@ def getTopOperator():
 #Agrega el operador a la pila de operadores
 def addOperandoToStack(operando):
     global pilaOperando
-    print("No linea que se hizo add al operandoStack: {}".format(lexer.lineno))
     pilaOperando.append(operando)
 #Agrega el nuevo salto a la pila
 def addSaltoToStack(salto):
@@ -926,14 +924,19 @@ def checkIfTemporal(memPos):
     global iContadorFloatTemp
     global iContadorBoolTemp
     global iContadorStringTemp
-    if (memPos >= iStringGlobales and memPos < iIntTemporales):
-        iContadorIntTemp -= 1
-    if (memPos >= iIntTemporales and memPos < iFloatTemporales):
-        iContadorFloatTemp -= 1
-    if (memPos >= iFloatTemporales and memPos < iBoolTemporales):
-        iContadorBoolTemp -= 1
-    if (memPos >= iBoolTemporales and memPos < iStringTemporales):
-        iContadorStringTemp -= 1
+    global returnInProcess
+    
+    if not returnInProcess:
+        if (memPos >= iStringGlobales and memPos < iIntTemporales):
+            iContadorIntTemp -= 1
+        if (memPos >= iIntTemporales and memPos < iFloatTemporales):
+            iContadorFloatTemp -= 1
+        if (memPos >= iFloatTemporales and memPos < iBoolTemporales):
+            iContadorBoolTemp -= 1
+        if (memPos >= iBoolTemporales and memPos < iStringTemporales):
+            iContadorStringTemp -= 1
+    else:
+        pass
 
 
 #################
@@ -1196,6 +1199,7 @@ def p_returnx(p):
     '''
     returnx : RETURNX comments_nl mega_exp SEMICOLON comments_nl
     '''
+    
 
 def p_ctes(p):
     '''
@@ -1756,12 +1760,12 @@ def p_np_crea_era(p):
     '''
     global pilaArgumentos
     global pilaFunciones
+    global returnInProcess
+    
     nameFunc = p[-1]
     if nameFunc in dirFunc.val:
         valueFunc = dirFunc.val[nameFunc][0]
-        print(valueFunc)
         result = getAvail(valueFunc)
-        print("np_crea_era: " + str(result))
         addOperandoToStack(result)
         addTipoToStack(dirFunc.val[nameFunc][0])
         pilaFunciones.append(nameFunc)
@@ -1771,6 +1775,8 @@ def p_np_crea_era(p):
         print("In line {}, function {} not previously declared.".format( lexer.lineno, nameFunc))
         sys.exit()
         return
+    returnInProcess = True
+    
 
 def p_np_add_parametro(p):
     '''
@@ -1805,9 +1811,12 @@ def p_np_genera_gosub(p):
     '''
     global pilaArgumentos
     global pilaFunciones
+    global returnInProcess
+    
+    returnInProcess = False
     operando=popOperando()
     iArgumentos = pilaArgumentos.pop()
-    #checkIfTemporal(operando)
+    checkIfTemporal(operando)
     nameFunc = pilaFunciones.pop()
     if iArgumentos == dirFunc.val[nameFunc][2]:
         addQuad('gosub', nameFunc, len(arrCuad)+1, dirFunc.val[nameFunc][3])
@@ -1818,6 +1827,8 @@ def p_np_genera_gosub(p):
         sys.exit()
         return
 
+    
+    
 def p_np_genera_gosub2(p):
     '''
     np_genera_gosub2 : empty
@@ -2132,7 +2143,6 @@ def p_np_check_return2(p):
             print("In line {}, return statment missing.".format(lexer.lineno))
             sys.exit()
             return
-
 
 parser = yacc.yacc() 
 

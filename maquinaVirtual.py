@@ -23,8 +23,8 @@ cuadruplos = []
 #Contador que apunta al cuadruplo que se va a ejecutar
 iEjecutando = 0
 
-#Variable donde se almacenan los valores de retorno de las funciones 
-returnValue=0
+#Stack donde se almacenan los valores de retorno de las funciones 
+returnValues = []
 
 #Variable que almacena la posición en la que estaba la ejecución de los cuadruplos antes de hacer el llamado a una función.
 iLlamadaAFuncion = []
@@ -33,40 +33,40 @@ iLlamadaAFuncion = []
 # Valor que habilita la cantidad de espacios disponibles para cada tipo de dato
 espaciosDisponibles = 1000
 
-#1 Valor que apunta al primer lugar disponible de los int locales
+#1 Valor que apunta al limite superior de los int locales
 iIntLocales = espaciosDisponibles
 
-#2 Valor que apunta al primer lugar disponible de los float locales
+#2 Valor que apunta al limite superior de los float locales
 iFloatLocales = iIntLocales + espaciosDisponibles
 
-#3 Valor que apunta al primer lugar disponible de los bool locales
+#3 Valor que apunta al limite superior de los bool locales
 iBoolLocales = iFloatLocales + espaciosDisponibles
 
-#4 Valor que apunta al primer lugar disponible de los strings locales
+#4 Valor que apunta al limite superior de los strings locales
 iStringLocales = iBoolLocales + espaciosDisponibles
 
-#5 Valor que apunta al primer lugar disponible de los int locales
+#5 Valor que apunta al limite superior de los int locales
 iIntGlobales = iStringLocales + espaciosDisponibles
 
-#6 Valor que apunta al primer lugar disponible de los float locales
+#6 Valor que apunta al limite superior de los float locales
 iFloatGlobales = iIntGlobales + espaciosDisponibles
 
-#7 Valor que apunta al primer lugar disponible de los bool locales
+#7 Valor que apunta al limite superior de los bool locales
 iBoolGlobales = iFloatGlobales + espaciosDisponibles
 
-#8 Valor que apunta al primer lugar disponible de los strings locales
+#8 Valor que apunta al limite superior de los strings locales
 iStringGlobales = iBoolGlobales + espaciosDisponibles
 
-#9 Valor que apunta al primer lugar disponible de los int temporales
+#9 Valor que apunta al limite superior de los int temporales
 iIntTemporales = iStringGlobales + espaciosDisponibles
 
-#10 Valor que apunta al primer lugar disponible de los float temporales
+#10 Valor que apunta al limite superior de los float temporales
 iFloatTemporales = iIntTemporales + espaciosDisponibles
 
-#11 Valor que apunta al primer lugar disponible de los bool temporales
+#11 Valor que apunta al limite superior de los bool temporales
 iBoolTemporales = iFloatTemporales + espaciosDisponibles
 
-#12 Valor que apunta al primer lugar disponible de los strings temporales
+#12 Valor que apunta al limite superior de los strings temporales
 iStringTemporales = iBoolTemporales + espaciosDisponibles
 
 #13 Valor que apunta al siguiente lugar disponible de los int
@@ -92,6 +92,9 @@ isMemAdd = False
 
 #Archivo a leer
 compiledFile = open("codeobj.rs","r")
+
+#Variable que almacen el siguiente cuádruplo a ser ejecutado
+nextCuad = -1
 
 
 #Regresa el tipo de dato al que pertenece la dirección de memoria proporcionada.
@@ -155,7 +158,7 @@ def getData(currentMemory, tipoDeDato, memAdd):
 #Determina si la dirección proporcionada es de variables locales o no
 def esGlobalOTemporal(memAddress1):
 	memAddress = int(memAddress1)
-	if memAddress >= iStringLocales and memAddress < iStringTemporales:
+	if memAddress >= iStringLocales and memAddress < iStringGlobales:
 		tempVal = True
 	else:
 		tempVal = False
@@ -168,15 +171,17 @@ def ejecutaCuadruplo():
 	global memoria
 	global iLlamadaAFuncion
 	global tempMemoryStack
-	global returnValue
+	global returnValues
 	global currentCuad
 	global dirMem
 	global isMemAdd
+	global nextCuad
 
 	isMemAdd = False
 	#bEndProc = False
 	memoria = memoryStack.pop()
 	currentCuad = cuadruplos[iEjecutando]
+	#print("Current Cuad en ejecucion: " + str(currentCuad))
 	nextCuad = -1
 	#Brincos
 	if currentCuad[0] == 'GoTo':
@@ -201,13 +206,13 @@ def ejecutaCuadruplo():
 			int(currentCuad[1])
 			valueTemp = getData(memoria, tempTipo, currentCuad[1])
 		except:
-			valueTemp = returnValue
+			valueTemp = returnValues.pop()
 		if esGlobalOTemporal(currentCuad[3]):
 			memGlobal.addValue(tempTipo, currentCuad[3], valueTemp)
 		else:
 			memoria.addValue(tempTipo, currentCuad[3], valueTemp)
-	if currentCuad[0] == '+':
-		
+	
+	if currentCuad[0] == '+':	
 		tempTipoUno = checkTipo(currentCuad[1])
 		tempTipoDos = checkTipo(currentCuad[2])
 		operadorUno = getData(memoria, tempTipoUno,currentCuad[1])
@@ -422,9 +427,9 @@ def ejecutaCuadruplo():
 	
 	if currentCuad[0] == 'return':
 		#memoriaFuncionPrevia = memoryStack.pop()
-		returnValue = getData(memoria, checkTipo(currentCuad[3]), currentCuad[3])
-
-
+		valorTemporal = getData(memoria, checkTipo(currentCuad[3]), currentCuad[3])
+		returnValues.append(valorTemporal)
+		
 	if currentCuad[0] == 'end':
 		print("Se terminó la ejecución del programa.")
 		memoria.printMem()
@@ -481,7 +486,7 @@ def ejecutaCuadruplo():
 			int(currentCuad[1])
 			valueTemp = getData(memoria, tempTipo, currentCuad[1])
 		except:
-			valueTemp = returnValue
+			valueTemp = returnValues.pop()
 		if esGlobalOTemporal(posicionMemoria):
 			memGlobal.addValue(tempTipo, posicionMemoria, valueTemp)
 		else:
@@ -504,8 +509,7 @@ def ejecutaCuadruplo():
 	#if bEndProc == False:
 	memoryStack.append(memoria)
 
-	setCuadruplo(nextCuad)
-	ejecutaCuadruplo()
+	
 
 #Se leen los cuadruplos generados por el compilador y se modifican para que queden como estaban en el compilador
 for cuad in compiledFile:
@@ -535,3 +539,6 @@ for cuad in compiledFile:
 	cuadruplos.append(tupla)
 
 ejecutaCuadruplo()
+while True:
+	setCuadruplo(nextCuad)
+	ejecutaCuadruplo()
