@@ -1116,7 +1116,7 @@ def p_aplicaciones(p):
     '''
     aplicaciones : condition comments_nl aplicaciones comments_nl
                 | escritura comments_nl aplicaciones comments_nl
-                | lectura comments_nl aplicaciones comments_nl
+                | lectura1 comments_nl aplicaciones comments_nl
                 | llama_spec_func comments_nl aplicaciones comments_nl
                 | asignacion comments_nl aplicaciones comments_nl
                 | durante comments_nl aplicaciones comments_nl
@@ -1160,7 +1160,7 @@ def p_escritura(p):
 
 def p_lectura1(p):
     '''
-    lectura : READ np_read_quad1 comments_nl LEFTPARENTHESIS comments_nl ID np_read_quad3 lectura2 comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_read_quad2 comments_nl
+    lectura1 : READ np_read_quad1 comments_nl LEFTPARENTHESIS comments_nl ID np_read_quad3 lectura2 comments_nl RIGHTPARENTHESIS comments_nl SEMICOLON np_read_quad2 comments_nl
     '''
 
 def p_lectura2(p):
@@ -1179,20 +1179,19 @@ def p_llama_spec_func(p):
 
 def p_spec_func(p):
     '''
-    spec_func : SQRT comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | POW comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | ABS comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | STDEV comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | MEAN comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | MEDIAN comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | MODE comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | FACTORIAL comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | SORT comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | SIN comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | COS comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+    spec_func : SQRT np_spec_func comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS np_spec_func2 comments_nl 
+                | POW np_spec_func comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS np_pow2 comments_nl 
+                | ABS np_spec_func comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS np_spec_func2 comments_nl 
+                | STDEV np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func3 RIGHTPARENTHESIS comments_nl 
+                | MEAN np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func3 RIGHTPARENTHESIS comments_nl 
+                | MEDIAN np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func3 RIGHTPARENTHESIS comments_nl 
+                | MODE np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func3 RIGHTPARENTHESIS comments_nl 
+                | FACTORIAL np_spec_func comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS np_spec_func2 comments_nl 
+                | SORT np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func4 RIGHTPARENTHESIS comments_nl 
+                | SIN np_spec_func comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS np_spec_func2 comments_nl 
+                | COS np_spec_func comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS np_spec_func2 comments_nl 
                 | TRANSPOSE comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | EXPORTCSV comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | ARRANGE comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | EXPORTCSV np_spec_func comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl ID np_spec_func_contenido RIGHTPARENTHESIS comments_nl 
                 | GRAPH3D comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
                 | PIECHART comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl
                 | HISTOGRAMCHART comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
@@ -1997,6 +1996,7 @@ def p_np_asignacion_matrix_quad2(p):
     np_asignacion_matrix_quad2 : 
     '''
     global iFilasDeclaradas
+    global iColumnasDeclaradas
     global iVarFilas
     if iFilasDeclaradas != iVarFilas-1:
         print("In line {}, number of arguments provided doesn't match the amount specified.".format(lexer.lineno))
@@ -2004,6 +2004,7 @@ def p_np_asignacion_matrix_quad2(p):
         return
     else:
         iFilasDeclaradas = 0
+        iColumnasDeclaradas=0
 
 def p_np_solo_asignar_matrix_quad1(p):
     '''
@@ -2030,9 +2031,10 @@ def p_np_solo_asignar_matrix_quad1(p):
                     sys.exit()
                     return
             addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
-            temporalSiguiente = getAvail('int')
+            #temporalSiguiente = getAvail('int')
             temporalSiguiente2=getAvail('int')
-            
+            temporalSiguiente = getAvail(tipoTemp)
+
             addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente2)
             addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
             addQuad("+**", temporalSiguiente2, dirFunc.getVarMemPos(nombreFunc,idName),temporalSiguiente)
@@ -2052,8 +2054,10 @@ def p_np_solo_asignar_matrix_quad1(p):
                     sys.exit()
                     return
             addQuad('ver', dirFunc.getColumnasVar('globals', idName),dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
-            temporalSiguiente = getAvail('int')
+            #temporalSiguiente = getAvail('int')
             temporalSiguiente2=getAvail('int')
+            temporalSiguiente = getAvail(tipoTemp)
+            
             
             addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar('globals', idName), temporalSiguiente2)
             addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
@@ -2094,7 +2098,8 @@ def p_np_solo_asignar_arreglo_quad1(p):
                     sys.exit()
                     return
             addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
-            temporalSiguiente=getAvail('int')
+            #temporalSiguiente=getAvail('int')
+            temporalSiguiente=getAvail(tipoTemp)
             addQuad("+**", iColumnasLlamadas, dirFunc.getVarMemPos(nombreFunc, idName), temporalSiguiente)
             addOperandoToStack(temporalSiguiente)
         else:
@@ -2110,7 +2115,8 @@ def p_np_solo_asignar_arreglo_quad1(p):
                     sys.exit()
                     return
             addQuad('ver', dirFunc.getColumnasVar('globals', idName),dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
-            temporalSiguiente=getAvail('int')
+            #temporalSiguiente=getAvail('int')
+            temporalSiguiente=getAvail(tipoTemp)
             addQuad("+**", iColumnasLlamadas, dirFunc.getVarMemPos('globals', idName), temporalSiguiente)
             addOperandoToStack(temporalSiguiente)
         checkIfTemporal(iColumnasLlamadas)
@@ -2171,12 +2177,186 @@ def p_np_check_return2(p):
             sys.exit()
             return
 
+def p_np_spec_func(p):
+    '''
+    np_spec_func :
+    '''
+    operadorTemporal= str(p[-1])
+    addOperadorToStack(operadorTemporal)
+
+def p_np_spec_func2(p):
+    '''
+    np_spec_func2 :
+    '''
+    operando=popOperando()
+    tipo=popTipos()
+    operador=popOperadores()
+    checkIfTemporal(operando)
+    print(operador)
+    print(tipo)
+    resultType=semantica.resultType(operador, tipo, '')
+    nextTemp= getAvail(resultType)
+    if 'error'!=resultType:
+        addOperandoToStack(nextTemp)
+        addTipoToStack(resultType)
+        addQuad(operador,operando,'',nextTemp)
+    else:
+        typeMismatch()
+
+def p_np_pow2(p):
+    '''
+    np_pow2 :
+    '''
+    operando2=popOperando()
+    tipo2=popTipos()
+    operando1=popOperando()
+    tipo1=popTipos()
+    operador=popOperadores()
+    checkIfTemporal(operando2)
+    checkIfTemporal(operando1)
+    resultType=semantica.resultType(operador, tipo1, tipo2)
+    nextTemp=getAvail(resultType)
+    if 'error'!=resultType:
+        addOperandoToStack(nextTemp)
+        addTipoToStack(resultType)
+        addQuad(operador,operando1, operando2,nextTemp)
+    else:
+        typeMismatch()
+
+def p_np_spec_func3(p):
+    '''
+    np_spec_func3 :
+    '''
+    tempIdName = str(p[-1])
+    operador=popOperadores()
+    if tempIdName in dirFunc.val[nombreFunc][1]:
+        if dirFunc.getColumnasVar(nombreFunc,tempIdName)==0 or dirFunc.getFilasVar(nombreFunc, tempIdName)>0:
+            print("In line {}, expected array".format(lexer.lineno))
+            sys.exit()
+            return
+        tipo=dirFunc.getVarType(nombreFunc,tempIdName)
+        resultType=semantica.resultType(operador, tipo,'')
+        if 'error'!=resultType:
+            nextTemp=getAvail(resultType)
+            addOperandoToStack(nextTemp)
+            addQuad(operador,dirFunc.getVarMemPos(nombreFunc, tempIdName),dirFunc.getColumnasVar(nombreFunc,tempIdName),nextTemp)
+            addTipoToStack(resultType)
+        else:
+            typeMismatch()
+    elif tempIdName in dirFunc.val['globals'][1]:
+        if dirFunc.getColumnasVar('globals',tempIdName)==0 or dirFunc.getFilasVar('globals', tempIdName)>0:
+            print("In line {}, expected [".format(lexer.lineno))
+            sys.exit()
+            return
+        tipo=dirFunc.getVarType(nombreFunc,tempIdName)
+        resultType=semantica.resultType(operador, tipo,'')
+        if 'error'!=resultType:
+            nextTemp=getAvail(resultType)
+            addOperandoToStack(nextTemp)
+            addQuad(operador,dirFunc.getVarMemPos('globals', tempIdName),dirFunc.getColumnasVar('globals',tempIdName),nextTemp)
+            addTipoToStack(resultType)
+        else:
+            typeMismatch()
+
+
+def p_np_spec_func4(p):
+    '''
+    np_spec_func4 :
+    '''
+    tempIdName = str(p[-1])
+    operador=popOperadores()
+    if tempIdName in dirFunc.val[nombreFunc][1]:
+        if dirFunc.getColumnasVar(nombreFunc,tempIdName)==0 or dirFunc.getFilasVar(nombreFunc, tempIdName)>0:
+            print("In line {}, expected array".format(lexer.lineno))
+            sys.exit()
+            return
+        tipo=dirFunc.getVarType(nombreFunc,tempIdName)
+        resultType=semantica.resultType(operador, tipo,'')
+        if 'error'!=resultType:
+            addQuad(operador,dirFunc.getVarMemPos(nombreFunc, tempIdName),dirFunc.getColumnasVar(nombreFunc,tempIdName),'')
+        else:
+            typeMismatch()
+    elif tempIdName in dirFunc.val['globals'][1]:
+        if dirFunc.getColumnasVar('globals',tempIdName)==0 or dirFunc.getFilasVar('globals', tempIdName)>0:
+            print("In line {}, expected array".format(lexer.lineno))
+            sys.exit()
+            return
+        tipo=dirFunc.getVarType(nombreFunc,tempIdName)
+        resultType=semantica.resultType(operador, tipo,'')
+        if 'error'!=resultType:
+            addQuad(operador,dirFunc.getVarMemPos('globals', tempIdName),dirFunc.getColumnasVar('globals',tempIdName),'')
+        else:
+            typeMismatch()
+    nextTemp=getAvail("bool")
+    addQuad('=',14001,'',nextTemp)
+    addOperandoToStack(nextTemp)
+    addTipoToStack('bool')
+
+def p_np_spec_func_contenido(p):
+    '''
+    np_spec_func_contenido :
+    '''
+    tempIdName = str(p[-1])
+    operador=popOperadores()
+    operando=popOperando()
+    tipoTitulo=popTipos()
+    tipo=''
+    resultType=''
+    if tempIdName in dirFunc.val[nombreFunc][1]:
+        if dirFunc.getColumnasVar(nombreFunc,tempIdName)==0 or dirFunc.getFilasVar(nombreFunc, tempIdName)==0:
+            print("In line {}, expected matrix".format(lexer.lineno))
+            sys.exit()
+            return
+        tipo=dirFunc.getVarType(nombreFunc,tempIdName)
+        resultType=semantica.resultType(operador, tipoTitulo,tipo)
+        if 'error'!=resultType:
+            addQuad("export1",dirFunc.getVarMemPos(nombreFunc, tempIdName),dirFunc.getColumnasVar(nombreFunc,tempIdName),dirFunc.getFilasVar(nombreFunc, tempIdName))
+            addQuad("export2",operando,'','')
+        else:
+            typeMismatch()
+    elif tempIdName in dirFunc.val['globals'][1]:
+        if dirFunc.getColumnasVar('globals',tempIdName)==0 or dirFunc.getFilasVar('globals', tempIdName)==0:
+            print("In line {}, expected matrix".format(lexer.lineno))
+            sys.exit()
+            return
+        tipo=dirFunc.getVarType(nombreFunc,tempIdName)
+        resultType=semantica.resultType(operador, tipoTitulo,tipo)
+        if 'error'!=resultType:
+            addQuad("export1",dirFunc.getVarMemPos('globals', tempIdName),dirFunc.getColumnasVar('globals',tempIdName),dirFunc.getFilasVar('globals', tempIdName))
+            addQuad("export2",operando,'','')
+        else:
+            typeMismatch()
+    nextTemp=getAvail(resultType)
+    addQuad('=',14001,'',nextTemp)
+    addOperandoToStack(nextTemp)
+    addTipoToStack(resultType)
+
+
+"""
+def p_np_abs2(p):
+    '''
+    np_abs2 :
+    '''
+    operando=popOperando()
+    tipo=popTipos()
+    operador=popOperadores()
+    checkIfTemporal(operando)
+    resultType=semantica.resultType(operador, tipo, '')
+    nextTemp= getAvail(resultType)
+    if 'error'!=resultType:
+        addOperandoToStack(nextTemp)
+        addTipoToStack(resultType)
+        addQuad(operador,operando,'',nextTemp)
+    else:
+        typeMismatch()
+"""
+
 parser = yacc.yacc() 
 
 #Cambiar el nombre del archivo de entrada para probar el codigo
 #name='pruebaRose.txt'
-#name='pruebaCuad3.txt'
-name='fibonacci.txt'
+name='pruebaCuad.txt'
+#name='fibonacci.txt'
 
 with open(name, 'r') as myfile:
     s=myfile.read()

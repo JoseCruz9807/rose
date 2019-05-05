@@ -57,6 +57,7 @@ class CuboSemantico:
 		('float',	'float',	'>'		)	:'bool'		,
 		('float',	'float',	'>='	)	:'bool'		,
 		('float',	'float',	'=='	)	:'bool'		,
+		('float',	'float',	'=*'	)	:'float'	,
 		
 		('string',	'string',	'+',	)	:'string'	,
 		('string',	'string',	'='		)	:'string'	,
@@ -88,7 +89,46 @@ class CuboSemantico:
 		('read*',	'float',	''	)	:	'float',
 		
 
-		('not',		'bool',		''	)	:	'bool'
+		('not',		'bool',		''	)	:	'bool',
+		('sqrt', 	'float',	''	)	:	'float',
+		('sqrt',	'int',		''	)	:	'float',
+
+		('pow',		'int',		'int')	:	'float',
+		('pow',		'int',		'float'):	'float',
+		('pow',		'float',	'int')	:	'float',
+		('pow',		'float',	'float'):	'float',
+
+		('abs',		'int',		''	)	:	'int',
+		('abs',		'float',	'' )	:	'float',
+
+		('sin',		'int',		'')		:	'float',
+		('sin'		'float',	'')		:	'float',
+		('cos',		'int',		'')		:	'float',
+		('cos',		'float',	'')		:	'float',
+		('factorial','int',		'')		:	'int',
+
+		('stdev',	'int',		'')		:	'float',
+		('stdev',	'float',	'')		:	'float',
+
+		('mean',	'int',		'')		:	'float',
+		('mean',	'float',	'')		:	'float',
+
+		('median',	'float',	'')		:	'float',
+		('median',	'int',		'')		:	'float',
+
+		('mode',	'int',		'')		:	'int',
+		('mode'		'float',	'')		:	'float',
+		('mode',	'string',	'')		:	'string',
+
+		('sort',	'int',		'')		:	'int',
+		('sort',	'float',	'')		:	'float',
+		('sort',	'string',	'')		:	'string',
+
+		('exportCSV','string',	'string'):	'bool',
+		('exportCSV','string',	'int')	:	'bool',
+		('exportCSV','string',	'float'):	'bool',
+		('exportCSV','string',	'bool')	:	'bool'
+
 		}
 
 	def resultType(self, op1, op2, operator):

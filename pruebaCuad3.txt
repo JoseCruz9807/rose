@@ -1,20 +1,39 @@
 
 program test; 
 
-globals string arrString[2];
-
-
-func string funcion(string strUno;){
-	string variable = "HOLA CRAYOLA";
-	//string arrString[2][2];	
-	read(arrString[0]);
-	print(arrString[0]);
-	return variable;
-}
-
-
 main (){ 
-funcion("Porfa jala");
-print(arrString[0]);
+float matA[3][3] = {{1.0, 1.0, 1.0},{1.0,1.0,1.0},{1.0,1.0,1.0}};
+float matB[3][3] = {{1.0, 1.0, 1.0},{1.0,1.0,1.0},{1.0,1.0,1.0}};
+float matC[3][3];
+int iI = 0;
+int iJ = 0;
+int iK = 0;
+int iSize = 3;
+
+while(iI < iSize) {
+    iJ=0;
+    while(iJ < iSize) {
+        matC[iI][iJ] = 0;
+        iK = 0;
+        while(iK < iSize) {
+            matC[iI][iJ] = matA[iI][iK] * matB[iK][iJ];
+            iK = iK +1;
+        }
+        iJ = iJ+1;
+    }
+    iI = iI+1;
 }
 
+
+iI = 0;
+iJ = 0;
+while(iI<iSize) {
+    iJ = 0;
+    while(iJ<iSize) {
+        print(matC[iI][iJ]);
+        iJ = iJ+1;
+    }
+    iI = iI+1;
+}
+
+}

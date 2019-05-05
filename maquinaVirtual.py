@@ -1,6 +1,9 @@
 
 from Memoria import * 
 import re
+import numpy as np
+import math
+import statistics
 
 #Memoria virtual que almacena datos de manera global
 memGlobal = Memoria("Global")
@@ -95,6 +98,9 @@ compiledFile = open("codeobj.rs","r")
 
 #Variable que almacen el siguiente cuádruplo a ser ejecutado
 nextCuad = -1
+
+#Matriz para exportar a csv
+exportData=[]
 
 
 #Regresa el tipo de dato al que pertenece la dirección de memoria proporcionada.
@@ -200,7 +206,7 @@ def ejecutaCuadruplo():
 	
 	#Operadores
 	if currentCuad[0] == '=':
-		tempTipo = checkTipo(currentCuad[3])
+		tempTipo = checkTipo(currentCuad[1])
 		valueTemp=0
 		try:
 			int(currentCuad[1])
@@ -332,7 +338,7 @@ def ejecutaCuadruplo():
 			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 		else:
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
-	if currentCuad[0] == '=>':
+	if currentCuad[0] == '>=':
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
 		if operadorUno > operadorDos:
@@ -521,6 +527,130 @@ def ejecutaCuadruplo():
 			sys.exit()
 			return
 	
+	if currentCuad[0]=='sqrt':
+		parametro=getData(memoria, checkTipo(currentCuad[1]), currentCuad[1])
+		if float(parametro)<0:
+			print("Math error, negative squarte root")
+			sys.exit()
+			return
+		parametro = np.sqrt(float(parametro))
+		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],parametro)
+
+	if currentCuad[0]=='pow':
+		parametro=getData(memoria, checkTipo(currentCuad[1]), currentCuad[1])
+		parametro2=getData(memoria, checkTipo(currentCuad[2]), currentCuad[2])
+		parametro=np.power(float(parametro),float(parametro2))
+		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],parametro)
+
+	if currentCuad[0]=='abs':
+		parametro=getData(memoria, checkTipo(currentCuad[1]), currentCuad[1])
+		parametro = np.absolute(float(parametro))
+		if checkTipo(currentCuad[3])=='int':
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],int(parametro))
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],float(parametro))
+
+	if currentCuad[0]=='sin':
+		parametro=getData(memoria, checkTipo(currentCuad[1]), currentCuad[1])
+		parametro = np.sin(float(parametro))
+		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],parametro)
+
+	if currentCuad[0]=='cos':
+		parametro=getData(memoria, checkTipo(currentCuad[1]), currentCuad[1])
+		parametro = np.sin(float(parametro))
+		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],parametro)
+
+	if currentCuad[0]=='factorial':
+		parametro=getData(memoria, checkTipo(currentCuad[1]), currentCuad[1])
+		if int(parametro)<0:
+			print("Math error, negative factorial")
+			sys.exit()
+			return
+		parametro = math.factorial(int(parametro))
+		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],parametro)
+
+	if currentCuad[0]=='stdev':
+		space=0
+		result=[]
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			result.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3], np.std(result))
+
+	if currentCuad[0]=='mean':
+		space=0
+		result=[]
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			result.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3], np.mean(result))
+
+	if currentCuad[0]=='median':
+		space=0
+		result=[]
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			result.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+		memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3], np.median(result))
+
+
+	if currentCuad[0]=='mode':
+		space=0
+		result=[]
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			if checkTipo(memoriaBase+x)=='int':
+				result.append(int(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+			elif checkTipo(memoriaBase+x)=='float':
+				result.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+			elif checkTipo(memoriaBase+x)=='string':
+				result.append(str(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+		try:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3], statistics.mode(result))
+		except:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3], getData(memoria, checkTipo(memoriaBase), memoriaBase))
+
+	if currentCuad[0]=='sort':
+		space=0
+		result=[]
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			if checkTipo(memoriaBase+x)=='int':
+				result.append(int(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+			elif checkTipo(memoriaBase+x)=='float':
+				result.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+			elif checkTipo(memoriaBase+x)=='string':
+				result.append(str(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+		result.sort()
+		for x in range (int(currentCuad[2])):
+			memoria.addValue(checkTipo(memoriaBase+x),str(memoriaBase+x), result[x])
+
+
+	if currentCuad[0]=='export1':
+		memoriaBase=int(currentCuad[1])
+		columnas=int(currentCuad[2])
+		filas=int(currentCuad[3])
+		arregloTemporal=[]
+		for fila in range(filas):
+			arregloTemporal=[]
+			for columna in range(columnas):
+				x=memoriaBase+columna+fila*columnas
+				arregloTemporal.append(getData(memoria, checkTipo(x), x))
+			exportData.append(arregloTemporal)
+
+	if currentCuad[0]=='export2':
+		titulo=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
+		titulo=titulo[:-1]
+		titulo=titulo[1:]
+		f= open(titulo+".csv","w+")
+		for fila in exportData:
+			renglon=''
+			for valor in fila:
+				renglon=renglon+","+valor
+			renglon=renglon[1:]
+			f.write(renglon+"\n")
+		f.close() 
+
 	#Procedimientos para arreglos y matrices
 	if currentCuad[0]=='ver':
 		isMemAdd = True
