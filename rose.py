@@ -1045,7 +1045,6 @@ def p_exp(p):
     exp : termino np_expaux_quad4 expaux comments_nl
     '''
 
-
 def p_expaux(p):
     '''
     expaux : PLUS np_expaux_quad3 comments_nl exp
@@ -1067,7 +1066,7 @@ def p_terminoaux(p):
 
 def p_factor(p):
     '''
-    factor : vars_cte comments_nl
+    factor : np_add_fondo_falso vars_cte np_parentesis_quad2 comments_nl
             | LEFTPARENTHESIS np_parentesis_quad1 comments_nl mega_exp comments_nl RIGHTPARENTHESIS np_parentesis_quad2 comments_nl
     '''
 
@@ -1207,7 +1206,7 @@ def p_returnx(p):
     returnx : RETURNX comments_nl mega_exp SEMICOLON comments_nl
     '''
 
-def p_np_np_add_fondo_falso(p):
+def p_np_add_fondo_falso(p):
 	'''
 	np_add_fondo_falso :
 	'''
@@ -1828,40 +1827,30 @@ def p_np_add_parametro(p):
 	iArgumentosDeFunc = dirFunc.val[nameFunc][2]
 	listaDirFunc = list(dirFunc.val[nameFunc][1].values()) 
 	if iArgumentosDeFunc >= iArgumentos:
-		print("los parametros ingresados no sobrepasaon los declarados en la firma de la func")
 		if listaDirFunc[iArgumentos-1][0] == tipoArgumento:
-			print("el tipo de dato {} matchea con su # de elemento en la firma de la func".format(str(iArgumentos-1)))
 			iFilasEsperadas = listaDirFunc[iArgumentos-1][1]
 			iColumnasEsperadas = listaDirFunc[iArgumentos-1][2]
 			if iFilasEsperadas != 0:
 				dimensionEsperadaArgumento = (iFilasEsperadas * iColumnasEsperadas)
 			else:
 				dimensionEsperadaArgumento = iColumnasEsperadas
-			print("dimEsperadas: {}".format(dimensionEsperadaArgumento))
 			#Intenta sacar las dimensiones decladaras del argumento proporcionado, puede que pasen constantes, temps como parámetros
-			print("Intenta sacar las dimensiones decladaras del argumento {}".format(argumentoValor))
 			try:
 				nombreArgumento = dirFunc.getVarName(nombreFunc, argumentoValor)
-				print("nombreArgumento: {}".format(nombreArgumento))
 				tempFilas = dirFunc.getFilasVar(nombreFunc, nombreArgumento)
 				tempColumnas = dirFunc.getColumnasVar(nombreFunc, nombreArgumento)
 				if tempFilas != 0:
 					dimensionDeclaradaArgumento = tempFilas*tempColumnas
 				else:
 					dimensionDeclaradaArgumento = tempColumnas
-				print("dimensionDeclaradaArgumento: {}".format(dimensionDeclaradaArgumento))
-				
 			except:
-				print("No es una variable declarada")
 				dimensionDeclaradaArgumento = 0
 			#Las dimensiones son las mismas?
-			print("dimensionDeclaradaArgumento: {}".format(dimensionDeclaradaArgumento))
 			if dimensionEsperadaArgumento == dimensionDeclaradaArgumento:
 				if dimensionDeclaradaArgumento == 0:
 					direccionBase = argumentoValor
 					addQuad('parameter', direccionBase, '', paramName)
 				else:
-					print("las dimensiones esperadas y declaradas del argumento, son las mismas")
 					iI = 0
 					while iI < dimensionEsperadaArgumento:
 						#Intenta sacar la posición base del argumentoValor, puede que sea un temporal o constante
@@ -2704,10 +2693,10 @@ parser = yacc.yacc()
 #Cambiar el nombre del archivo de entrada para probar el codigo
 #name='pruebaRose.txt'
 #name='pruebaCuad2.txt'
-#name='fibonacci.txt'
+name='fibonacci.txt'
 #name='factorial.txt'
 #name='bubbleSort.txt'
-name= 'multiplicacionMatrices.txt'
+#name= 'multiplicacionMatrices.txt'
 #name= 'search.txt'
 with open(name, 'r') as myfile:
     s=myfile.read()
