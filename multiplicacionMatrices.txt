@@ -1,9 +1,7 @@
 
 program test; 
 
-main (){ 
-float matA[3][3] = {{2.0,3.0,5.2},{2.6,6.1,6.3},{2.3,0.1,27.9}};
-float matB[3][3] = {{4.3,3.3,2.2},{1.1,5.5,6.6},{7.7,8.8,9.9}};
+func void matrixMultiplication(float matA[3][3], matB[3][3];){
 float matC[3][3];
 int iI = 0;
 int iJ = 0;
@@ -23,8 +21,6 @@ while(iI < iSize) {
     iJ = 0;
     iI = iI+1;
 }
-
-
 iI = 0;
 iJ = 0;
 while(iI<iSize) {
@@ -34,6 +30,11 @@ while(iI<iSize) {
     }
     iI = iI+1;
     iJ = 0;
+}    
 }
 
+main (){ 
+float matA[3][3] = {{2.0,3.0,5.2},{2.6,6.1,6.3},{2.3,0.1,27.9}};
+float matB[3][3] = {{4.3,3.3,2.2},{1.1,5.5,6.6},{7.7,8.8,9.9}};
+matrixMultiplication(matA,matB);
 }

@@ -1,15 +1,20 @@
 program test; 
 
-globals float arr[5]={5.0,4.0,3.0,1.0,2.0};
+globals float arr[5]={5.0,4.0,3.4,1.0,2.0};
 
 
 func int search(float arr[5];) {
-	float fNum;
-	int iSize = 5;
+	float fNum = 1.3;
+	int iCol = 2;
+	int iFil = 5;
 	int iI = 0;
+	int iJ = 0;
 	print("Ingrese el numero a buscar en el arreglo ");
 	read(fNum);
-	while(iI < iSize) {
+
+
+	iI=0;
+	while(iI < iFil) {
 		if(arr[iI] == fNum) {
 			return iI;
 		}
@@ -19,18 +24,9 @@ func int search(float arr[5];) {
 }
 
 main (){ 
+	float arrUno[5] = {6.0,7.0,8.0,9.0,10.0};
 	int iPos;
-	iPos = search(arr[0],arr[1],arr[2],arr[3],arr[4]);
-	if (iPos != -1) {
-		print("El numero que buscaba esta en la posicion ");
-		print(iPos);
-	}
-	else
-	{
-		print("No se encontro el elemento");
-	}
-
-	sort(arr);
+	iPos = search(arrUno);
 	if (iPos != -1) {
 		print("El numero que buscaba esta en la posicion ");
 		print(iPos);

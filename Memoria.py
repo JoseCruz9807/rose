@@ -8,12 +8,12 @@ class Memoria:
 		self.memoria = ({},{},{'14000': 'false', '14001':'true'},{})
 		self.name = nameMemory
 	def addValue(self, tipo, memAdd, value):
-	""" Añade valor a la tupla de memoria
-		Args:
-		 tipo: Tipo del valor a añadir.
-		 memAdd: Dirección de memoria que le fue asignada.
-		 value: Valor que va almacenar.
-	"""
+		""" Añade valor a la tupla de memoria
+			Args:
+			 tipo: Tipo del valor a añadir.
+			 memAdd: Dirección de memoria que le fue asignada.
+			 value: Valor que va almacenar.
+		"""
 		if tipo == 'int':
 			dictInt = self.memoria[0]
 			dictInt[memAdd] = str(value)
@@ -31,11 +31,11 @@ class Memoria:
 			dictString[memAdd] = str(value)
 			self.memoria = (self.memoria[0], self.memoria[1], self.memoria[2], dictString)
 	def getValue(self, tipo, memAdd):
-	""" Busca el valor correspondiente al espacio de memoria solicitado
-		Args:
-		 tipo: Tipo del valor a añadir.
-		 memAdd: Dirección de memoria que le fue asignada.
-	"""
+		""" Busca el valor correspondiente al espacio de memoria solicitado
+			Args:
+			 tipo: Tipo del valor a añadir.
+			 memAdd: Dirección de memoria que le fue asignada.
+		"""
 		typeVal = -1
 		if tipo == 'int':
 			typeVal = 0
@@ -48,10 +48,10 @@ class Memoria:
 		returnVal = self.memoria[typeVal][memAdd] 
 		return returnVal
 	def getSizeMem(self, tipo):
-	""" Regresa la cantidad del diccionario del tipo especificado
-		Args:
-		 tipo: Tipo del valor a añadir.
-	"""
+		""" Regresa la cantidad del diccionario del tipo especificado
+			Args:
+			 tipo: Tipo del valor a añadir.
+		"""
 		if tipo == 'int':
 			size = len(self.memoria[0])
 		if tipo == 'float':
@@ -62,9 +62,9 @@ class Memoria:
 			size = len(self.memoria[3])
 		return size
 	def printMem(self):
-	""" Imprime el contenido de lo que tenga almacenado.
-		Args:
-	"""
+		""" Imprime el contenido de lo que tenga almacenado.
+			Args:
+		"""
 		print("nombre de memoria: " + self.name)
 		print(self.memoria[0])
 		print(self.memoria[1])

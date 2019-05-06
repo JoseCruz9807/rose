@@ -4,12 +4,11 @@ func int fib(int iNum;) {
    if(iNum <= 1) {
       return iNum;
    }
-   return (fib(iNum-1)) + (fib(iNum-2));
+   return fib(iNum-1) + fib(iNum-2);
 }
 
 main() {
    int x;
-   int i=0;
    print("Enter the number of terms of series ");
    read(x);
    

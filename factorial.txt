@@ -11,6 +11,8 @@ func int fact(int x;){
 
 
 main(){
-
-    print(fact(7));
+	int iNum;
+	print("Ingresa el numero al que se le aplica factorial ");
+	read(iNum);
+    print(fact(iNum));
 }

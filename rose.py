@@ -553,6 +553,7 @@ def actualizaApuntadorMemoria(dataType, cantidadValores):
             memoriaLocalCantidad[3] += cantidadValores
             if memoriaLocalCantidad[3] > iStringLocales:
                 memoryOverflow('string local')
+    print('terminan int: {}, float: {}, bool: {}, string: {}'.format(memoriaLocalCantidad[0],memoriaLocalCantidad[1],memoriaLocalCantidad[2],memoriaLocalCantidad[3]))
 
 
 #Guarda la cantidad de parametros en la funcion
@@ -1090,10 +1091,10 @@ def p_argumentos(p):
 def p_mismotipo(p):
     '''
     mismotipo : ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl COMMA np_anadir_variable np_calcular_k_matrix comments_nl mismotipo comments_nl
-                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl COMMA np_asignar_arreglo np_calcular_k_arreglo comments_nl mismotipo comments_nl
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl COMMA np_asignar_arreglo np_calcular_k_arreglo comments_nl mismotipo comments_nl 
                 | ID np_obtener_nombre_var np_agregar_parametros comments_nl COMMA np_asignar_fil_col comments_nl mismotipo comments_nl
-                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl np_anadir_variable
-                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl np_asignar_arreglo
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl LEFTBRACKET comments_nl CTEI np_obtener_filas comments_nl RIGHTBRACKET comments_nl np_anadir_variable np_calcular_k_matrix
+                | ID np_obtener_nombre_var np_agregar_parametros comments_nl LEFTBRACKET comments_nl CTEI np_obtener_columnas comments_nl RIGHTBRACKET comments_nl np_asignar_arreglo np_calcular_k_arreglo
                 | ID np_obtener_nombre_var np_agregar_parametros comments_nl np_asignar_fil_col
     '''
 
@@ -1205,7 +1206,12 @@ def p_returnx(p):
     '''
     returnx : RETURNX comments_nl mega_exp SEMICOLON comments_nl
     '''
-    
+
+def p_np_np_add_fondo_falso(p):
+	'''
+	np_add_fondo_falso :
+	'''
+	addOperadorToStack('(')
 
 def p_ctes(p):
     '''
@@ -1367,6 +1373,7 @@ def p_np_factor_quad1(p):
     np_factor_quad1 : 
     '''
     tempIdName = str(p[-1])
+    '''
     if tempIdName in dirFunc.val[nombreFunc][1]:
         if dirFunc.getColumnasVar(nombreFunc,tempIdName)!=0:
             print("In line {}, expected [".format(lexer.lineno))
@@ -1377,6 +1384,7 @@ def p_np_factor_quad1(p):
             print("In line {}, expected [".format(lexer.lineno))
             sys.exit()
             return
+    '''	
     addIdToStack(tempIdName)
 
 def p_np_factor_quad2(p):
@@ -1805,31 +1813,73 @@ def p_np_crea_era(p):
     
 
 def p_np_add_parametro(p):
-    '''
-    np_add_parametro : empty
-    '''
-    global pilaArgumentos
-    argumentoValor = popOperando()
-    tipoArgumento = popTipos()
-    checkIfTemporal(argumentoValor)
-    nameFunc = pilaFunciones.pop()
-    iArgumentos = pilaArgumentos.pop() + 1
-    pilaArgumentos.append(iArgumentos)
-    paramName = 'param' + str(iArgumentos)
-    iArgumentosDeFunc = dirFunc.val[nameFunc][2]
-    listaDirFunc = list(dirFunc.val[nameFunc][1].values()) 
-    if iArgumentosDeFunc >= iArgumentos:
-        if listaDirFunc[iArgumentos-1][0] == tipoArgumento:
-            addQuad('parameter', argumentoValor, '', paramName)
-        else:
-            print("In line {}, argument {} type mismatch with function declaration.".format( lexer.lineno, nameFunc))
-            sys.exit()
-            return
-    else:
-        print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
-        sys.exit()
-        return
-    pilaFunciones.append(nameFunc)
+	'''
+	np_add_parametro : empty
+	'''
+	global pilaArgumentos
+	global nombreFunc
+	argumentoValor = popOperando()
+	tipoArgumento = popTipos()
+	checkIfTemporal(argumentoValor)
+	nameFunc = pilaFunciones.pop()
+	iArgumentos = pilaArgumentos.pop() + 1
+	pilaArgumentos.append(iArgumentos)
+	paramName = 'param' + str(iArgumentos)
+	iArgumentosDeFunc = dirFunc.val[nameFunc][2]
+	listaDirFunc = list(dirFunc.val[nameFunc][1].values()) 
+	if iArgumentosDeFunc >= iArgumentos:
+		print("los parametros ingresados no sobrepasaon los declarados en la firma de la func")
+		if listaDirFunc[iArgumentos-1][0] == tipoArgumento:
+			print("el tipo de dato {} matchea con su # de elemento en la firma de la func".format(str(iArgumentos-1)))
+			iFilasEsperadas = listaDirFunc[iArgumentos-1][1]
+			iColumnasEsperadas = listaDirFunc[iArgumentos-1][2]
+			if iFilasEsperadas != 0:
+				dimensionEsperadaArgumento = (iFilasEsperadas * iColumnasEsperadas)
+			else:
+				dimensionEsperadaArgumento = iColumnasEsperadas
+			print("dimEsperadas: {}".format(dimensionEsperadaArgumento))
+			#Intenta sacar las dimensiones decladaras del argumento proporcionado, puede que pasen constantes, temps como parámetros
+			print("Intenta sacar las dimensiones decladaras del argumento {}".format(argumentoValor))
+			try:
+				nombreArgumento = dirFunc.getVarName(nombreFunc, argumentoValor)
+				print("nombreArgumento: {}".format(nombreArgumento))
+				tempFilas = dirFunc.getFilasVar(nombreFunc, nombreArgumento)
+				tempColumnas = dirFunc.getColumnasVar(nombreFunc, nombreArgumento)
+				if tempFilas != 0:
+					dimensionDeclaradaArgumento = tempFilas*tempColumnas
+				else:
+					dimensionDeclaradaArgumento = tempColumnas
+				print("dimensionDeclaradaArgumento: {}".format(dimensionDeclaradaArgumento))
+				
+			except:
+				print("No es una variable declarada")
+				dimensionDeclaradaArgumento = 0
+			#Las dimensiones son las mismas?
+			print("dimensionDeclaradaArgumento: {}".format(dimensionDeclaradaArgumento))
+			if dimensionEsperadaArgumento == dimensionDeclaradaArgumento:
+				if dimensionDeclaradaArgumento == 0:
+					direccionBase = argumentoValor
+					addQuad('parameter', direccionBase, '', paramName)
+				else:
+					print("las dimensiones esperadas y declaradas del argumento, son las mismas")
+					iI = 0
+					while iI < dimensionEsperadaArgumento:
+						#Intenta sacar la posición base del argumentoValor, puede que sea un temporal o constante
+						direccionBase = argumentoValor + iI
+						addQuad('parameter', direccionBase, '', paramName)
+						iI = iI+1
+			else:
+				print("In line {}, argument number {} doesn't match the specified dimensions in function declaration.".format(lexer.lineno, iArgumentos-1))
+				sys.exit()
+		else:
+			print("In line {}, argument {} type mismatch with function declaration.".format( lexer.lineno, nameFunc))
+			sys.exit()
+			return
+	else:
+		print("In line {}, argument count in function {} does not match.".format( lexer.lineno, nameFunc))
+		sys.exit()
+		return
+	pilaFunciones.append(nameFunc)
 	
 def p_np_genera_gosub(p):
     '''
@@ -2655,9 +2705,10 @@ parser = yacc.yacc()
 #name='pruebaRose.txt'
 #name='pruebaCuad2.txt'
 #name='fibonacci.txt'
+#name='factorial.txt'
 #name='bubbleSort.txt'
-#name= 'multiplicacionMatrices.txt'
-name= 'search.txt'
+name= 'multiplicacionMatrices.txt'
+#name= 'search.txt'
 with open(name, 'r') as myfile:
     s=myfile.read()
 print(name)

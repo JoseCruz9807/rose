@@ -95,10 +95,10 @@ class DirFunc:
 
     def getVarMemPos(self, scope, nombre):
         """
-        Regresa el tipo de la variable solicitada.
+        Regresa el valor de memoria que le fue asignado.
         Args:
          scope: Función donde se busca la variable deseada
-         nombre: Nombre de la variable que se desea saber el tipo 
+         nombre: Nombre de la variable que se desea saber el valor de memoria que le fue asignado 
         """
         try:
             tableVars = self.val[scope][1]
