@@ -2355,9 +2355,11 @@ parser = yacc.yacc()
 
 #Cambiar el nombre del archivo de entrada para probar el codigo
 #name='pruebaRose.txt'
-name='pruebaCuad.txt'
+#name='pruebaCuad2.txt'
 #name='fibonacci.txt'
-
+#name='bubbleSort.txt'
+#name= 'multiplicacionMatrices.txt'
+name= 'search.txt'
 with open(name, 'r') as myfile:
     s=myfile.read()
 print(name)

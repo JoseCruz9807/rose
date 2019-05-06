@@ -136,16 +136,13 @@ def getData(currentMemory, tipoDeDato, memAdd):
 	global memGlobal
 	global currentCuad
 	global isMemAdd
-	#print("isMedAdd: " + str(isMemAdd))
 	returnVal = 0
 	memAdd=str(memAdd)
 	try:
 		returnVal = currentMemory.getValue(tipoDeDato,memAdd)
-		
 	except:
 		try:
-			returnVal = memGlobal.getValue(tipoDeDato,memAdd)
-			
+			returnVal = memGlobal.getValue(tipoDeDato,memAdd)		
 		except:
 			if isMemAdd:
 				return (memAdd)
@@ -206,7 +203,10 @@ def ejecutaCuadruplo():
 	
 	#Operadores
 	if currentCuad[0] == '=':
-		tempTipo = checkTipo(currentCuad[1])
+		try:
+			tempTipo = checkTipo(currentCuad[1])
+		except:
+			tempTipo = checkTipo(currentCuad[3])
 		valueTemp=0
 		try:
 			int(currentCuad[1])
@@ -448,6 +448,8 @@ def ejecutaCuadruplo():
 
 	#Funciones Especiales
 	if currentCuad[0] == 'print':
+		if currentCuad[2] == 'arr':
+			isMemAdd = True
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]), currentCuad[1])
 		print('console>' + str(operadorUno))
 	
@@ -672,7 +674,7 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]), currentCuad[3], valueTemp)
 
 	if currentCuad[0]=='+*':
-		isMemAdd = True
+		#isMemAdd = True
 		valorTupla=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		valor = valorTupla[0]
 		dirBase=int(currentCuad[2])
@@ -699,9 +701,8 @@ def ejecutaCuadruplo():
 			memoria.addValue(tempTipo, posicionMemoria, valueTemp)
 		
 
-
 	if currentCuad[0]=='+**':
-		isMemAdd = True
+		#isMemAdd = True
 		valorTupla=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		valor = valorTupla[0]
 		dirBase=int(currentCuad[2])

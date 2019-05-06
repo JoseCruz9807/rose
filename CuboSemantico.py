@@ -132,6 +132,12 @@ class CuboSemantico:
 		}
 
 	def resultType(self, op1, op2, operator):
+		""" Busca en el diccionario de valores el tipo de valor que la operación debe regresar.
+			Args:
+			 op1: Primer Operando.
+			 op2: Segundo Operando.
+			 operator: Operador que se está ejecutando.
+		 """
 		#return self.semantica[op1,op2,operator]
 		try:
 			tipo = self.semantica[op1,op2,operator]

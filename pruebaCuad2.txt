@@ -1,0 +1,21 @@
+
+program test; 
+
+main (){ 
+float matA[2][2] = {{1.0,1.0},{1.0,1.0}};
+float matB[2][2] = {{1.0,1.0},{1.0,1.0}};
+float matC[2][2];
+int iI = 0;
+int iJ = 0;
+int iK = 0;
+float fSize = 2;
+
+fSize = iI + 1 -1 * 2 / 3;
+if(fSize > 0 AND iI==0) {
+	print(fSize);
+}
+else
+{
+	print("Es falso");
+}
+}
