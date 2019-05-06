@@ -4,6 +4,11 @@ import re
 import numpy as np
 import math
 import statistics
+import matplotlib.pyplot as plt
+
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from sklearn.linear_model import LinearRegression
 
 #Memoria virtual que almacena datos de manera global
 memGlobal = Memoria("Global")
@@ -102,6 +107,11 @@ nextCuad = -1
 #Matriz para exportar a csv
 exportData=[]
 
+#Arreglo para almacenar valores de x y y z en gráficas
+xData=[]
+yData=[]
+zData=[]
+
 
 #Regresa el tipo de dato al que pertenece la dirección de memoria proporcionada.
 def checkTipo(iMemAdd1):
@@ -130,6 +140,18 @@ def setCuadruplo(iPosicion):
 		iEjecutando = iPosicion
 	else:
 		iEjecutando += 1
+
+def resetX():
+	global xData
+	xData=[]
+
+def resetY():
+	global yData
+	yData=[]
+
+def resetZ():
+	global zData
+	zData=[]
 
 #Regresa la información almacenada en la dirección proporcionada
 def getData(currentMemory, tipoDeDato, memAdd):	
@@ -203,15 +225,13 @@ def ejecutaCuadruplo():
 	
 	#Operadores
 	if currentCuad[0] == '=':
-		try:
-			tempTipo = checkTipo(currentCuad[1])
-		except:
-			tempTipo = checkTipo(currentCuad[3])
 		valueTemp=0
 		try:
+			tempTipo = checkTipo(currentCuad[1])
 			int(currentCuad[1])
 			valueTemp = getData(memoria, tempTipo, currentCuad[1])
 		except:
+			tempTipo = checkTipo(currentCuad[3])
 			valueTemp = returnValues.pop()
 		if esGlobalOTemporal(currentCuad[3]):
 			memGlobal.addValue(tempTipo, currentCuad[3], valueTemp)
@@ -624,15 +644,21 @@ def ejecutaCuadruplo():
 			elif checkTipo(memoriaBase+x)=='string':
 				result.append(str(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
 		result.sort()
-		for x in range (int(currentCuad[2])):
-			memoria.addValue(checkTipo(memoriaBase+x),str(memoriaBase+x), result[x])
+		if esGlobalOTemporal(memoriaBase):
+			for x in range (int(currentCuad[2])):
+				memGlobal.addValue(checkTipo(memoriaBase+x),str(memoriaBase+x), result[x])
+		else:
+			for x in range (int(currentCuad[2])):
+				memoria.addValue(checkTipo(memoriaBase+x),str(memoriaBase+x), result[x])
 
 
 	if currentCuad[0]=='export1':
+		global exportData
 		memoriaBase=int(currentCuad[1])
 		columnas=int(currentCuad[2])
 		filas=int(currentCuad[3])
 		arregloTemporal=[]
+		exportData=[]
 		for fila in range(filas):
 			arregloTemporal=[]
 			for columna in range(columnas):
@@ -652,6 +678,144 @@ def ejecutaCuadruplo():
 			renglon=renglon[1:]
 			f.write(renglon+"\n")
 		f.close() 
+
+	if currentCuad[0]=='linechart1':
+		resetX()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			xData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+
+	if currentCuad[0]=='linechart2':
+		resetY()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			yData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+		plt.plot(xData,yData)
+		plt.show()
+
+	if currentCuad[0]=='grapg3d1':
+		resetX()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			xData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+	
+	if currentCuad[0]=='grapg3d2':
+		resetY()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			yData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+	
+	if currentCuad[0]=='grapg3d3':
+		resetZ()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			zData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+		fig = plt.figure()
+		ax = fig.gca(projection='3d')
+		ax.plot(xData, yData, zData)
+		plt.show()
+
+	if currentCuad[0]=='graphpie1':
+		resetX()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			temp=str(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x))[:-1]
+			temp=temp[1:]
+			xData.append(temp)
+
+	if currentCuad[0]=='graphpie2':
+		resetZ()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			zData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+		fig1, ax1 = plt.subplots()
+		ax1.pie(zData, labels=xData, autopct='%1.1f%%', shadow=True, startangle=90)
+		ax1.axis('equal') 
+		plt.show()
+
+	if currentCuad[0]=='graphhist':
+		resetX()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			xData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+		binsH=int(getData(memoria, checkTipo(currentCuad[3]), currentCuad[3]))
+		n, bins, patches = plt.hist(xData, binsH, facecolor='blue', alpha=0.5)
+		plt.show()
+
+	if currentCuad[0]=='graphbar1':
+		resetX()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			temp=str(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x))[:-1]
+			temp=temp[1:]
+			xData.append(temp)
+
+	if currentCuad[0]=='graphbar2':
+		resetZ()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			zData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+		fig1, ax1 = plt.subplots()
+		ax1.pie(zData, labels=xData, autopct='%1.1f%%', shadow=True, startangle=90)
+		ax1.axis('equal') 
+		plt.show()
+		plt.rcdefaults()
+		fig, ax = plt.subplots()
+		y_pos = np.arange(len(xData))
+		ax.barh(y_pos, zData, align='center', color='green')
+		ax.set_yticks(y_pos)
+		ax.set_yticklabels(xData)
+		ax.invert_yaxis()  # labels read top-to-bottom
+		plt.show()
+
+	if currentCuad[0]=='transpose':
+		memoriaBase=int(currentCuad[1])
+		columnas=int(currentCuad[2])
+		filas=int(currentCuad[3])
+		matrizTemporal=[]
+		arregloTemporal=[]
+		for fila in range(filas):
+			arregloTemporal=[]
+			for columna in range(columnas):
+				x=memoriaBase+fila+columna*filas
+				arregloTemporal.append(getData(memoria, checkTipo(x), x))
+			matrizTemporal.append(arregloTemporal)
+		if esGlobalOTemporal(memoriaBase):
+			for fila in range(filas):
+				for columna in range(columnas):
+					x=memoriaBase+columna+fila*columnas
+					memGlobal.addValue(checkTipo(x),str(x),matrizTemporal[columna][fila])
+		else:
+			for fila in range(filas):
+				for columna in range(columnas):
+					x=memoriaBase+columna+fila*columnas
+					memoria.addValue(checkTipo(x),str(x),matrizTemporal[fila][columna])
+
+
+	if currentCuad[0]=='linreg1':
+		resetX()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			xData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+	if currentCuad[0]=='linreg2':
+		resetY()
+		memoriaBase=int(currentCuad[1])
+		for x in range (int(currentCuad[2])):
+			yData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
+
+	if currentCuad[0]=='linreg3':
+		x = np.array(xData).reshape((-1, 1))
+		y = np.array(yData)
+		model = LinearRegression().fit(x, y)
+		request=int(getData(memoria,checkTipo(currentCuad[1]),currentCuad[1]))
+		if request==1:
+			r_sq = model.score(x, y)
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],r_sq)
+		elif request==2:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],model.intercept_)
+		else:
+			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],model.coef_[0])
+		
 
 	#Procedimientos para arreglos y matrices
 	if currentCuad[0]=='ver':

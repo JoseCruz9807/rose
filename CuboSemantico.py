@@ -127,7 +127,43 @@ class CuboSemantico:
 		('exportCSV','string',	'string'):	'bool',
 		('exportCSV','string',	'int')	:	'bool',
 		('exportCSV','string',	'float'):	'bool',
-		('exportCSV','string',	'bool')	:	'bool'
+		('exportCSV','string',	'bool')	:	'bool',
+
+		('lineChart','int',		'int')	:	'bool',
+		('lineChart','float',	'float'):	'bool',
+		('lineChart','float',	'int')	:	'bool',
+		('lineChart','int',		'float'):	'bool',
+
+		('graph3d','int',		'int')	:	'graph3d2',
+		('graph3d','float',	'float')	:	'graph3d2',
+		('graph3d','float',	'int')		:	'graph3d2',
+		('graph3d','int',		'float'):	'graph3d2',
+
+		('graph3d2','int',		'int')	:	'bool',
+		('graph3d2','float',	'float'):	'bool',
+		('graph3d2','float',	'int')	:	'bool',
+		('graph3d2','int',		'float'):	'bool',
+
+		('pieChart','string',	'int')	:	'bool',
+		('pieChart','string',	'float'):	'bool',
+
+		('histogramChart','int','int')	:	'bool',
+		('histogramChart','float','int'):	'bool',
+		
+		('barChart','string',	'float'):	'bool',
+		('barChart','string',	'int')	:	'bool',
+
+		('transpose','int',		'')		:	'bool',
+		('transpose','float',		'')	:	'bool',
+		('transpose','bool',		'')	:	'bool',
+		('transpose','string',		'')	:	'bool',
+
+		('linreg','int',		'int')	:	'linreg2',
+		('linreg','float',	'float')	:	'linreg2',
+		('linreg','int',	'float')	:	'linreg2',
+		('linreg','float',	'int')		:	'linreg2',
+
+		('linreg2','int',	'')			:	'float',
 
 		}
 
