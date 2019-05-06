@@ -1190,14 +1190,14 @@ def p_spec_func(p):
                 | SORT np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func4 RIGHTPARENTHESIS comments_nl 
                 | SIN np_spec_func comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS np_spec_func2 comments_nl 
                 | COS np_spec_func comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS np_spec_func2 comments_nl 
-                | TRANSPOSE comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
+                | TRANSPOSE np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func_transpose RIGHTPARENTHESIS comments_nl 
                 | EXPORTCSV np_spec_func comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl ID np_spec_func_contenido RIGHTPARENTHESIS comments_nl 
-                | GRAPH3D comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl 
-                | PIECHART comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS comments_nl
-                | HISTOGRAMCHART comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
-                | LINECHART comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
-                | BARCHART comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
-                | LINREG comments_nl LEFTPARENTHESIS comments_nl mega_exp COMMA comments_nl mega_exp RIGHTPARENTHESIS comments_nl
+                | GRAPH3D np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func_line1 COMMA comments_nl ID np_spec_func_line1 COMMA comments_nl ID np_spec_func_3d RIGHTPARENTHESIS comments_nl 
+                | PIECHART np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func_line1 COMMA comments_nl ID np_spec_func_pie RIGHTPARENTHESIS comments_nl
+                | HISTOGRAMCHART np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func_line1 COMMA comments_nl mega_exp np_spec_func_histogram RIGHTPARENTHESIS comments_nl
+                | LINECHART np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func_line1 COMMA comments_nl ID np_spec_func_line2 RIGHTPARENTHESIS comments_nl
+                | BARCHART np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func_line1 COMMA comments_nl ID np_spec_func_bar RIGHTPARENTHESIS comments_nl
+                | LINREG np_spec_func comments_nl LEFTPARENTHESIS comments_nl ID np_spec_func_line1 COMMA comments_nl ID np_spec_func_line1 COMMA mega_exp np_spec_func_linreg RIGHTPARENTHESIS comments_nl
                 | NOT np_not_quad1 comments_nl LEFTPARENTHESIS comments_nl mega_exp RIGHTPARENTHESIS np_not_quad2 comments_nl
     '''
 
@@ -1254,7 +1254,7 @@ def p_empty(p):
 def p_error(p):
     print ("Syntax error in line " + str(lexer.lineno))
     tok = lexer.token()
-    print("lo que truena es el: " + str(tok))
+    #print("lo que truena es el: " + str(tok))
     sys.exit()
     return
 
@@ -2245,7 +2245,7 @@ def p_np_spec_func3(p):
             typeMismatch()
     elif tempIdName in dirFunc.val['globals'][1]:
         if dirFunc.getColumnasVar('globals',tempIdName)==0 or dirFunc.getFilasVar('globals', tempIdName)>0:
-            print("In line {}, expected [".format(lexer.lineno))
+            print("In line {}, expected array".format(lexer.lineno))
             sys.exit()
             return
         tipo=dirFunc.getVarType(nombreFunc,tempIdName)
@@ -2257,6 +2257,10 @@ def p_np_spec_func3(p):
             addTipoToStack(resultType)
         else:
             typeMismatch()
+    else:
+        print("In line {}, variable not declared".format(lexer.lineno))
+        sys.exit()
+        return
 
 
 def p_np_spec_func4(p):
@@ -2287,6 +2291,10 @@ def p_np_spec_func4(p):
             addQuad(operador,dirFunc.getVarMemPos('globals', tempIdName),dirFunc.getColumnasVar('globals',tempIdName),'')
         else:
             typeMismatch()
+    else:
+        print("In line {}, variable not declared".format(lexer.lineno))
+        sys.exit()
+        return
     nextTemp=getAvail("bool")
     addQuad('=',14001,'',nextTemp)
     addOperandoToStack(nextTemp)
@@ -2326,30 +2334,320 @@ def p_np_spec_func_contenido(p):
             addQuad("export2",operando,'','')
         else:
             typeMismatch()
+    else:
+        print("In line {}, variable not declared".format(lexer.lineno))
+        sys.exit()
+        return
     nextTemp=getAvail(resultType)
     addQuad('=',14001,'',nextTemp)
     addOperandoToStack(nextTemp)
     addTipoToStack(resultType)
 
 
-"""
-def p_np_abs2(p):
+def p_np_spec_func_line1(p):
     '''
-    np_abs2 :
+    np_spec_func_line1 :
     '''
-    operando=popOperando()
-    tipo=popTipos()
+    tempIdName = str(p[-1])
+    if tempIdName in dirFunc.val[nombreFunc][1] :
+        addOperandoToStack(tempIdName)
+        addTipoToStack(dirFunc.getVarType(nombreFunc,tempIdName))
+    elif tempIdName in dirFunc.val['globals'][1]: 
+        addOperandoToStack(tempIdName)
+        addTipoToStack(dirFunc.getVarType('globals',tempIdName))
+    else:
+        print("In line {}, variable not declared".format(lexer.lineno))
+        sys.exit()
+        return
+
+def p_np_spec_func_line2(p):
+    '''
+    np_spec_func_line2 :
+    '''
+    y = str(p[-1])
     operador=popOperadores()
-    checkIfTemporal(operando)
-    resultType=semantica.resultType(operador, tipo, '')
-    nextTemp= getAvail(resultType)
+    x=popOperando()
+    xTipo=popTipos()
+    yTipo=''
+    yFunc=''
+    xFunc=''
+    resultType=''
+    if y in dirFunc.val[nombreFunc][1]:
+        yFunc=nombreFunc
+    elif y in dirFunc.val['globals'][1]:
+        yFunc='globals'
+    else:
+        print("In line {}, variable not declared".format(lexer.lineno))
+        sys.exit()
+        return
+    yTipo=dirFunc.getVarType(yFunc,y)
+    if x in dirFunc.val[nombreFunc][1]:
+        xFunc=nombreFunc
+    elif x in dirFunc.val['globals'][1]:
+        xFunc='globals'
+    if dirFunc.getColumnasVar(yFunc,y)==0 or dirFunc.getFilasVar(yFunc, y)>0 or dirFunc.getColumnasVar(xFunc,x)==0 or dirFunc.getFilasVar(xFunc, x)>0:
+        print("In line {}, expected array".format(lexer.lineno))
+        sys.exit()
+        return
+    elif dirFunc.getColumnasVar(yFunc,y)!=dirFunc.getColumnasVar(xFunc,x):
+        print("In line {}, array size do not match".format(lexer.lineno))
+    
+    resultType=semantica.resultType(operador, xTipo,yTipo)
     if 'error'!=resultType:
-        addOperandoToStack(nextTemp)
-        addTipoToStack(resultType)
-        addQuad(operador,operando,'',nextTemp)
+        addQuad("linechart1",dirFunc.getVarMemPos(xFunc, x),dirFunc.getColumnasVar(xFunc,x),'')
+        addQuad("linechart2",dirFunc.getVarMemPos(yFunc, y),dirFunc.getColumnasVar(yFunc,y),'')
     else:
         typeMismatch()
-"""
+    nextTemp=getAvail(resultType)
+    addQuad('=',14001,'',nextTemp)
+    addOperandoToStack(nextTemp)
+    addTipoToStack(resultType)
+    
+def p_np_spec_func_3d(p):
+    '''
+    np_spec_func_3d :
+    '''
+    z = str(p[-1])
+    operador=popOperadores()
+    y=popOperando()
+    yTipo=popTipos()
+    x=popOperando()
+    xTipo=popTipos()
+    zTipo=''
+    zFunc=''
+    xFunc=''
+    yFunc=''
+    resultType=''
+    if z in dirFunc.val[nombreFunc][1]:
+        zFunc=nombreFunc
+    elif z in dirFunc.val['globals'][1]:
+        zFunc='globals'
+    else:
+        print("In line {}, variable not declared".format(lexer.lineno))
+        sys.exit()
+        return
+    zTipo=dirFunc.getVarType(zFunc,z)
+
+    if x in dirFunc.val[nombreFunc][1]:
+        xFunc=nombreFunc
+    elif x in dirFunc.val['globals'][1]:
+        xFunc='globals'
+
+    if y in dirFunc.val[nombreFunc][1]:
+        yFunc=nombreFunc
+    elif y in dirFunc.val['globals'][1]:
+        yFunc='globals'
+
+    if dirFunc.getColumnasVar(yFunc,y)==0 or dirFunc.getFilasVar(yFunc, y)>0 or dirFunc.getColumnasVar(xFunc,x)==0 or dirFunc.getFilasVar(xFunc, x)>0 or dirFunc.getColumnasVar(zFunc,z)==0 or dirFunc.getFilasVar(zFunc, z)>0:
+        print("In line {}, expected array".format(lexer.lineno))
+        sys.exit()
+        return
+    elif dirFunc.getColumnasVar(yFunc,y)!=dirFunc.getColumnasVar(xFunc,x) or dirFunc.getColumnasVar(yFunc,y)!=dirFunc.getColumnasVar(zFunc,z):
+        print("In line {}, array size do not match".format(lexer.lineno))
+    
+    resultType=semantica.resultType(operador, xTipo,yTipo)
+    resultType=semantica.resultType(resultType, yTipo, zTipo)
+    if 'error'!=resultType:
+        addQuad("grapg3d1",dirFunc.getVarMemPos(xFunc, x),dirFunc.getColumnasVar(xFunc,x),'')
+        addQuad("grapg3d2",dirFunc.getVarMemPos(yFunc, y),dirFunc.getColumnasVar(yFunc,y),'')
+        addQuad("grapg3d3",dirFunc.getVarMemPos(zFunc, z),dirFunc.getColumnasVar(zFunc,z),'')
+    else:
+        typeMismatch()
+    nextTemp=getAvail(resultType)
+    addQuad('=',14001,'',nextTemp)
+    addOperandoToStack(nextTemp)
+    addTipoToStack(resultType)
+
+def p_np_spec_func_pie(p):
+    '''
+    np_spec_func_pie :
+    '''
+    z = str(p[-1])
+    operador=popOperadores()
+    x=popOperando()
+    xTipo=popTipos()
+    xFunc=''
+    yFunc=''
+    resultType=''
+    if z in dirFunc.val[nombreFunc][1]:
+        zFunc=nombreFunc
+    elif z in dirFunc.val['globals'][1]:
+        zFunc='globals'
+    else:
+        print("In line {}, variable not declared".format(lexer.lineno))
+        sys.exit()
+        return
+    zTipo=dirFunc.getVarType(zFunc,z)
+    if x in dirFunc.val[nombreFunc][1]:
+        xFunc=nombreFunc
+    elif x in dirFunc.val['globals'][1]:
+        xFunc='globals'
+    
+    if dirFunc.getColumnasVar(zFunc,z)==0 or dirFunc.getFilasVar(zFunc, z)>0 or dirFunc.getColumnasVar(xFunc,x)==0 or dirFunc.getFilasVar(xFunc, x)>0:
+        print("In line {}, expected array".format(lexer.lineno))
+        sys.exit()
+        return
+    elif dirFunc.getColumnasVar(zFunc,z)!=dirFunc.getColumnasVar(xFunc,x):
+        print("In line {}, array size do not match".format(lexer.lineno))
+
+    resultType=semantica.resultType(operador, xTipo,zTipo)
+    if 'error'!=resultType:
+        addQuad("graphpie1",dirFunc.getVarMemPos(xFunc, x),dirFunc.getColumnasVar(xFunc,x),'')
+        addQuad("graphpie2",dirFunc.getVarMemPos(zFunc, z),dirFunc.getColumnasVar(zFunc,z),'')
+    else:
+        typeMismatch()
+    nextTemp=getAvail(resultType)
+    addQuad('=',14001,'',nextTemp)
+    addOperandoToStack(nextTemp)
+    addTipoToStack(resultType)
+
+def p_np_spec_func_histogram(p):
+    '''
+    np_spec_func_histogram :
+    '''
+    operador=popOperadores()
+    bins=popOperando()
+    binTipo=popTipos()
+    data=popOperando()
+    dataTipo=popTipos()
+    dataFunc=''
+    if data in dirFunc.val[nombreFunc][1]:
+        dataFunc=nombreFunc
+    elif data in dirFunc.val['globals'][1]:
+        dataFunc='globals'
+    if dirFunc.getColumnasVar(dataFunc,data)==0 or dirFunc.getFilasVar(dataFunc, data)>0:
+        print("In line {}, expected array".format(lexer.lineno))
+        sys.exit()
+        return
+    resultType=semantica.resultType(operador, dataTipo,binTipo)
+    if 'error'!=resultType:
+        addQuad("graphhist",dirFunc.getVarMemPos(dataFunc, data),dirFunc.getColumnasVar(dataFunc,data),bins)
+    else:
+        typeMismatch()
+    nextTemp=getAvail(resultType)
+    addQuad('=',14001,'',nextTemp)
+    addOperandoToStack(nextTemp)
+    addTipoToStack(resultType)
+    
+def p_np_spec_func_bar(p):
+    '''
+    np_spec_func_bar :
+    '''
+    z = str(p[-1])
+    operador=popOperadores()
+    x=popOperando()
+    xTipo=popTipos()
+    xFunc=''
+    yFunc=''
+    resultType=''
+    if z in dirFunc.val[nombreFunc][1]:
+        zFunc=nombreFunc
+    elif z in dirFunc.val['globals'][1]:
+        zFunc='globals'
+    else:
+        print("In line {}, variable not declared".format(lexer.lineno))
+        sys.exit()
+        return
+    zTipo=dirFunc.getVarType(zFunc,z)
+    if x in dirFunc.val[nombreFunc][1]:
+        xFunc=nombreFunc
+    elif x in dirFunc.val['globals'][1]:
+        xFunc='globals'
+    
+    if dirFunc.getColumnasVar(zFunc,z)==0 or dirFunc.getFilasVar(zFunc, z)>0 or dirFunc.getColumnasVar(xFunc,x)==0 or dirFunc.getFilasVar(xFunc, x)>0:
+        print("In line {}, expected array".format(lexer.lineno))
+        sys.exit()
+        return
+    elif dirFunc.getColumnasVar(zFunc,z)!=dirFunc.getColumnasVar(xFunc,x):
+        print("In line {}, array size do not match".format(lexer.lineno))
+
+    resultType=semantica.resultType(operador, xTipo,zTipo)
+    if 'error'!=resultType:
+        addQuad("graphbar1",dirFunc.getVarMemPos(xFunc, x),dirFunc.getColumnasVar(xFunc,x),'')
+        addQuad("graphbar2",dirFunc.getVarMemPos(zFunc, z),dirFunc.getColumnasVar(zFunc,z),'')
+    else:
+        typeMismatch()
+    nextTemp=getAvail(resultType)
+    addQuad('=',14001,'',nextTemp)
+    addOperandoToStack(nextTemp)
+    addTipoToStack(resultType)
+
+def p_np_spec_func_transpose(p):
+    '''
+    np_spec_func_transpose :
+    '''
+    z = str(p[-1])
+    operador=popOperadores()
+    resultType=''
+    zFunc=''
+    if z in dirFunc.val[nombreFunc][1]:
+        zFunc=nombreFunc
+    elif z in dirFunc.val['globals'][1]:
+        zFunc='globals'
+    else:
+        print("In line {}, variable not declared".format(lexer.lineno))
+        sys.exit()
+        return
+    zTipo=dirFunc.getVarType(zFunc,z)
+    if dirFunc.getColumnasVar(zFunc,z)==0 or dirFunc.getFilasVar(zFunc, z)==0:
+        print("In line {}, expected array".format(lexer.lineno))
+        sys.exit()
+        return
+    elif dirFunc.getColumnasVar(zFunc,z)!=dirFunc.getFilasVar(zFunc, z):
+        print("In line {}, matrix must be square".format(lexer.lineno))
+        sys.exit()
+        return
+    resultType=semantica.resultType(operador,zTipo,'')
+    if 'error'!=resultType:
+        addQuad("transpose",dirFunc.getVarMemPos(zFunc, z),dirFunc.getColumnasVar(zFunc,z),dirFunc.getFilasVar(zFunc,z))
+    else:
+        typeMismatch()
+    nextTemp=getAvail(resultType)
+    addQuad('=',14001,'',nextTemp)
+    addOperandoToStack(nextTemp)
+    addTipoToStack(resultType)
+
+def p_np_spec_func_linreg(p):
+    '''
+    np_spec_func_linreg :
+    '''
+    request=popOperando()
+    requestTipo=popTipos()
+    y=popOperando()
+    yTipo=popTipos()
+    x=popOperando()
+    xTipo=popTipos()
+    operador=popOperadores()
+    xFunc=''
+    yFunc=''
+    if x in dirFunc.val[nombreFunc][1]:
+        xFunc=nombreFunc
+    elif x in dirFunc.val['globals'][1]:
+        xFunc='globals'
+    if y in dirFunc.val[nombreFunc][1]:
+        yFunc=nombreFunc
+    elif y in dirFunc.val['globals'][1]:
+        yFunc='globals'
+    if dirFunc.getColumnasVar(yFunc,y)==0 or dirFunc.getFilasVar(yFunc, y)>0 or dirFunc.getColumnasVar(xFunc,x)==0 or dirFunc.getFilasVar(xFunc, x)>0:
+        print("In line {}, expected array".format(lexer.lineno))
+        sys.exit()
+        return
+    elif dirFunc.getColumnasVar(yFunc,y)!=dirFunc.getColumnasVar(xFunc,x):
+        print("In line {}, array size do not match".format(lexer.lineno))
+    resultType=semantica.resultType(operador, xTipo,yTipo)
+    resultType=semantica.resultType(resultType, requestTipo,'')
+    nextTemp=''
+    if 'error'!=resultType:
+        nextTemp=getAvail(resultType)
+        addQuad("linreg1",dirFunc.getVarMemPos(xFunc, x),dirFunc.getColumnasVar(xFunc,x),'')
+        addQuad("linreg2",dirFunc.getVarMemPos(yFunc, y),dirFunc.getColumnasVar(yFunc,y),'')
+        addQuad("linreg3",request,'',nextTemp)
+    else:
+        typeMismatch()
+    addOperandoToStack(nextTemp)
+    addTipoToStack(resultType)
+
+
 
 parser = yacc.yacc() 
 
