@@ -103,7 +103,7 @@ class CuboSemantico:
 		('abs',		'float',	'' )	:	'float',
 
 		('sin',		'int',		'')		:	'float',
-		('sin'		'float',	'')		:	'float',
+		('sin',		'float',	'')		:	'float',
 		('cos',		'int',		'')		:	'float',
 		('cos',		'float',	'')		:	'float',
 		('factorial','int',		'')		:	'int',
@@ -118,7 +118,7 @@ class CuboSemantico:
 		('median',	'int',		'')		:	'float',
 
 		('mode',	'int',		'')		:	'int',
-		('mode'		'float',	'')		:	'float',
+		('mode',	'float',	'')		:	'float',
 		('mode',	'string',	'')		:	'string',
 
 		('sort',	'int',		'')		:	'int',
