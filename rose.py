@@ -553,7 +553,7 @@ def actualizaApuntadorMemoria(dataType, cantidadValores):
             memoriaLocalCantidad[3] += cantidadValores
             if memoriaLocalCantidad[3] > iStringLocales:
                 memoryOverflow('string local')
-    print('terminan int: {}, float: {}, bool: {}, string: {}'.format(memoriaLocalCantidad[0],memoriaLocalCantidad[1],memoriaLocalCantidad[2],memoriaLocalCantidad[3]))
+    #print('terminan int: {}, float: {}, bool: {}, string: {}'.format(memoriaLocalCantidad[0],memoriaLocalCantidad[1],memoriaLocalCantidad[2],memoriaLocalCantidad[3]))
 
 
 #Guarda la cantidad de parametros en la funcion
@@ -636,54 +636,81 @@ def addIdToStack(nameId):
         return
 #Agrega el operando a la pila de operandos y su tipo a la pila de tipos 
 def addValueToStack(value):
-    global dictInt
-    global dictFloat
-    global dictString
-    global memoriaConstantesCantidad
-    global contadorConstantes
-    #print(value)
-    #print(type(value))
-    #print(tipoDato)
-    if type(value) == int:
-        if value not in dictInt:
-            if memoriaConstantesCantidad[0] < iIntConst:
-                dictInt[value]=memoriaConstantesCantidad[0]
-                memoriaConstantesCantidad[0] += 1
-                addQuadInicio('addConstInt', value, '', dictInt[value])
-                contadorConstantes += 1
-            else:
-                memoryOverflow('int const') 
-        addOperandoToStack(dictInt[value])
-        addTipoToStack('int')
-    if type(value) == float:
-        if value not in dictFloat:
-            if memoriaConstantesCantidad[1] < iFloatConst:
-                dictFloat[value]=memoriaConstantesCantidad[1]
-                memoriaConstantesCantidad[1] += 1
-                addQuadInicio('addConstFloat', value, '', dictFloat[value])
-                contadorConstantes += 1
-            else:
-                memoryOverflow('float const')  
-        addOperandoToStack(dictFloat[value])
-        addTipoToStack('float')
-    if type(value) == str:
-        if (value == 'true' or value == 'false'):
-            if(value=='true'):
-                addOperandoToStack(iFloatConst+1)
-            else:
-                addOperandoToStack(iFloatConst)
-            addTipoToStack('bool')
-        else:
-            if value not in dictString:
-                if memoriaConstantesCantidad[3] < iStringConst:
-                    dictString[value]=memoriaConstantesCantidad[3]
-                    memoriaConstantesCantidad[3] += 1
-                    addQuadInicio('addConstString', value, '', dictString[value])
-                    contadorConstantes += 1
-                else:
-                    memoryOverflow('string const') 
-            addOperandoToStack(dictString[value])
-            addTipoToStack('string')
+	global dictInt
+	global dictFloat
+	global dictString
+	global memoriaConstantesCantidad
+	global contadorConstantes
+	global declaracionVariables
+	#print(value)
+	#print(type(value))
+	#print(tipoDato)
+    
+	if type(value) == float:
+		if value not in dictFloat:
+			if memoriaConstantesCantidad[1] < iFloatConst:
+				dictFloat[value]=memoriaConstantesCantidad[1]
+				memoriaConstantesCantidad[1] += 1
+				addQuadInicio('addConstFloat', value, '', dictFloat[value])
+				contadorConstantes += 1
+			else:
+				memoryOverflow('float const')  
+		addOperandoToStack(dictFloat[value])
+		addTipoToStack('float')
+	if type(value) == int:
+		if declaracionVariables:
+			if tipoDato == 'float':
+				value = value +0.0
+				if value not in dictFloat:
+					if memoriaConstantesCantidad[1] < iFloatConst:
+						dictFloat[value]=memoriaConstantesCantidad[1]
+						memoriaConstantesCantidad[1] += 1
+						addQuadInicio('addConstFloat', value, '', dictFloat[value])
+						contadorConstantes += 1
+					else:
+						memoryOverflow('float const')  
+				addOperandoToStack(dictFloat[value])
+				addTipoToStack('float')
+			else:
+				if value not in dictInt:
+					if memoriaConstantesCantidad[0] < iIntConst:
+						dictInt[value]=memoriaConstantesCantidad[0]
+						memoriaConstantesCantidad[0] += 1
+						addQuadInicio('addConstInt', value, '', dictInt[value])
+						contadorConstantes += 1
+					else:
+						memoryOverflow('int const') 
+				addOperandoToStack(dictInt[value])		
+				addTipoToStack('int')
+		else:
+			if value not in dictInt:
+				if memoriaConstantesCantidad[0] < iIntConst:
+					dictInt[value] = memoriaConstantesCantidad[0]
+					memoriaConstantesCantidad[0] += 1
+					addQuadInicio('addConstInt', value, '', dictInt[value])
+					contadorConstantes += 1
+				else:
+					memoryOverflow('int const')
+			addOperandoToStack(dictInt[value])
+			addTipoToStack('int')
+	if type(value) == str:
+		if (value == 'true' or value == 'false'):
+			if(value=='true'):
+				addOperandoToStack(iFloatConst+1)
+			else:
+				addOperandoToStack(iFloatConst)
+			addTipoToStack('bool')
+		else:
+			if value not in dictString:
+				if memoriaConstantesCantidad[3] < iStringConst:
+					dictString[value]=memoriaConstantesCantidad[3]
+					memoriaConstantesCantidad[3] += 1
+					addQuadInicio('addConstString', value, '', dictString[value])
+					contadorConstantes += 1
+				else:
+					memoryOverflow('string const') 
+			addOperandoToStack(dictString[value])
+			addTipoToStack('string')
 #Agrega el operador a la pila de operadores
 def addOperadorToStack(operator):
 	global pilaOperadores
@@ -1205,12 +1232,6 @@ def p_returnx(p):
     '''
     returnx : RETURNX comments_nl mega_exp SEMICOLON comments_nl
     '''
-
-def p_np_add_fondo_falso(p):
-	'''
-	np_add_fondo_falso :
-	'''
-	addOperadorToStack('(')
 
 def p_ctes(p):
     '''
@@ -2686,14 +2707,18 @@ def p_np_spec_func_linreg(p):
     addOperandoToStack(nextTemp)
     addTipoToStack(resultType)
 
-
+def p_np_add_fondo_falso(p):
+	'''
+	np_add_fondo_falso :
+	'''
+	addOperadorToStack('(')
 
 parser = yacc.yacc() 
 
 #Cambiar el nombre del archivo de entrada para probar el codigo
 #name='pruebaRose.txt'
-#name='pruebaCuad2.txt'
-name='fibonacci.txt'
+name='pruebaCuad2.txt'
+#name='fibonacci.txt'
 #name='factorial.txt'
 #name='bubbleSort.txt'
 #name= 'multiplicacionMatrices.txt'

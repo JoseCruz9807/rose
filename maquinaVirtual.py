@@ -325,8 +325,19 @@ def ejecutaCuadruplo():
 
 	#Operadores logicos
 	if currentCuad[0] == '<':
-		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
-		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
+		tempTipoUno = checkTipo(currentCuad[1])
+		tempTipoDos = checkTipo(currentCuad[2])
+		operadorUno = getData(memoria, tempTipoUno,currentCuad[1])
+		operadorDos = getData(memoria, tempTipoDos,currentCuad[2])
+		if tempTipoUno == 'int':
+			operadorUno = int(operadorUno)
+		if tempTipoDos == 'int':
+			operadorDos = int(operadorDos)
+		if tempTipoUno == 'float':
+			operadorUno = float(operadorUno)
+		if tempTipoDos == 'float':
+			operadorDos = float(operadorDos)
+		
 		if operadorUno < operadorDos:
 			resultado = 'true'
 		else:
@@ -336,8 +347,19 @@ def ejecutaCuadruplo():
 		else:
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 	if currentCuad[0] == '<=':
-		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
-		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
+		tempTipoUno = checkTipo(currentCuad[1])
+		tempTipoDos = checkTipo(currentCuad[2])
+		operadorUno = getData(memoria, tempTipoUno,currentCuad[1])
+		operadorDos = getData(memoria, tempTipoDos,currentCuad[2])
+		if tempTipoUno == 'int':
+			operadorUno = int(operadorUno)
+		if tempTipoDos == 'int':
+			operadorDos = int(operadorDos)
+		if tempTipoUno == 'float':
+			operadorUno = float(operadorUno)
+		if tempTipoDos == 'float':
+			operadorDos = float(operadorDos)
+		
 		if operadorUno <= operadorDos:
 			resultado = 'true'
 		else:
@@ -348,8 +370,19 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 	
 	if currentCuad[0] == '>':
-		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
-		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
+		tempTipoUno = checkTipo(currentCuad[1])
+		tempTipoDos = checkTipo(currentCuad[2])
+		operadorUno = getData(memoria, tempTipoUno,currentCuad[1])
+		operadorDos = getData(memoria, tempTipoDos,currentCuad[2])
+		if tempTipoUno == 'int':
+			operadorUno = int(operadorUno)
+		if tempTipoDos == 'int':
+			operadorDos = int(operadorDos)
+		if tempTipoUno == 'float':
+			operadorUno = float(operadorUno)
+		if tempTipoDos == 'float':
+			operadorDos = float(operadorDos)
+		
 		if operadorUno > operadorDos:
 			resultado = 'true'
 		else:
@@ -359,8 +392,19 @@ def ejecutaCuadruplo():
 		else:
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 	if currentCuad[0] == '>=':
-		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
-		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
+		tempTipoUno = checkTipo(currentCuad[1])
+		tempTipoDos = checkTipo(currentCuad[2])
+		operadorUno = getData(memoria, tempTipoUno,currentCuad[1])
+		operadorDos = getData(memoria, tempTipoDos,currentCuad[2])
+		if tempTipoUno == 'int':
+			operadorUno = int(operadorUno)
+		if tempTipoDos == 'int':
+			operadorDos = int(operadorDos)
+		if tempTipoUno == 'float':
+			operadorUno = float(operadorUno)
+		if tempTipoDos == 'float':
+			operadorDos = float(operadorDos)
+		
 		if operadorUno > operadorDos:
 			resultado = 'true'
 		else:
@@ -371,8 +415,19 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 
 	if currentCuad[0] == '==':
-		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
-		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
+		tempTipoUno = checkTipo(currentCuad[1])
+		tempTipoDos = checkTipo(currentCuad[2])
+		operadorUno = getData(memoria, tempTipoUno,currentCuad[1])
+		operadorDos = getData(memoria, tempTipoDos,currentCuad[2])
+		if tempTipoUno == 'int':
+			operadorUno = int(operadorUno)
+		if tempTipoDos == 'int':
+			operadorDos = int(operadorDos)
+		if tempTipoUno == 'float':
+			operadorUno = float(operadorUno)
+		if tempTipoDos == 'float':
+			operadorDos = float(operadorDos)
+		
 		if operadorUno == operadorDos:
 			resultado = 'true'
 		else:
@@ -383,8 +438,19 @@ def ejecutaCuadruplo():
 			memoria.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 	
 	if currentCuad[0] == '!=':
-		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
-		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
+		tempTipoUno = checkTipo(currentCuad[1])
+		tempTipoDos = checkTipo(currentCuad[2])
+		operadorUno = getData(memoria, tempTipoUno,currentCuad[1])
+		operadorDos = getData(memoria, tempTipoDos,currentCuad[2])
+		if tempTipoUno == 'int':
+			operadorUno = int(operadorUno)
+		if tempTipoDos == 'int':
+			operadorDos = int(operadorDos)
+		if tempTipoUno == 'float':
+			operadorUno = float(operadorUno)
+		if tempTipoDos == 'float':
+			operadorDos = float(operadorDos)
+		
 		if operadorUno != operadorDos:
 			resultado = 'true'
 		else:
@@ -397,7 +463,7 @@ def ejecutaCuadruplo():
 	if currentCuad[0] == 'AND':
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
 		operadorDos = getData(memoria, checkTipo(currentCuad[2]),currentCuad[2])
-		if operadorUno and operadorDos:
+		if operadorUno == operadorDos and operadorUno == 'true':
 			resultado = 'true'
 		else:
 			resultado = 'false'
@@ -408,10 +474,10 @@ def ejecutaCuadruplo():
 	if currentCuad[0] == 'OR':
 		operadorUno = getData(memoria, checkTipo(currentCuad[1]),int(currentCuad[1]))
 		operadorDos = getData(memoria, checkTipo(currentCuad[2]),int(currentCuad[2]))
-		if operadorUno or operadorDos:
-			resultado = 'true'
-		else:
+		if operadorUno == operadorDos and operadorUno == 'false' and operadorDos=='false':
 			resultado = 'false'
+		else:
+			resultado = 'true'
 		if esGlobalOTemporal(currentCuad[3]):
 			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 		else:

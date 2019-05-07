@@ -63,6 +63,7 @@ class CuboSemantico:
 		('string',	'string',	'='		)	:'string'	,
 		('string',	'string',	'=*'	)	:'string'	,
 		('string',	'string',	'=='	)	:'bool'	,
+		('string', 	'string',	'!='	)	:'bool',
 		
 		('bool',	'bool',		'='		)	:'bool'	,
 		('bool',	'bool',		'=*'	)	:'bool'	,
