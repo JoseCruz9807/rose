@@ -10,9 +10,9 @@ int iSize = 3;
 
 while(iI < iSize) {
     while(iJ < iSize) {
-        matC[iI][iJ] = 0.0;
+        matC[iJ][iI] = 0.0;
         while(iK < iSize) {
-            matC[iI][iJ] = matC[iI][iJ] + matA[iI][iK] * matB[iK][iJ];
+            matC[iJ][iI] = matC[iJ][iI] + matA[iK][iI] * matB[iJ][iK];
             iK = iK +1;
         }
         iK = 0;
@@ -25,7 +25,7 @@ iI = 0;
 iJ = 0;
 while(iI<iSize) {
     while(iJ<iSize) {
-        print(matC[iI][iJ]);
+        print(matC[iJ][iI]);
         iJ = iJ+1;
     }
     iI = iI+1;

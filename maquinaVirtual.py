@@ -167,7 +167,7 @@ def getData(currentMemory, tipoDeDato, memAdd):
 			returnVal = memGlobal.getValue(tipoDeDato,memAdd)		
 		except:
 			if isMemAdd:
-				return (memAdd)
+				return memAdd
 			
 			"""
 			print(memAdd)
@@ -256,7 +256,6 @@ def ejecutaCuadruplo():
 		if tempTipoDos == 'float':
 			tempOperadorDos = float(operadorDos)
 		resultado = tempOperadorUno + tempOperadorDos
-
 		if esGlobalOTemporal(currentCuad[3]):
 			memGlobal.addValue(checkTipo(currentCuad[3]),currentCuad[3],resultado)
 		else:
@@ -524,8 +523,8 @@ def ejecutaCuadruplo():
 		
 	if currentCuad[0] == 'end':
 		print("Se terminó la ejecución del programa.")
-		memoria.printMem()
-		memGlobal.printMem()
+		#memoria.printMem()
+		#memGlobal.printMem()
 		entrada = input()
 		sys.exit()
 
@@ -758,6 +757,7 @@ def ejecutaCuadruplo():
 			yData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
 		plt.plot(xData,yData)
 		plt.show()
+		plt.close("all")
 
 	if currentCuad[0]=='grapg3d1':
 		resetX()
@@ -780,6 +780,7 @@ def ejecutaCuadruplo():
 		ax = fig.gca(projection='3d')
 		ax.plot(xData, yData, zData)
 		plt.show()
+		plt.close("all")
 
 	if currentCuad[0]=='graphpie1':
 		resetX()
@@ -798,6 +799,7 @@ def ejecutaCuadruplo():
 		ax1.pie(zData, labels=xData, autopct='%1.1f%%', shadow=True, startangle=90)
 		ax1.axis('equal') 
 		plt.show()
+		plt.close("all")
 
 	if currentCuad[0]=='graphhist':
 		resetX()
@@ -807,6 +809,7 @@ def ejecutaCuadruplo():
 		binsH=int(getData(memoria, checkTipo(currentCuad[3]), currentCuad[3]))
 		n, bins, patches = plt.hist(xData, binsH, facecolor='blue', alpha=0.5)
 		plt.show()
+		plt.close("all")
 
 	if currentCuad[0]=='graphbar1':
 		resetX()
@@ -833,6 +836,7 @@ def ejecutaCuadruplo():
 		ax.set_yticklabels(xData)
 		ax.invert_yaxis()  # labels read top-to-bottom
 		plt.show()
+		plt.close("all")
 
 	if currentCuad[0]=='transpose':
 		memoriaBase=int(currentCuad[1])
@@ -906,10 +910,11 @@ def ejecutaCuadruplo():
 	if currentCuad[0]=='+*':
 		#isMemAdd = True
 		valorTupla=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
-		valor = valorTupla[0]
+		valor = valorTupla
 		dirBase=int(currentCuad[2])
 		valueTemp=int(valor)+dirBase#getData(memoria,checkTipo(valor+factor), valor+factor)
 		y=getData(memoria, checkTipo(currentCuad[2]), valueTemp)
+		#print("VALUE TEMP: "+str(valor)+"    "+str(valorTupla))
 		if esGlobalOTemporal(currentCuad[3]):
 			memGlobal.addValue(checkTipo(currentCuad[2]), currentCuad[3], y)
 		else:
@@ -934,7 +939,7 @@ def ejecutaCuadruplo():
 	if currentCuad[0]=='+**':
 		#isMemAdd = True
 		valorTupla=getData(memoria, checkTipo(currentCuad[1]),currentCuad[1])
-		valor = valorTupla[0]
+		valor = valorTupla
 		dirBase=int(currentCuad[2])
 		valueTemp=int(valor)+dirBase#getData(memoria,checkTipo(valor+factor), valor+factor)
 		#y=getData(memoria, checkTipo(currentCuad[2]), valueTemp)
