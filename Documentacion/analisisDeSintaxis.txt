@@ -1,0 +1,78 @@
+rose : PROGRAM ID SEMICOLON roseauxvars roseauxfunc main
+    
+roseauxvars : GLOBALS vars roseauxvars 
+| empty
+    
+roseauxfunc : func roseauxfunc 
+| empty
+
+main : MAIN LEFTPARENTHESIS RIGHTPARENTHESIS bloque 
+
+vars : tipo ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET EQUALS LEFTKEY asignacionmatriz RIGHTKEY SEMICOLON 
+| tipo ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET SEMICOLON 
+| tipo ID LEFTBRACKET CTEI RIGHTBRACKET EQUALS LEFTKEY asignacionarreglo RIGHTKEY SEMICOLON 
+| tipo ID LEFTBRACKET CTEI RIGHTBRACKET SEMICOLON 
+| tipo ID EQUALS ctes SEMICOLON 
+| tipo ID SEMICOLON 
+
+asignacionmatriz : LEFTKEY asignacionarreglo RIGHTKEY COMMA asignacionmatriz | LEFTKEY asignacionarreglo RIGHTKEY 
+
+asignacionarreglo : ctes COMMA asignacionarreglo | ctes
+
+tipo : INT | FLOAT | STRING | BOOL 
+
+durante : WHILE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS bloque
+
+condition : IF LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS bloque else
+
+else : ELSE bloque | empty
+
+mega_exp : expression_compare mega_expaux
+
+mega_expaux : OR mega_exp | AND mega_exp | empty
+
+expression_compare : exp DIFFERENT exp | exp GTEQ exp | exp LTEQ exp | exp EQUIVALENTE exp | exp GT exp | exp LT exp | exp
+
+exp : termino expaux 
+
+expaux : PLUS exp | MINUS exp | empty 
+
+termino : factor terminoaux
+
+terminoaux : DIVIDE termino | MULTIPLY termino | empty
+
+factor : vars_cte | LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 
+
+func : FUNC VOID restofuncion | FUNC tipo restofuncion 
+
+restofuncion : ID LEFTPARENTHESIS argumentos RIGHTPARENTHESIS bloque
+
+argumentos : tipo mismotipo SEMICOLON argumentos | empty
+
+mismotipo : ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET COMMA mismotipo | ID LEFTBRACKET CTEI RIGHTBRACKET COMMA mismotipo | ID COMMA mismotipo | ID LEFTBRACKET CTEI RIGHTBRACKET LEFTBRACKET CTEI RIGHTBRACKET | ID LEFTBRACKET CTEI RIGHTBRACKET | ID 
+
+bloque : LEFTKEY estatuto RIGHTKEY 
+
+estatuto : declaracionvariables aplicaciones 
+ 
+declaracionvariables : vars declaracionvariables | empty
+
+aplicaciones : condition aplicaciones | escritura aplicaciones | lectura aplicaciones | llama_spec_func aplicaciones | asignacion aplicaciones | durante aplicaciones | llama_func aplicaciones | returnx aplicaciones  | empty
+
+vars_cte : spec_func | ID LEFTBRACKET mega_exp RIGHTBRACKET LEFTBRACKET mega_exp RIGHTBRACKET | ID LEFTBRACKET mega_exp RIGHTBRACKET | ID LEFTPARENTHESIS params RIGHTPARENTHESIS | ID | ctes
+
+params : paramsaux | empty
+
+paramsaux : mega_exp COMMA paramsaux | mega_exp
+
+asignacion : ID LEFTBRACKET mega_exp RIGHTBRACKET LEFTBRACKET mega_exp RIGHTBRACKET EQUALS mega_exp SEMICOLON  | ID LEFTBRACKET mega_exp RIGHTBRACKET EQUALS mega_exp SEMICOLON | ID EQUALS mega_exp SEMICOLON 
+
+escritura : PRINT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS SEMICOLON 
+
+lectura : READ LEFTPARENTHESIS ID lectura2 RIGHTPARENTHESIS SEMICOLON 
+
+lectura2 : LEFTBRACKET mega_exp RIGHTBRACKET LEFTBRACKET mega_exp RIGHTBRACKET | LEFTBRACKET mega_exp RIGHTBRACKET | empty
+
+llama_spec_func : spec_func SEMICOLON 
+
+spec_func : SQRT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | POW LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS | ABS LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | STDEV LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | MEAN LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | MEDIAN LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | MODE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | FACTORIAL LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | SORT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | SIN LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | COS LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | TRANSPOSE LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | EXPORTCSV LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS | ARRANGE LEFTPARENTHESIS mega_exp COMMA mega_exp COMMA mega_exp RIGHTPARENTHESIS | GRAPH3D LEFTPARENTHESIS mega_exp COMMA mega_exp COMMA mega_exp RIGHTPARENTHESIS | PIECHART LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS | HISTOGRAMCHART LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS | LINECHART LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS | BARCHART LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS | LINREG LEFTPARENTHESIS mega_exp COMMA mega_exp RIGHTPARENTHESIS | NOT LEFTPARENTHESIS mega_exp RIGHTPARENTHESIS 

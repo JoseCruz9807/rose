@@ -1,0 +1,28 @@
+
+program test; 
+
+main (){ 
+float matA[2][2] = {{1.0,1.0},{1.0,1.0}};
+float matB[2][2] = {{1.0,1.0},{1.0,1.0}};
+float matC[2][2];
+int matD[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
+bool bBandera = true;
+int iI = 0;
+int iJ = 0;
+int iK = 0;
+float fSize = 2;
+
+//print(matD[1][2]);
+
+if(fSize > 2.1 OR iI==0) {
+	print(fSize);
+}
+else
+{
+	print("Es falso");
+}
+if("Hola"=="Hola"){
+	print(sin(2.0));
+}
+
+}

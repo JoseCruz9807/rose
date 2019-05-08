@@ -1,3 +1,4 @@
-__pycache__/
+__pycache__/*
 parsertab.py
 parser.out
+codeobj.rs

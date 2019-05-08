@@ -1,0 +1,20 @@
+
+program test; 
+
+main (){ 
+int arrx[6]={5, 15, 25, 35, 45, 55};
+int arry[6]={5, 20, 14, 32, 22, 38};
+int iJ=0;
+int iI=0;
+string labels[5]={"Tom", "Dick", "Harry", "Slim", "Jim"};
+print(linreg(arrx,arry,1));
+//transpose(arrx);
+//while(iI<2) {
+   //iJ = 0;
+    //while(iJ<2) {
+        //print(arrx[iI][iJ]);
+      //  iJ = iJ+1;
+    //}
+  //  iI = iI+1;
+//}
+}    
