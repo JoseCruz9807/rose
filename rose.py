@@ -975,8 +975,8 @@ def p_rose(p):
     rose : comments_nl PROGRAM comments_nl ID comments_nl SEMICOLON comments_nl roseauxvars np_agregar_goto_main roseauxfunc main
     '''
     file = open("codeobj.rs","w+")
-    print(dirFunc.val)
-    print(arrCuad)
+    #print(dirFunc.val)
+    #print(arrCuad)
     for cuad in arrCuad:
     	file.write(str(cuad) + "\n")
     file.close()
@@ -1443,8 +1443,10 @@ def p_np_factor_quad3(p):
             addQuad('ver', dirFunc.getColumnasVar(nombreFunc, idName),dirFunc.getVarMemPos(nombreFunc, idName), iColumnasLlamadas)
             temporalSiguiente2=getAvail('int')
             temporalSiguiente=getAvail(tipoTemp)
-            addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente2)
-            addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
+            #addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente2)
+            #addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
+            addQuad("**", iFilasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente2)
+            addQuad("+", temporalSiguiente2, iColumnasLlamadas, temporalSiguiente2)
             addQuad("+*", temporalSiguiente2, dirFunc.getVarMemPos(nombreFunc,idName),temporalSiguiente)
             addOperandoToStack(temporalSiguiente)
         else:
@@ -1463,8 +1465,10 @@ def p_np_factor_quad3(p):
             addQuad('ver', dirFunc.getColumnasVar('globals', idName), dirFunc.getVarMemPos('globals', idName), iColumnasLlamadas)
             temporalSiguiente2=getAvail('int')
             temporalSiguiente=getAvail(tipoTemp)
-            addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar('globals', idName), temporalSiguiente2)
-            addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
+            #addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar('globals', idName), temporalSiguiente2)
+            #addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
+            addQuad("**", iFilasLlamadas, dirFunc.getColumnasVar('globals', idName), temporalSiguiente2)
+            addQuad("+", temporalSiguiente2, iColumnasLlamadas, temporalSiguiente2)
             addQuad("+*", temporalSiguiente2, dirFunc.getVarMemPos('globals',idName),temporalSiguiente)
             addOperandoToStack(temporalSiguiente)
         addTipoToStack(tipoTemp)
@@ -2095,8 +2099,10 @@ def p_np_solo_asignar_matrix_quad1(p):
             temporalSiguiente2=getAvail('int')
             temporalSiguiente = getAvail(tipoTemp)
 
-            addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente2)
-            addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
+            #addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente2)
+            #addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
+            addQuad("**", iFilasLlamadas, dirFunc.getColumnasVar(nombreFunc, idName), temporalSiguiente2)
+            addQuad("+", temporalSiguiente2, iColumnasLlamadas, temporalSiguiente2)
             addQuad("+**", temporalSiguiente2, dirFunc.getVarMemPos(nombreFunc,idName),temporalSiguiente)
 
             addOperandoToStack(temporalSiguiente)
@@ -2119,8 +2125,10 @@ def p_np_solo_asignar_matrix_quad1(p):
             temporalSiguiente = getAvail(tipoTemp)
             
             
-            addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar('globals', idName), temporalSiguiente2)
-            addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
+            #addQuad("**", iColumnasLlamadas, dirFunc.getColumnasVar('globals', idName), temporalSiguiente2)
+            #addQuad("+", temporalSiguiente2, iFilasLlamadas, temporalSiguiente2)
+            addQuad("**", iFilasLlamadas, dirFunc.getColumnasVar('globals', idName), temporalSiguiente2)
+            addQuad("+", temporalSiguiente2, iColumnasLlamadas, temporalSiguiente2)
             addQuad("+**", temporalSiguiente2, dirFunc.getVarMemPos('globals',idName),temporalSiguiente)
 
             addOperandoToStack(temporalSiguiente)
@@ -2252,8 +2260,6 @@ def p_np_spec_func2(p):
     tipo=popTipos()
     operador=popOperadores()
     checkIfTemporal(operando)
-    print(operador)
-    print(tipo)
     resultType=semantica.resultType(operador, tipo, '')
     nextTemp= getAvail(resultType)
     if 'error'!=resultType:
@@ -2717,7 +2723,7 @@ parser = yacc.yacc()
 
 #Cambiar el nombre del archivo de entrada para probar el codigo
 #name='pruebaRose.txt'
-name='pruebaCuad2.txt'
+name=sys.argv[1]
 #name='fibonacci.txt'
 #name='factorial.txt'
 #name='bubbleSort.txt'

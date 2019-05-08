@@ -1,0 +1,23 @@
+program test; 
+
+main (){ 
+    int kilometros[5][4]={{5,7,3,6,8},{5,4,6,5,5},{0,1,5,7,3},{100,8,5,6,7}};
+    int kilometrosTemporal[5];
+    float promedios[4];
+    int iN=0;
+    int iJ=0;
+    string labels[4]={"Tom", "Dick", "Harry", "Slim"};
+    while (iN<4){
+        iJ=0;
+        while(iJ<5){
+            kilometrosTemporal[iJ]=kilometros[iJ][iN];
+            print(kilometros[iJ][iN]);
+            iJ=iJ+1;
+        }
+        promedios[iN]=mean(kilometrosTemporal);
+        //print(promedios[iN]);
+        iN=iN+1;
+    }
+    barChart(labels,promedios);
+    exportCSV("Pruebas fisicas",kilometros);
+}

@@ -1,28 +1,44 @@
 
 program test; 
 
-main (){ 
-float matA[2][2] = {{1.0,1.0},{1.0,1.0}};
-float matB[2][2] = {{1.0,1.0},{1.0,1.0}};
-float matC[2][2];
-int matD[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
-bool bBandera = true;
+func void matrixMultiplication(float matA[3][2], matB[2][3];){
+float matC[3][3];
 int iI = 0;
 int iJ = 0;
 int iK = 0;
-float fSize = 2;
+int iSizeUno = 3;
+int iSizeDos = 2;
+matC[1][1]=0.0;
 
-//print(matD[1][2]);
+//iMatA[iSizeUno][iSizeDos]
+//matB[iSizeDos][iSizeUno]
+while(iI < iSizeUno) {
+    while(iJ < iSizeUno) {
+        matC[iI][iJ] = 0.0;
+        while(iK < iSizeDos) {
+            matC[iI][iJ] = matC[iI][iJ] + matA[iI][iK] * matB[iK][iJ];
+            iK = iK +1;
+        }
+        iK = 0;
+        iJ = iJ+1;
+    }
+    iJ = 0;
+    iI = iI+1;
+}
+iI = 0;
+iJ = 0;
+while(iI<iSizeUno) {
+    while(iJ<iSizeUno) {
+        print(matC[iI][iJ]);
+        iJ = iJ+1;
+    }
+    iI = iI+1;
+    iJ = 0;
+}    
+}
 
-if(fSize > 2.1 OR iI==0) {
-	print(fSize);
-}
-else
-{
-	print("Es falso");
-}
-if("Hola"=="Hola"){
-	print(sin(2.0));
-}
-
+main (){ 
+float matA[3][2] = {{2.0,3.0,5.2},{2.6,6.1,6.3}};
+float matB[2][3] = {{4.3,3.3},{1.1,5.5},{7.7,8.8}};
+matrixMultiplication(matB,matA);
 }
