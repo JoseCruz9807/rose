@@ -757,6 +757,7 @@ def ejecutaCuadruplo():
 			yData.append(float(getData(memoria, checkTipo(memoriaBase+x), memoriaBase+x)))
 		plt.plot(xData,yData)
 		plt.show()
+		plt.close("all")
 
 	if currentCuad[0]=='grapg3d1':
 		resetX()
@@ -779,6 +780,7 @@ def ejecutaCuadruplo():
 		ax = fig.gca(projection='3d')
 		ax.plot(xData, yData, zData)
 		plt.show()
+		plt.close("all")
 
 	if currentCuad[0]=='graphpie1':
 		resetX()
@@ -797,6 +799,7 @@ def ejecutaCuadruplo():
 		ax1.pie(zData, labels=xData, autopct='%1.1f%%', shadow=True, startangle=90)
 		ax1.axis('equal') 
 		plt.show()
+		plt.close("all")
 
 	if currentCuad[0]=='graphhist':
 		resetX()
@@ -806,6 +809,7 @@ def ejecutaCuadruplo():
 		binsH=int(getData(memoria, checkTipo(currentCuad[3]), currentCuad[3]))
 		n, bins, patches = plt.hist(xData, binsH, facecolor='blue', alpha=0.5)
 		plt.show()
+		plt.close("all")
 
 	if currentCuad[0]=='graphbar1':
 		resetX()
@@ -832,6 +836,7 @@ def ejecutaCuadruplo():
 		ax.set_yticklabels(xData)
 		ax.invert_yaxis()  # labels read top-to-bottom
 		plt.show()
+		plt.close("all")
 
 	if currentCuad[0]=='transpose':
 		memoriaBase=int(currentCuad[1])

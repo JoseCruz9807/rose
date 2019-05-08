@@ -1,7 +1,7 @@
 program test; 
 
 main (){ 
-    int kilometros[5][4]={{5,7,3,6,8},{5,4,6,5,5},{0,1,5,7,3},{100,8,5,6,7}};
+    int kilometros[5][4]={{5,7,3,6,8},{5,4,6,5,5},{0,1,5,7,3},{10,8,5,6,7}};
     int kilometrosTemporal[5];
     float promedios[4];
     int iN=0;
@@ -15,7 +15,6 @@ main (){
             iJ=iJ+1;
         }
         promedios[iN]=mean(kilometrosTemporal);
-        //print(promedios[iN]);
         iN=iN+1;
     }
     barChart(labels,promedios);
